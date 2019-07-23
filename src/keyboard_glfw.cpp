@@ -6,12 +6,13 @@
 
 #include <iostream>
 #include <stdexcept>
+#include <type_traits>
 
 using namespace gdk;
 
 static constexpr char TAG[] = "keyboard_glfw";
 
-static inline int glfwKeyCodeFromKey(const keyboard::Key &a)
+static inline int glfwKeyCodeFromKey(const keyboard::Key a)
 {
     switch(a)
     {
@@ -134,6 +135,8 @@ static inline int glfwKeyCodeFromKey(const keyboard::Key &a)
         case keyboard::Key::Num0:         return GLFW_KEY_KP_0;
         case keyboard::Key::NumPeriod:    return GLFW_KEY_KP_DECIMAL;
     }
+
+    throw std::invalid_argument(std::string("Unable to convert keyboard key \"").append(std::to_string( static_cast< std::underlying_type< decltype(a)>::type>(a))).append("\" to GLFW_KEY")); 
 }
 
 namespace gdk
