@@ -13,21 +13,32 @@ namespace gdk
     class gamepad
     {
     public:
+        using size_type = size_t;
+
         //! hat direction
         /// left -1, right +1, up +1, down -1
         using hat_type = std::pair<short int, short int>;
 
         //! human readable device name
-        virtual std::string getName() const = 0;
+        virtual std::string_view getName() const = 0;
         
         //! normalized magnitude of axis. 0 = no input, 1 = full input
         virtual float getAxis(int index) const = 0;
+
+        //! number of axes
+        virtual size_type getAxisCount() const = 0;
         
         //! whether or not the button is being held down by the user
         virtual bool getButtonDown(int index) const = 0;
 
+        //! number of buttons
+        virtual size_type getButtonCount() const = 0;
+
         //! value of a hat direction by index
         virtual hat_type getHat(int index) const = 0;
+
+        //! number of hats
+        virtual size_type getHatCount() const = 0;
 
         // TODO: think about how to hide this. the user does nnot need access to this. It will also be a no-op on some implementations, which is silly. solution: hierarchy of interfaces? an internal interface, an external interface etc. Think about it.
         //! opportunity to update inputs in the case of non-callback based implementations TODO: should hide from users?

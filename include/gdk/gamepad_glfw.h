@@ -16,19 +16,25 @@ namespace gdk
         std::string m_Name;
         
         //! Buffer containing most recent button states
-        std::vector<const unsigned char> m_Buttons;
+        std::vector<unsigned char> m_Buttons;
        
         //! Buffer containing most recent axis states
-        std::vector<const float> m_Axes;
+        std::vector<float> m_Axes;
 
     public:
         virtual float getAxis(int index) const override;
+
+        virtual gamepad::size_type getAxisCount() const override;
         
         virtual bool getButtonDown(int index) const override;
 
+        virtual gamepad::size_type getButtonCount() const override;
+        
         virtual gamepad::hat_type getHat(int index) const override;
+        
+        virtual gamepad::size_type getHatCount() const override;
 
-        virtual std::string getName() const override;
+        virtual std::string_view getName() const override;
 
         virtual void update() override;
 

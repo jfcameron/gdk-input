@@ -6,6 +6,7 @@
 #include <iostream>
 #include <map>
 #include <vector>
+#include <iostream>
 
 #include <GLFW/glfw3.h>
 
@@ -28,22 +29,41 @@ namespace gdk
     }())
     {}
 
+    gamepad::size_type gamepad_glfw::getAxisCount() const
+    {
+       return m_Axes.size(); 
+    }
+
+    gamepad::size_type gamepad_glfw::getButtonCount() const
+    {
+       return m_Buttons.size(); 
+    }
+
+    gamepad::size_type gamepad_glfw::getHatCount() const
+    {
+        std::runtime_error("Unimplemented!!");
+
+        return 0;
+    }
+
     float gamepad_glfw::getAxis(int index) const 
     {
-        return 0;
+        return m_Axes[index];
     }
 
     bool gamepad_glfw::getButtonDown(int index) const 
     {
-        return false;
+        return m_Buttons[index];
     }
 
     gamepad::hat_type gamepad_glfw::getHat(int index) const
     {
+        std::runtime_error("Unimplemented!!");
+
         return {};
     }
 
-    std::string gamepad_glfw::getName() const 
+    std::string_view gamepad_glfw::getName() const 
     {
         return "balr";
     }
@@ -55,14 +75,14 @@ namespace gdk
             int button_count;
             const unsigned char *buttons = glfwGetJoystickButtons(m_JoystickIndex, &button_count);
             
+            m_Buttons = decltype(m_Buttons)(buttons, buttons + button_count);
+
             int axes_count;
             const float *axes = glfwGetJoystickAxes(m_JoystickIndex, &axes_count);
 
-            //return std::vector<const unsigned char *>();// decltype(m_Buttons)(buttons, buttons + button_count);
-            //return decltype(m_Buttons)(buttons, buttons + button_count);
+            m_Axes = decltype(m_Axes)(axes, axes + axes_count);
 
-            m_Buttons = decltype(m_Buttons)(buttons, buttons + 1);
-            //std::vector<std::string>(argv, argv + argc);
+            //TODO: hats. also hat hint at initialization
         }
         //TODO: is throw appropriate? No. a disconnected flag probably better. How to do reconnect logic? uncertain.
         // static vector that shares used indicies? When I am disconnected & update is called, check unused indicies, check if it has a name == to my name?

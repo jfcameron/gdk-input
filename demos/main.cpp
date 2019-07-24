@@ -54,10 +54,12 @@ int main(int argc, char **argv)
     std::unique_ptr<gdk::keyboard> pKeyboard = std::make_unique<gdk::keyboard_glfw>(gdk::keyboard_glfw(pWindow));
 
     gdk::gamepad_glfw gamepad(0);
-
+    
     while(!glfwWindowShouldClose(pWindow.get()))
     { 
         glfwPollEvents();
+
+        gamepad.update();
 
         if (pMouse->getButtonDown(gdk::mouse::Button::Left))  std::cout << "Left\n";
         if (pMouse->getButtonDown(gdk::mouse::Button::Right)) std::cout << "Right\n";
@@ -65,6 +67,13 @@ int main(int argc, char **argv)
         if (pKeyboard->getKeyDown(gdk::keyboard::Key::Q)) std::cout << "Q\n";
         if (pKeyboard->getKeyDown(gdk::keyboard::Key::W)) std::cout << "W\n";
         if (pKeyboard->getKeyDown(gdk::keyboard::Key::E)) std::cout << "E\n";
+
+        for (size_t i = 0, s = gamepad.getAxisCount(); i < s; ++i)
+        {
+            std::cout << i << ": " << gamepad.getAxis(i) << ", ";
+        }
+
+        std::cout << "\n";
     }
 
     return EXIT_SUCCESS;
