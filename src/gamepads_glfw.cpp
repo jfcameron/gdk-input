@@ -86,6 +86,7 @@ namespace gdk
         }
         //TODO: is throw appropriate? No. a disconnected flag probably better. How to do reconnect logic? uncertain.
         // static vector that shares used indicies? When I am disconnected & update is called, check unused indicies, check if it has a name == to my name?
+        // https://github.com/jfcameron/gdk-input/issues/1
         else throw std::invalid_argument(std::string(TAG).append(": no gamepad at index: ")
             .append(std::to_string(m_JoystickIndex)));
     }
