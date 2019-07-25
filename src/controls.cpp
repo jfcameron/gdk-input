@@ -25,7 +25,7 @@ namespace gdk
         {
             for (const auto &key : iter->second.keys)
             {
-                if (const auto raw = static_cast<float>(m_Keyboard->getKeyDown(key))) return raw;
+                if (const auto value = static_cast<float>(m_Keyboard->getKeyDown(key))) return value;
             }
         }
 
@@ -33,7 +33,7 @@ namespace gdk
         {
             for (const auto &button : iter->second.mouse.buttons)
             {
-                if (const auto raw = static_cast<float>(m_Mouse->getButtonDown(button))) return raw;
+                if (const auto value = static_cast<float>(m_Mouse->getButtonDown(button))) return value;
             }
 
             //TODO: Mouse axes
@@ -45,7 +45,7 @@ namespace gdk
             {
                 for (const auto &button : current_gamepad_iter->second.buttons)
                 {   
-                    if (const auto raw = static_cast<float>(m_Gamepad->getButtonDown(button))) return raw;
+                    if (const auto value = static_cast<float>(m_Gamepad->getButtonDown(button))) return value;
                 }
 
                 //TODO: Hats, axes

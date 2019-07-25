@@ -11,12 +11,13 @@ struct GLFWwindow;
 
 namespace gdk
 {
+    /// \brief glfw based implementation for keyboards
+    /// \attention glfwPollEvents() must be called periodically in order to update the keyboard state
     class keyboard_glfw : public keyboard
     {
         std::shared_ptr<GLFWwindow> m_pWindow;
 
     public:
-
         virtual bool getKeyDown(const keyboard::Key &aKeyCode) override;
 
         keyboard_glfw(decltype(m_pWindow) pWindow)

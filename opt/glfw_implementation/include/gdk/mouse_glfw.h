@@ -12,6 +12,7 @@ struct GLFWwindow;
 namespace gdk
 {
     /// \brief mouse using glfw for implementation
+    /// \attention glfwPollEvents() must be called periodically in order to update the mouse state
     class mouse_glfw : public mouse
     {
         std::shared_ptr<GLFWwindow> m_pWindow;

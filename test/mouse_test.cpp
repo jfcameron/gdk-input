@@ -7,11 +7,11 @@
 
 #include "test_include.h"
 
-//#include <gdk/camera.h>
+#include <gdk/gamepad.h>
 
 using namespace gdk;
 
-TEST_CASE("example constructors", "[example]")
+TEST_CASE("mouse constructors", "[mouse]")
 {
     initGLFW();
 

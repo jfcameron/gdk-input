@@ -9,7 +9,7 @@
 
 namespace gdk
 {
-    /// \brief gamepad interface type
+    /// \brief gamepad interface
     class gamepad
     {
     public:
@@ -44,24 +44,8 @@ namespace gdk
         //! number of hats
         virtual size_type getHatCount() const = 0;
 
-        // TODO: think about how to hide this. the user does nnot need access to this. It will also be a no-op on some implementations, which is silly. solution: hierarchy of interfaces? an internal interface, an external interface etc. Think about it.
-        //! opportunity to update inputs in the case of non-callback based implementations TODO: should hide from users?
-        virtual void update() = 0;
-
         virtual ~gamepad() = default;
     };
-    
-    namespace Gamepads
-    {
-        //! Get a gamepad by index. Index value is based on order in
-        /// which the device was connected to the system.
-        //std::weak_ptr<Gamepad> get(const int aIndex);
-
-        //! Get a gamepad by device name
-        //std::weak_ptr<Gamepad> get(const std::string &aName);
-
-        // extern vector<gamepad> pads? maybe? expose iterators st for (gamepad : gamepads) can be done
-    }
 }
 
 #endif

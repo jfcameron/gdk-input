@@ -8,7 +8,7 @@
 #include <string>
 #include <string_view>
 
-#include <gdk/gamepads.h>
+#include <gdk/gamepad.h>
 #include <gdk/keyboard.h>
 #include <gdk/mouse.h>
 
@@ -72,8 +72,6 @@ namespace gdk
         void addMouseButtonMapping(const std::string &aName, const mouse::Button aButton);
     
         void addGamepadButtonMapping(const std::string &aInputName, const std::string &aGamepadName, const int aButtonIndex);
-
-        //controls() = delete;
 
         controls(std::shared_ptr<keyboard> aKeyboard = nullptr, 
             std::shared_ptr<mouse> aMouse = nullptr,

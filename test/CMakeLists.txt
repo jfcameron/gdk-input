@@ -5,7 +5,9 @@ jfc_add_tests(
     C_STANDARD 90
 
     TEST_SOURCE_FILES
-        "${CMAKE_CURRENT_LIST_DIR}/example_test.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/gamepad_test.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/keyboard_test.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/mouse_test.cpp"
 
     INCLUDE_DIRECTORIES
         "${${PROJECT_NAME}_INCLUDE_DIRECTORIES}"

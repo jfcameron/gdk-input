@@ -3,10 +3,12 @@
 #ifndef GDK_GAMEPAD_GLFW_H
 #define GDK_GAMEPAD_GLFW_H
 
-#include <gdk/gamepads.h>
+#include <gdk/gamepad.h>
 
 namespace gdk
 {
+    /// \brief gamepad implementation for GLFW3
+    /// \attention update method be called to update gamepad state. This is not handled by glfwPollEvents
     class gamepad_glfw : public gamepad
     {
     private:
@@ -40,7 +42,8 @@ namespace gdk
 
         virtual std::string_view getName() const override;
 
-        virtual void update() override;
+        //! updates the state of this gamepad
+        void update();
 
         gamepad_glfw(const int joystickID);
     };

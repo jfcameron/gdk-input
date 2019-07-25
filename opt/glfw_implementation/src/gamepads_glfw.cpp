@@ -20,6 +20,9 @@ namespace gdk
     : m_JoystickIndex(aJoystickIndex)
     , m_Name([aJoystickIndex]()
     {
+/*#if defined(GDK_INPUT_IMPLEMENTATION_GLFW)
+        throw std::runtime_error("blarblarblarblar!");
+#endif*/
         const char *name = glfwGetJoystickName(aJoystickIndex); //the returned char* is non-owning.
 
         if (!name) throw std::invalid_argument(std::string(TAG).append(": no gamepad at index: ").append(std::to_string(aJoystickIndex)));
