@@ -4,8 +4,9 @@
 #define GDK_CONTROLS_H
 
 #include <map>
-#include <string_view>
+#include <set>
 #include <string>
+#include <string_view>
 
 #include <gdk/gamepads.h>
 #include <gdk/keyboard.h>
@@ -17,39 +18,55 @@ namespace gdk
     /// abstraction on top of gamepads, mouse, keyboards.
     class controls
     {
-        using key_collection_type = std::vector<keyboard::Key>;
+        //TODO: mouse button, axis
+        //TODO: gamepad hat, axis
+        using key_collection_type = std::set<keyboard::Key>;
+        using gamepad_button_collection_type = std::set<int>; //TODO: int? gamepad::button_index_type?
 
-        std::map<std::string, key_collection_type> m_Inputs;
+        struct gamepad_bindings
+        {
+            std::string name;
+
+            gamepad_button_collection_type buttons;
+        };
+
+        struct bindings
+        {
+            key_collection_type keys;
+
+            //std::set<gamepad_bindings> gamepads; //!< bindings for supported gamepads
+            std::map<std::string, gamepad_bindings> gamepads;
+        };
+
+        std::map<std::string, bindings> m_Inputs;
 
         std::shared_ptr<keyboard> m_Keyboard;
+        std::shared_ptr<gamepad> m_Gamepad;
 
     public:
-        float get(const std::string &aName);
+        //! get value of an input
+        float get(const std::string &aName) const;
 
-        controls() = delete;
+        //! [re]sets keyboard pointer
+        void setKeyboard(std::shared_ptr<keyboard> aKeyboard);
 
-        controls(std::shared_ptr<keyboard> aKeyboard);
-        /*controls(
-            std::vector< //inputs
-                std::tuple<
-                    std::string, //name of this input (e.g: Up)
-                    std::vector<Key>, //mapped keys
-                    std::vector< //List of supported gamepads
-                        std::tuple<
-                            std::string, //gamepad name (e.g: Xbox)
-                            std::vector<int>, //button indicies
-                            std::vector< //hats
-                                std::pair<
-                                    int, //hat index
-                                    hat_state_type //hat state
-                                >
-                            >,
-                            std::vector<int>, //Axes indicies
-                        >
-                    >
-                >
-            >
-        )*/
+        //! [re]sets mouse pointer
+        //void setMouse(std::shared_ptr<mouse> aMouse);
+        
+        //! [re]sets gamepad pointer
+        void setGamepad(std::shared_ptr<gamepad> aGamepad);
+
+        //! adds a mapping to an existing input OR creates a new input and adds to that
+        void addKeyMapping(const std::string &aName, const keyboard::Key aKey);
+    
+        void addGamepadButtonMapping(const std::string &aInputName, const std::string &aGamepadName, const int aButtonIndex);
+
+        //controls() = delete;
+
+        controls(std::shared_ptr<keyboard> aKeyboard = nullptr, 
+            //std::shared_ptr<mouse> aMouse = nullptr,
+            std::shared_ptr<gamepad> aGamepad = nullptr);//,  //TODO: support multiple gamepads? would add complexity for a very niche feature..
+            //const std::vector<std::string> &aInputNames);
     };
 }
 

@@ -30,7 +30,7 @@ namespace gdk
 
         virtual gamepad::size_type getAxisCount() const override;
         
-        virtual bool getButtonDown(int index) const override;
+        virtual gamepad::button_state_type getButtonDown(int index) const override;
 
         virtual gamepad::size_type getButtonCount() const override;
         

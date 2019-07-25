@@ -38,7 +38,7 @@ namespace gdk
        return m_Axes.size(); 
     }
 
-    bool gamepad_glfw::getButtonDown(int index) const 
+    gamepad::button_state_type gamepad_glfw::getButtonDown(int index) const 
     {
         return m_Buttons[index];
     }

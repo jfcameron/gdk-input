@@ -14,6 +14,7 @@ namespace gdk
     {
     public:
         using size_type = size_t;
+        using button_state_type = bool;
         
         //! hat direction
         /// left -1, right +1, up +1, down -1
@@ -32,7 +33,7 @@ namespace gdk
         virtual size_type getAxisCount() const = 0;
         
         //! whether or not the button is being held down by the user
-        virtual bool getButtonDown(int index) const = 0;
+        virtual button_state_type getButtonDown(int index) const = 0;
 
         //! number of buttons
         virtual size_type getButtonCount() const = 0;

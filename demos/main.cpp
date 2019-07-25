@@ -51,20 +51,22 @@ int main(int argc, char **argv)
 
     auto pWindow = initGLFW();
 
-    std::unique_ptr<gdk::mouse> pMouse = std::make_unique<gdk::mouse_glfw>(gdk::mouse_glfw(pWindow));
+    std::shared_ptr<gdk::mouse> pMouse = std::make_shared<gdk::mouse_glfw>(gdk::mouse_glfw(pWindow));
     std::shared_ptr<gdk::keyboard> pKeyboard = std::make_shared<gdk::keyboard_glfw>(gdk::keyboard_glfw(pWindow));
+    std::shared_ptr<gdk::gamepad> pGamepad = std::make_shared<gdk::gamepad_glfw>(0);
 
-    gdk::gamepad_glfw gamepad(0);
+    gdk::controls player_controls(pKeyboard, pGamepad);
 
-    gdk::controls player_controls(pKeyboard);
+    player_controls.addKeyMapping("Jump", gdk::keyboard::Key::C);
+    player_controls.addGamepadButtonMapping("Jump", std::string(pGamepad->getName()), 0);
     
     while(!glfwWindowShouldClose(pWindow.get()))
     { 
         glfwPollEvents();
 
-        gamepad.update();
+        pGamepad->update();
 
-        if (pMouse->getButtonDown(gdk::mouse::Button::Left))  std::cout << "Left\n";
+        /*if (pMouse->getButtonDown(gdk::mouse::Button::Left))  std::cout << "Left\n";
         if (pMouse->getButtonDown(gdk::mouse::Button::Right)) std::cout << "Right\n";
         
         if (pKeyboard->getKeyDown(gdk::keyboard::Key::Q)) std::cout << "Q\n";
@@ -76,7 +78,9 @@ int main(int argc, char **argv)
             auto state = gamepad.getHat(i);
 
             if (state.x || state.y) std::cout << i << ": {" << state.x << ", " << state.y  << "}, " << "\n";
-        }
+        }*/
+
+        if (player_controls.get("Jump")) std::cout << "Jumping!\n";
 
     }
 
