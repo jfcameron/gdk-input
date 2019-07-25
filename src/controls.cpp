@@ -7,19 +7,11 @@
 
 namespace gdk
 {
-    controls::controls(std::shared_ptr<keyboard> aKeyboard, std::shared_ptr<gamepad> aGamepad)//, const std::vector<std::string> &aInputNames)
-    /*: m_Inputs([&aInputNames]()
-    {
-        std::remove_reference<decltype(m_Inputs)>::type buffer;
-
-        for (size_t i = 0, s = aInputNames.size(); i < s; ++i)
-        {
-            buffer[aInputNames[i]] = {};
-        }
-
-        return buffer;
-    }())*/
+    controls::controls(std::shared_ptr<keyboard> aKeyboard, 
+        std::shared_ptr<mouse> aMouse, 
+        std::shared_ptr<gamepad> aGamepad)    
     : m_Keyboard(aKeyboard)
+    , m_Mouse(aMouse)
     , m_Gamepad(aGamepad)
     {}
 
@@ -37,8 +29,15 @@ namespace gdk
             }
         }
 
-        //TODO: Mouse
-        //if (m_Mouse)...
+        if (m_Mouse) 
+        {
+            for (const auto &button : iter->second.mouse.buttons)
+            {
+                if (const auto raw = static_cast<float>(m_Mouse->getButtonDown(button))) return raw;
+            }
+
+            //TODO: Mouse axes
+        }
        
         if (m_Gamepad)
         {
@@ -62,7 +61,10 @@ namespace gdk
         m_Keyboard = aKeyboard;
     }
 
-    //void controls::setMouse(std::shared_ptr<keyboard> aKeyboard){}
+    void controls::setMouse(std::shared_ptr<mouse> aMouse)
+    {
+        m_Mouse = aMouse;
+    }
 
     void controls::setGamepad(std::shared_ptr<gamepad> aGamepad)
     {
@@ -76,6 +78,13 @@ namespace gdk
         keys.insert(aKey);
     }
     
+    void controls::addMouseButtonMapping(const std::string &aName, const mouse::Button aButton)
+    {
+        auto &buttons = m_Inputs[aName].mouse.buttons;
+
+        buttons.insert(aButton);
+    }
+
     void controls::addGamepadButtonMapping(const std::string &aInputName, const std::string &aGamepadName, const int aButtonIndex)
     {
         auto &current_gamepad = m_Inputs[aInputName].gamepads[aGamepadName];

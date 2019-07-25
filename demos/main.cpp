@@ -55,7 +55,7 @@ int main(int argc, char **argv)
     std::shared_ptr<gdk::keyboard> pKeyboard = std::make_shared<gdk::keyboard_glfw>(gdk::keyboard_glfw(pWindow));
     std::shared_ptr<gdk::gamepad> pGamepad = std::make_shared<gdk::gamepad_glfw>(0);
 
-    gdk::controls player_controls(pKeyboard, pGamepad);
+    gdk::controls player_controls(pKeyboard, pMouse, pGamepad);
 
     player_controls.addKeyMapping("Jump", gdk::keyboard::Key::C);
     player_controls.addGamepadButtonMapping("Jump", std::string(pGamepad->getName()), 0);
