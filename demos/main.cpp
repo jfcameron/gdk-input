@@ -59,7 +59,10 @@ int main(int argc, char **argv)
 
     player_controls.addKeyMapping("Jump", gdk::keyboard::Key::C);
     player_controls.addGamepadButtonMapping("Jump", std::string(pGamepad->getName()), 0);
-    
+
+    player_controls.addKeyMapping("Run", gdk::keyboard::Key::X);
+    player_controls.addGamepadButtonMapping("Run", std::string(pGamepad->getName()), 1);
+
     while(!glfwWindowShouldClose(pWindow.get()))
     { 
         glfwPollEvents();
@@ -81,7 +84,7 @@ int main(int argc, char **argv)
         }*/
 
         if (player_controls.get("Jump")) std::cout << "Jumping!\n";
-
+        if (player_controls.get("Run")) std::cout << "Running!\n";
     }
 
     return EXIT_SUCCESS;

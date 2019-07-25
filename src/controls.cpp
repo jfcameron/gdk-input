@@ -78,8 +78,6 @@ namespace gdk
     
     void controls::addGamepadButtonMapping(const std::string &aInputName, const std::string &aGamepadName, const int aButtonIndex)
     {
-        std::cout << aInputName << ", " << aGamepadName << ", " << aButtonIndex << "\n";
-
         auto &current_gamepad = m_Inputs[aInputName].gamepads[aGamepadName];
 
         current_gamepad.buttons.insert(aButtonIndex);

@@ -74,6 +74,8 @@ namespace gdk
     {
         if (GLFW_TRUE == glfwJoystickPresent(m_JoystickIndex))
         {
+            m_Name = glfwGetJoystickName(m_JoystickIndex);
+
             int count;
             
             const unsigned char *buttons = glfwGetJoystickButtons(m_JoystickIndex, &count);
