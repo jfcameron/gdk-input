@@ -1,4 +1,4 @@
-// © 2018 Joseph Cameron - All Rights Reserved
+// © 2019 Joseph Cameron - All Rights Reserved
 
 #ifndef GDK_GAMEPADS_H
 #define GDK_GAMEPADS_H
@@ -14,10 +14,13 @@ namespace gdk
     {
     public:
         using size_type = size_t;
-
+        
         //! hat direction
         /// left -1, right +1, up +1, down -1
-        using hat_type = std::pair<short int, short int>;
+        struct hat_state_type
+        {
+            short int x, y;
+        };
 
         //! human readable device name
         virtual std::string_view getName() const = 0;
@@ -35,7 +38,7 @@ namespace gdk
         virtual size_type getButtonCount() const = 0;
 
         //! value of a hat direction by index
-        virtual hat_type getHat(int index) const = 0;
+        virtual hat_state_type getHat(int index) const = 0;
 
         //! number of hats
         virtual size_type getHatCount() const = 0;
@@ -49,8 +52,6 @@ namespace gdk
     
     namespace Gamepads
     {
-        
-
         //! Get a gamepad by index. Index value is based on order in
         /// which the device was connected to the system.
         //std::weak_ptr<Gamepad> get(const int aIndex);

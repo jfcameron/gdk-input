@@ -29,9 +29,10 @@ jfc_project(library
         ${glfw_LIBRARIES}
 
     DEPENDENCIES
-            "glfw"
+        "glfw"
 
     SOURCE_LIST 
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/controls.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/gamepads_glfw.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/keyboard_glfw.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/mouse_glfw.cpp

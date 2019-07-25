@@ -22,33 +22,20 @@ namespace gdk
     {
         const char *name = glfwGetJoystickName(aJoystickIndex); //the returned char* is non-owning.
 
-        if (!name) 
-            throw std::invalid_argument(std::string(TAG).append(": no gamepad at index: ").append(std::to_string(aJoystickIndex)));
+        if (!name) throw std::invalid_argument(std::string(TAG).append(": no gamepad at index: ").append(std::to_string(aJoystickIndex)));
 
         return name; 
     }())
     {}
 
-    gamepad::size_type gamepad_glfw::getAxisCount() const
-    {
-       return m_Axes.size(); 
-    }
-
-    gamepad::size_type gamepad_glfw::getButtonCount() const
-    {
-       return m_Buttons.size(); 
-    }
-
-    gamepad::size_type gamepad_glfw::getHatCount() const
-    {
-        std::runtime_error("Unimplemented!!");
-
-        return 0;
-    }
-
     float gamepad_glfw::getAxis(int index) const 
     {
         return m_Axes[index];
+    }
+
+    gamepad::size_type gamepad_glfw::getAxisCount() const
+    {
+       return m_Axes.size(); 
     }
 
     bool gamepad_glfw::getButtonDown(int index) const 
@@ -56,39 +43,57 @@ namespace gdk
         return m_Buttons[index];
     }
 
-    gamepad::hat_type gamepad_glfw::getHat(int index) const
+    gamepad::size_type gamepad_glfw::getButtonCount() const
     {
-        std::runtime_error("Unimplemented!!");
+       return m_Buttons.size(); 
+    }
 
-        return {};
+    gamepad::hat_state_type gamepad_glfw::getHat(int index) const
+    {
+        const auto hat_state_glfw = m_Hats[index];
+    
+        if (hat_state_glfw == GLFW_HAT_CENTERED) return {0, 0};
+
+        return {
+            hat_state_glfw & GLFW_HAT_RIGHT ? short(1) : hat_state_glfw & GLFW_HAT_LEFT ? short(-1) : short(0), 
+            hat_state_glfw & GLFW_HAT_UP    ? short(1) : hat_state_glfw & GLFW_HAT_DOWN ? short(-1) : short(0)
+        };
+    }
+
+    gamepad::size_type gamepad_glfw::getHatCount() const
+    {
+        return m_Hats.size();
     }
 
     std::string_view gamepad_glfw::getName() const 
     {
-        return "balr";
+        return m_Name;
     }
 
     void gamepad_glfw::update()
-   {
+    {
         if (GLFW_TRUE == glfwJoystickPresent(m_JoystickIndex))
         {
-            int button_count;
-            const unsigned char *buttons = glfwGetJoystickButtons(m_JoystickIndex, &button_count);
+            int count;
             
-            m_Buttons = decltype(m_Buttons)(buttons, buttons + button_count);
+            const unsigned char *buttons = glfwGetJoystickButtons(m_JoystickIndex, &count);
 
-            int axes_count;
-            const float *axes = glfwGetJoystickAxes(m_JoystickIndex, &axes_count);
+            m_Buttons = decltype(m_Buttons)(buttons, buttons + count);
 
-            m_Axes = decltype(m_Axes)(axes, axes + axes_count);
+            const float *axes = glfwGetJoystickAxes(m_JoystickIndex, &count);
 
-            //TODO: hats. also hat hint at initialization
+            m_Axes = decltype(m_Axes)(axes, axes + count);
+
+            const unsigned char* hats = glfwGetJoystickHats(m_JoystickIndex, &count);
+
+            m_Hats = decltype(m_Hats)(hats, hats + count);
         }
-        //TODO: is throw appropriate? No. a disconnected flag probably better. How to do reconnect logic? uncertain.
-        // static vector that shares used indicies? When I am disconnected & update is called, check unused indicies, check if it has a name == to my name?
-        // https://github.com/jfcameron/gdk-input/issues/1
-        else throw std::invalid_argument(std::string(TAG).append(": no gamepad at index: ")
-            .append(std::to_string(m_JoystickIndex)));
+        else // order can get confused if multiple controllers are disconnected at the same time.
+        {
+            m_Buttons.clear();
+            m_Axes.clear();
+            m_Hats.clear();
+        }
     }
 }
 

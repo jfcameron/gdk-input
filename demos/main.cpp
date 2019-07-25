@@ -7,9 +7,10 @@
 
 #include <GLFW/glfw3.h>
 
+#include <gdk/controls.h>
+#include <gdk/gamepad_glfw.h>
 #include <gdk/keyboard_glfw.h>
 #include <gdk/mouse_glfw.h>
-#include <gdk/gamepad_glfw.h>
 
 static auto constexpr TAG = "demo";
 
@@ -51,9 +52,11 @@ int main(int argc, char **argv)
     auto pWindow = initGLFW();
 
     std::unique_ptr<gdk::mouse> pMouse = std::make_unique<gdk::mouse_glfw>(gdk::mouse_glfw(pWindow));
-    std::unique_ptr<gdk::keyboard> pKeyboard = std::make_unique<gdk::keyboard_glfw>(gdk::keyboard_glfw(pWindow));
+    std::shared_ptr<gdk::keyboard> pKeyboard = std::make_shared<gdk::keyboard_glfw>(gdk::keyboard_glfw(pWindow));
 
     gdk::gamepad_glfw gamepad(0);
+
+    gdk::controls player_controls(pKeyboard);
     
     while(!glfwWindowShouldClose(pWindow.get()))
     { 
@@ -68,12 +71,13 @@ int main(int argc, char **argv)
         if (pKeyboard->getKeyDown(gdk::keyboard::Key::W)) std::cout << "W\n";
         if (pKeyboard->getKeyDown(gdk::keyboard::Key::E)) std::cout << "E\n";
 
-        for (size_t i = 0, s = gamepad.getAxisCount(); i < s; ++i)
+        for (size_t i = 0, s = gamepad.getHatCount(); i < s; ++i)
         {
-            std::cout << i << ": " << gamepad.getAxis(i) << ", ";
+            auto state = gamepad.getHat(i);
+
+            if (state.x || state.y) std::cout << i << ": {" << state.x << ", " << state.y  << "}, " << "\n";
         }
 
-        std::cout << "\n";
     }
 
     return EXIT_SUCCESS;
