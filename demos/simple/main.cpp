@@ -53,7 +53,7 @@ int main(int argc, char **argv)
 
     std::shared_ptr<gdk::mouse> pMouse = std::make_shared<gdk::mouse_glfw>(gdk::mouse_glfw(pWindow));
     std::shared_ptr<gdk::keyboard> pKeyboard = std::make_shared<gdk::keyboard_glfw>(gdk::keyboard_glfw(pWindow));
-    std::shared_ptr<gdk::gamepad> pGamepad = std::make_shared<gdk::gamepad_glfw>(0);
+    std::shared_ptr<gdk::gamepad_glfw> pGamepad = std::make_shared<gdk::gamepad_glfw>(0);
 
     gdk::controls player_controls(pKeyboard, pMouse, pGamepad);
 

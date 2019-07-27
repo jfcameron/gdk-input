@@ -45,7 +45,7 @@ namespace gdk
         virtual bool getButtonDown(const Button aKeyCode) = 0;
 
         /// \brief change cursor mode
-        virtual void setCursorMode(const CursorMode aCursorMode) = 0; //normal, hidden, locked
+        //virtual void setCursorMode(const CursorMode aCursorMode) = 0; //normal, hidden, locked
 
         /// \brief Check if the button was just pressed
         //virtual bool getButton(const Button &aKeyCode) = 0;
