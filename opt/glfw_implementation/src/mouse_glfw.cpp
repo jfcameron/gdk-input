@@ -33,24 +33,24 @@ namespace gdk
         return static_cast<bool>(glfwGetMouseButton(m_pWindow.get(), glfwmouseButtonFromButton(aButton)));
     }
 
-    /*Vector2 getCursorPosition()
+    void mouse_glfw::setCursorMode(const CursorMode aCursorMode)
     {
-        //return glfw::GetCursorPos();
+        throw std::runtime_error("unimplemented!");
+    }
 
+    mouse::cursor_2d_type mouse_glfw::getCursorPosition()
+    {
         double x,y;
-        glfwGetCursorPos(gdk::input::PRIVATE::pGLFWwindow, &x, &y);
-        
-        return Vector2(x, y);
-    }*/
+        glfwGetCursorPos(m_pWindow.get(), &x, &y);
 
-    /*bool getButton(const Button &aKeyCode)
-    {
-        throw std::runtime_error(std::string(TAG).append("/mouse::getButton(const Button &aKeyCode) not implemented"));
-    }*/
+        return {x, y};
+    }
 
-    /*Vector2 getDelta()
+    mouse::cursor_2d_type mouse_glfw::getDelta()
     {
-        throw std::runtime_error(std::string(TAG).append("/mouse::getDelta not implemented"));
-    }*/
+        throw std::runtime_error("unimplemented!");
+
+        return {};
+    }
 }
 

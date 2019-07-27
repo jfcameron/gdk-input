@@ -20,7 +20,11 @@ namespace gdk
     public:
         virtual bool getButtonDown(const mouse::Button aButtonCode) override;
 
-        //virtual Vector2 getCursorPosition() override;
+        virtual void setCursorMode(const CursorMode aCursorMode) override;
+
+        virtual cursor_2d_type getCursorPosition() override;
+
+        virtual cursor_2d_type getDelta() override;
 
         mouse_glfw(decltype(m_pWindow) pWindow)
         : m_pWindow(pWindow)

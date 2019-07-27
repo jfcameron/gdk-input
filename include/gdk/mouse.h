@@ -8,8 +8,6 @@
 //TODO: add scroll support
 namespace gdk
 {
-    //struct Vector2;
-    
     /// \brief Get mouse keys and position on a window    
     class mouse
     {      
@@ -41,22 +39,20 @@ namespace gdk
             double x, y;
         };
            
+        /// \brief Check if the button was just pressed
+        //virtual bool getButton(const Button &aKeyCode) = 0;
+        
         /// \brief Check if the button is being held down
         virtual bool getButtonDown(const Button aKeyCode) = 0;
 
         /// \brief change cursor mode
-        //virtual void setCursorMode(const CursorMode aCursorMode) = 0; //normal, hidden, locked
-
-        /// \brief Check if the button was just pressed
-        //virtual bool getButton(const Button &aKeyCode) = 0;
+        virtual void setCursorMode(const CursorMode aCursorMode) = 0;
 
         /// \brief Viewcoordinate of cursor
-        //virtual Vector2 getCursorPosition() = 0;
+        virtual cursor_2d_type getCursorPosition() = 0;
 
         /// \brief Get amount of cursor movement since the last frame
-        //virtual Vector2 getDelta() = 0;
-
-        //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        virtual cursor_2d_type getDelta() = 0;
 
         virtual ~mouse() = default;
     };
