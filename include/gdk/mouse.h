@@ -26,18 +26,29 @@ namespace gdk
             Seven, 
             Eight 
         };
-            
+        
+        /// \brief Used to represent cursor delta or position within a window
+        struct cursor_2d_type
+        {
+            double x, y;
+        };
+           
         /// \brief Check if the button is being held down
         virtual bool getButtonDown(const Button aKeyCode) = 0;
 
-        /*/// \brief Check if the button was just pressed
-        virtual bool getButton(const Button &aKeyCode) = 0;
+
+        //void setMode(mode) = 0; //normal, hidden, locked
+
+        /// \brief Check if the button was just pressed
+        //virtual bool getButton(const Button &aKeyCode) = 0;
 
         /// \brief Viewcoordinate of cursor
-        Vector2 getCursorPosition();
+        virtual Vector2 getCursorPosition() = 0;
 
         /// \brief Get amount of cursor movement since the last frame
-        Vector2 getDelta();*/
+        virtual Vector2 getDelta() = 0;
+
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
         virtual ~mouse() = default;
     };
