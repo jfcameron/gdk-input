@@ -63,11 +63,15 @@ int main(int argc, char **argv)
     player_controls.addKeyMapping("Run", gdk::keyboard::Key::X);
     player_controls.addGamepadButtonMapping("Run", std::string(pGamepad->getName()), 1);*/
 
+    pMouse->setCursorMode(gdk::mouse::CursorMode::Locked);
+
     while(!glfwWindowShouldClose(pWindow.get()))
     { 
         glfwPollEvents();
 
-        auto coord = pMouse->getCursorPosition();
+        //auto coord = pMouse->getCursorPosition();
+
+        auto coord = pMouse->getDelta();
 
         std::cout << coord.x << ", " << coord.y << "\n";
 

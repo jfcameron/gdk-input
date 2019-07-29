@@ -35,7 +35,29 @@ namespace gdk
 
     void mouse_glfw::setCursorMode(const CursorMode aCursorMode)
     {
-        throw std::runtime_error("unimplemented!");
+        decltype(GLFW_CURSOR_NORMAL) cursorModeBuffer;
+
+        switch (aCursorMode)
+        {
+            case CursorMode::Normal:
+            {
+                cursorModeBuffer = GLFW_CURSOR_NORMAL;
+            } break;
+
+            case CursorMode::Hidden:
+            {
+                cursorModeBuffer = GLFW_CURSOR_HIDDEN;
+            } break;
+
+            case CursorMode::Locked:
+            {
+                cursorModeBuffer = GLFW_CURSOR_DISABLED;
+            } break;
+
+            default: throw std::invalid_argument(std::string("Unhandled CursorMode: ").append(std::to_string(static_cast<std::underlying_type<decltype(aCursorMode)>::type>(aCursorMode))));
+        }
+
+        glfwSetInputMode(m_pWindow.get(), GLFW_CURSOR, cursorModeBuffer);
     }
 
     mouse::cursor_2d_type mouse_glfw::getCursorPosition()
@@ -48,9 +70,16 @@ namespace gdk
 
     mouse::cursor_2d_type mouse_glfw::getDelta()
     {
-        throw std::runtime_error("unimplemented!");
+        auto currentCursorPosition = getCursorPosition();
+       
+        mouse::cursor_2d_type deltaBuffer;
 
-        return {};
+        deltaBuffer.x = currentCursorPosition.x - m_LastDeltaCallCursorPosition.x;
+        deltaBuffer.y = currentCursorPosition.y - m_LastDeltaCallCursorPosition.y;
+
+        m_LastDeltaCallCursorPosition = currentCursorPosition;
+        
+        return deltaBuffer;
     }
 }
 

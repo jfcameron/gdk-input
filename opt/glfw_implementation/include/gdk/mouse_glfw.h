@@ -15,7 +15,11 @@ namespace gdk
     /// \attention glfwPollEvents() must be called periodically in order to update the mouse state
     class mouse_glfw : public mouse
     {
+        //! ptr to the glfw window
         std::shared_ptr<GLFWwindow> m_pWindow;
+
+        //! buffer containing the cursor's position when delta was last called. used to calculate the delta.
+        cursor_2d_type m_LastDeltaCallCursorPosition;
 
     public:
         virtual bool getButtonDown(const mouse::Button aButtonCode) override;
