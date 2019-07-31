@@ -54,6 +54,10 @@ namespace gdk
         /// \brief Get amount of cursor movement since the last frame
         virtual cursor_2d_type getDelta() = 0;
 
+        ///
+        //virtual setCursorGraphic(standardShapeEnum) = 0;
+        //virtual setCursorGraphic(2dbytearray) = 0;
+
         //virtual void setCursorGraphic = 0;
 
         virtual ~mouse() = default;
