@@ -23,13 +23,20 @@ namespace gdk
         //TODO: serialize, deserialize methods. 
         using key_collection_type = std::set<keyboard::Key>;
         using mouse_button_collection_type = std::set<mouse::Button>;
+        
         using gamepad_button_collection_type = std::set<int>; //TODO: int? gamepad::button_index_type?
+        using gamepad_axis_collection_type = std::set<int>;
+        using gamepad_hat_collection_type = std::map<int, gamepad::hat_state_type>;
 
         struct gamepad_bindings
         {
             std::string name;
-
+            
             gamepad_button_collection_type buttons;
+            
+            gamepad_axis_collection_type axes;
+
+            gamepad_hat_collection_type hats;
         };
 
         struct bindings
@@ -40,9 +47,9 @@ namespace gdk
             {
                 mouse_button_collection_type buttons;
 
-            } mouse;
+                //TODO mouse axes
 
-            //TODO mouse axes
+            } mouse;
 
             std::map<std::string, gamepad_bindings> gamepads; //!< bindings for supported gamepads
         };
@@ -69,9 +76,12 @@ namespace gdk
         //! adds a mapping to an existing input OR creates a new input and adds to that
         void addKeyMapping(const std::string &aName, const keyboard::Key aKey);
         
-        void addMouseButtonMapping(const std::string &aName, const mouse::Button aButton);
-    
         void addGamepadButtonMapping(const std::string &aInputName, const std::string &aGamepadName, const int aButtonIndex);
+        void addGamepadAxisMapping(const std::string &aInputName, const std::string &aGamepadName, const int aAxisIndex);
+        
+        void addGamepadHatMapping(const std::string &aInputName, const std::string &aGamepadName, const int aHatIndex, const gamepad::hat_state_type aHatState);
+        
+        void addMouseButtonMapping(const std::string &aName, const mouse::Button aButton);
 
         controls(std::shared_ptr<keyboard> aKeyboard = nullptr, 
             std::shared_ptr<mouse> aMouse = nullptr,

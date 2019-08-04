@@ -48,7 +48,19 @@ namespace gdk
                     if (const auto value = static_cast<float>(m_Gamepad->getButtonDown(button))) return value;
                 }
 
-                //TODO: Hats, axes
+                for (const auto &hat : current_gamepad_iter->second.axes)
+                {
+                    //if (const auto value = static_cast<float>(m_Gamepad->getHat(hat))) 
+                    {
+                        //TODO convert hat type to float? must think
+                        //return value;
+                    }
+                }
+
+                for (const auto &axis : current_gamepad_iter->second.axes)
+                {
+                    if (const auto value = static_cast<float>(m_Gamepad->getAxis(axis))) return value;
+                }
             }
             else std::cerr << m_Gamepad->getName() << " not configured for these controls\n";
         }
@@ -83,6 +95,20 @@ namespace gdk
         auto &buttons = m_Inputs[aName].mouse.buttons;
 
         buttons.insert(aButton);
+    }
+
+    void controls::addGamepadAxisMapping(const std::string &aInputName, const std::string &aGamepadName, const int aAxisIndex)
+    {
+        auto &current_gamepad = m_Inputs[aInputName].gamepads[aGamepadName];
+
+        current_gamepad.axes.insert(aAxisIndex);
+    }
+
+    void controls::addGamepadHatMapping(const std::string &aInputName, const std::string &aGamepadName, const int aHatIndex, const gamepad::hat_state_type aHatState)
+    {
+        auto &current_gamepad = m_Inputs[aInputName].gamepads[aGamepadName];
+
+        current_gamepad.hats[aHatIndex] = aHatState;
     }
 
     void controls::addGamepadButtonMapping(const std::string &aInputName, const std::string &aGamepadName, const int aButtonIndex)

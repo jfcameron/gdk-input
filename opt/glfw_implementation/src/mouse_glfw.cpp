@@ -23,7 +23,7 @@ static inline int glfwmouseButtonFromButton(const gdk::mouse::Button a)
         case gdk::mouse::Button::Eight:  return GLFW_MOUSE_BUTTON_8;
     }
     
-    throw std::invalid_argument(std::string("Unable to convert mouse button \"").append(std::to_string( static_cast< std::underlying_type< decltype(a)>::type>(a))).append("\" to GLFW_MOUSE_BUTTON")); 
+    throw std::invalid_argument(std::string("Unable to convert mouse button \"").append(std::to_string(static_cast< std::underlying_type< decltype(a)>::type>(a))).append("\" to GLFW_MOUSE_BUTTON")); 
 }
 
 namespace gdk

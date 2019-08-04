@@ -53,46 +53,44 @@ int main(int argc, char **argv)
 
     std::shared_ptr<gdk::mouse> pMouse = std::make_shared<gdk::mouse_glfw>(gdk::mouse_glfw(pWindow));
     std::shared_ptr<gdk::keyboard> pKeyboard = std::make_shared<gdk::keyboard_glfw>(gdk::keyboard_glfw(pWindow));
-    /*std::shared_ptr<gdk::gamepad_glfw> pGamepad = std::make_shared<gdk::gamepad_glfw>(0);
+    //std::shared_ptr<gdk::gamepad_glfw> pGamepad = std::make_shared<gdk::gamepad_glfw>(0);
 
-    gdk::controls player_controls(pKeyboard, pMouse, pGamepad);
+    gdk::controls player_controls(pKeyboard, pMouse); //pGamepad);
 
     player_controls.addKeyMapping("Jump", gdk::keyboard::Key::C);
-    player_controls.addGamepadButtonMapping("Jump", std::string(pGamepad->getName()), 0);
+    //player_controls.addGamepadButtonMapping("Jump", std::string(pGamepad->getName()), 0);
 
     player_controls.addKeyMapping("Run", gdk::keyboard::Key::X);
-    player_controls.addGamepadButtonMapping("Run", std::string(pGamepad->getName()), 1);*/
+    //player_controls.addGamepadButtonMapping("Run", std::string(pGamepad->getName()), 1);
 
-    pMouse->setCursorMode(gdk::mouse::CursorMode::Locked);
+    //pMouse->setCursorMode(gdk::mouse::CursorMode::Locked);
 
     while(!glfwWindowShouldClose(pWindow.get()))
     { 
         glfwPollEvents();
 
         //auto coord = pMouse->getCursorPosition();
-
-        auto coord = pMouse->getDelta();
-
-        std::cout << coord.x << ", " << coord.y << "\n";
+        //auto coord = pMouse->getDelta();
+        //std::cout << coord.x << ", " << coord.y << "\n";
 
         //pGamepad->update();
 
         /*if (pMouse->getButtonDown(gdk::mouse::Button::Left))  std::cout << "Left\n";
-        if (pMouse->getButtonDown(gdk::mouse::Button::Right)) std::cout << "Right\n";
+        if (pMouse->getButtonDown(gdk::mouse::Button::Right)) std::cout << "Right\n";*/
         
-        if (pKeyboard->getKeyDown(gdk::keyboard::Key::Q)) std::cout << "Q\n";
+        /*if (pKeyboard->getKeyDown(gdk::keyboard::Key::Q)) std::cout << "Q\n";
         if (pKeyboard->getKeyDown(gdk::keyboard::Key::W)) std::cout << "W\n";
-        if (pKeyboard->getKeyDown(gdk::keyboard::Key::E)) std::cout << "E\n";
+        if (pKeyboard->getKeyDown(gdk::keyboard::Key::E)) std::cout << "E\n";*/
 
-        for (size_t i = 0, s = gamepad.getHatCount(); i < s; ++i)
+        /*for (size_t i = 0, s = gamepad.getHatCount(); i < s; ++i)
         {
             auto state = gamepad.getHat(i);
 
             if (state.x || state.y) std::cout << i << ": {" << state.x << ", " << state.y  << "}, " << "\n";
         }*/
 
-        /*if (player_controls.get("Jump")) std::cout << "Jumping!\n";
-        if (player_controls.get("Run")) std::cout << "Running!\n";*/
+        if (player_controls.get("Jump")) std::cout << "Jumping!\n";
+        if (player_controls.get("Run")) std::cout << "Running!\n";
     }
 
     return EXIT_SUCCESS;
