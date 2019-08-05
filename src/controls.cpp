@@ -47,7 +47,7 @@ namespace gdk
                 }
 
                 for (const auto &hat : current_gamepad_iter->second.hats)
-                {
+                {   
                     if (auto a = hat.second, b = m_Gamepad->getHat(hat.first); a.x == b.x && a.y == b.y) return 1;
                 }
 
@@ -100,9 +100,15 @@ namespace gdk
 
     void controls::addGamepadHatMapping(const std::string &aInputName, const std::string &aGamepadName, const int aHatIndex, const gamepad::hat_state_type aHatState)
     {
-        auto &current_gamepad = m_Inputs[aInputName].gamepads[aGamepadName];
+        //auto &current_gamepad = m_Inputs[aInputName].gamepads[aGamepadName];
+        
+        //current_gamepad.hats.insert({aHatIndex, aHatState});
 
-        current_gamepad.hats[aHatIndex] = aHatState;
+        m_Inputs[aInputName].gamepads[aGamepadName].hats.insert({aHatIndex, aHatState});
+ 
+        std::cout << aGamepadName << ", " << m_Inputs[aInputName].gamepads[aGamepadName].hats.size() << "\n";
+
+        //std::cout << aGamepadName << ", " << current_gamepad.hats.size() << "\n";
     }
 
     void controls::addGamepadButtonMapping(const std::string &aInputName, const std::string &aGamepadName, const int aButtonIndex)

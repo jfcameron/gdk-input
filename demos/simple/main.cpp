@@ -53,16 +53,23 @@ int main(int argc, char **argv)
 
     std::shared_ptr<gdk::mouse> pMouse = std::make_shared<gdk::mouse_glfw>(gdk::mouse_glfw(pWindow));
     std::shared_ptr<gdk::keyboard> pKeyboard = std::make_shared<gdk::keyboard_glfw>(gdk::keyboard_glfw(pWindow));
-    //std::shared_ptr<gdk::gamepad_glfw> pGamepad = std::make_shared<gdk::gamepad_glfw>(0);
+    std::shared_ptr<gdk::gamepad_glfw> pGamepad = std::make_shared<gdk::gamepad_glfw>(0);
 
-    gdk::controls player_controls(pKeyboard, pMouse); //pGamepad);
+    gdk::controls player_controls(pKeyboard, pMouse, pGamepad);
 
     player_controls.addKeyMapping("Jump", gdk::keyboard::Key::C);
-    //player_controls.addGamepadButtonMapping("Jump", std::string(pGamepad->getName()), 0);
+    player_controls.addGamepadButtonMapping("Jump", std::string(pGamepad->getName()), 0);
 
     player_controls.addKeyMapping("Run", gdk::keyboard::Key::X);
-    //player_controls.addGamepadButtonMapping("Run", std::string(pGamepad->getName()), 1);
+    player_controls.addGamepadButtonMapping("Run", std::string(pGamepad->getName()), 1);
 
+    player_controls.addGamepadHatMapping("Forward", std::string(pGamepad->getName()), 0,     {0, +1});
+    player_controls.addGamepadHatMapping("Backward", std::string(pGamepad->getName()), 0,    {0, -1});
+    player_controls.addGamepadHatMapping("StrafeLeft", std::string(pGamepad->getName()), 0,  {-1, 0});
+    player_controls.addGamepadHatMapping("StrafeRight", std::string(pGamepad->getName()), 0, {+1, 0});
+    
+    //player_controls.addGamepadAxisMapping("Run", std::string(pGamepad->getName()), 0);
+    
     //pMouse->setCursorMode(gdk::mouse::CursorMode::Locked);
 
     while(!glfwWindowShouldClose(pWindow.get()))
@@ -73,7 +80,7 @@ int main(int argc, char **argv)
         //auto coord = pMouse->getDelta();
         //std::cout << coord.x << ", " << coord.y << "\n";
 
-        //pGamepad->update();
+        pGamepad->update();
 
         /*if (pMouse->getButtonDown(gdk::mouse::Button::Left))  std::cout << "Left\n";
         if (pMouse->getButtonDown(gdk::mouse::Button::Right)) std::cout << "Right\n";*/
@@ -89,6 +96,11 @@ int main(int argc, char **argv)
             if (state.x || state.y) std::cout << i << ": {" << state.x << ", " << state.y  << "}, " << "\n";
         }*/
 
+        if (player_controls.get("Forward")) std::cout << "Moving forward!\n";
+        if (player_controls.get("Backward")) std::cout << "Moving backward!\n";
+        if (player_controls.get("StrafeLeft")) std::cout << "Moving left!\n";
+        if (player_controls.get("StrafeRight")) std::cout << "Moving right!\n";
+        
         if (player_controls.get("Jump")) std::cout << "Jumping!\n";
         if (player_controls.get("Run")) std::cout << "Running!\n";
     }

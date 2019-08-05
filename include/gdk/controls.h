@@ -30,8 +30,6 @@ namespace gdk
 
         struct gamepad_bindings
         {
-            std::string name;
-            
             gamepad_button_collection_type buttons;
             
             gamepad_axis_collection_type axes;
@@ -75,13 +73,15 @@ namespace gdk
 
         //! adds a mapping to an existing input OR creates a new input and adds to that
         void addKeyMapping(const std::string &aName, const keyboard::Key aKey);
-        
-        void addGamepadButtonMapping(const std::string &aInputName, const std::string &aGamepadName, const int aButtonIndex);
-        void addGamepadAxisMapping(const std::string &aInputName, const std::string &aGamepadName, const int aAxisIndex);
-        
-        void addGamepadHatMapping(const std::string &aInputName, const std::string &aGamepadName, const int aHatIndex, const gamepad::hat_state_type aHatState);
-        
+
         void addMouseButtonMapping(const std::string &aName, const mouse::Button aButton);
+        //void addMouseAxis(...)
+
+        void addGamepadButtonMapping(const std::string &aInputName, const std::string &aGamepadName, const int aButtonIndex);
+        
+        void addGamepadAxisMapping(const std::string &aInputName, const std::string &aGamepadName, const int aAxisIndex);
+       
+        void addGamepadHatMapping(const std::string &aInputName, const std::string &aGamepadName, const int aHatIndex, const gamepad::hat_state_type aHatState);
 
         controls(std::shared_ptr<keyboard> aKeyboard = nullptr, 
             std::shared_ptr<mouse> aMouse = nullptr,
