@@ -7,9 +7,7 @@
 
 namespace gdk
 {
-    controls::controls(std::shared_ptr<keyboard> aKeyboard, 
-        std::shared_ptr<mouse> aMouse, 
-        std::shared_ptr<gamepad> aGamepad)    
+    controls::controls(std::shared_ptr<keyboard> aKeyboard, std::shared_ptr<mouse> aMouse, std::shared_ptr<gamepad> aGamepad)    
     : m_Keyboard(aKeyboard)
     , m_Mouse(aMouse)
     , m_Gamepad(aGamepad)
@@ -48,13 +46,9 @@ namespace gdk
                     if (const auto value = static_cast<float>(m_Gamepad->getButtonDown(button))) return value;
                 }
 
-                for (const auto &hat : current_gamepad_iter->second.axes)
+                for (const auto &hat : current_gamepad_iter->second.hats)
                 {
-                    //if (const auto value = static_cast<float>(m_Gamepad->getHat(hat))) 
-                    {
-                        //TODO convert hat type to float? must think
-                        //return value;
-                    }
+                    if (auto a = hat.second, b = m_Gamepad->getHat(hat.first); a.x == b.x && a.y == b.y) return 1;
                 }
 
                 for (const auto &axis : current_gamepad_iter->second.axes)
