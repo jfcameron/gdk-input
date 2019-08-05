@@ -19,14 +19,14 @@ namespace gdk
     class controls
     {
         //TODO: mouse axis
-        //TODO: gamepad hat, axis
         //TODO: serialize, deserialize methods. 
         using key_collection_type = std::set<keyboard::Key>;
+
         using mouse_button_collection_type = std::set<mouse::Button>;
         
-        using gamepad_button_collection_type = std::set<int>; //TODO: int? gamepad::button_index_type?
-        using gamepad_axis_collection_type = std::set<int>;
-        using gamepad_hat_collection_type = std::map<int, gamepad::hat_state_type>;
+        using gamepad_button_collection_type = std::set</*index*/int>;
+        using gamepad_axis_collection_type = std::map</*index*/int, /*deadzone*/float>;
+        using gamepad_hat_collection_type = std::map</*index*/int, /*hat direction*/gamepad::hat_state_type>;
 
         struct gamepad_bindings
         {
@@ -79,14 +79,11 @@ namespace gdk
 
         void addGamepadButtonMapping(const std::string &aInputName, const std::string &aGamepadName, const int aButtonIndex);
         
-        void addGamepadAxisMapping(const std::string &aInputName, const std::string &aGamepadName, const int aAxisIndex);
+        void addGamepadAxisMapping(const std::string &aInputName, const std::string &aGamepadName, const int aAxisIndex, const float aMinimum);
        
         void addGamepadHatMapping(const std::string &aInputName, const std::string &aGamepadName, const int aHatIndex, const gamepad::hat_state_type aHatState);
 
-        controls(std::shared_ptr<keyboard> aKeyboard = nullptr, 
-            std::shared_ptr<mouse> aMouse = nullptr,
-            std::shared_ptr<gamepad> aGamepad = nullptr);//,  //TODO: support multiple gamepads? would add complexity for a very niche feature..
-            //const std::vector<std::string> &aInputNames);
+        controls(std::shared_ptr<keyboard> aKeyboard = nullptr, std::shared_ptr<mouse> aMouse = nullptr, std::shared_ptr<gamepad> aGamepad = nullptr);
     };
 }
 

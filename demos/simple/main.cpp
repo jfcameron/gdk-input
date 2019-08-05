@@ -63,12 +63,21 @@ int main(int argc, char **argv)
     player_controls.addKeyMapping("Run", gdk::keyboard::Key::X);
     player_controls.addGamepadButtonMapping("Run", std::string(pGamepad->getName()), 1);
 
-    player_controls.addGamepadHatMapping("Forward", std::string(pGamepad->getName()), 0,     {0, +1});
-    player_controls.addGamepadHatMapping("Backward", std::string(pGamepad->getName()), 0,    {0, -1});
-    player_controls.addGamepadHatMapping("StrafeLeft", std::string(pGamepad->getName()), 0,  {-1, 0});
-    player_controls.addGamepadHatMapping("StrafeRight", std::string(pGamepad->getName()), 0, {+1, 0});
+    player_controls.addGamepadHatMapping("Forward", std::string(pGamepad->getName()), 0, {0, +1});
+    player_controls.addGamepadAxisMapping("Forward", std::string(pGamepad->getName()), 1, -0.05);
+    player_controls.addKeyMapping("Forward", gdk::keyboard::Key::W);
+   
+    player_controls.addGamepadHatMapping("Backward", std::string(pGamepad->getName()), 0, {0, -1});
+    player_controls.addGamepadAxisMapping("Backward", std::string(pGamepad->getName()), 1, +0.05);
+    player_controls.addKeyMapping("Backward", gdk::keyboard::Key::S);
     
-    //player_controls.addGamepadAxisMapping("Run", std::string(pGamepad->getName()), 0);
+    player_controls.addGamepadHatMapping("StrafeLeft", std::string(pGamepad->getName()), 0, {-1, 0});
+    player_controls.addGamepadAxisMapping("StrafeLeft", std::string(pGamepad->getName()), 0, -0.05);
+    player_controls.addKeyMapping("StrafeLeft", gdk::keyboard::Key::A);
+
+    player_controls.addGamepadHatMapping("StrafeRight", std::string(pGamepad->getName()), 0, {+1, 0});
+    player_controls.addGamepadAxisMapping("StrafeRight", std::string(pGamepad->getName()), 0, +0.05);
+    player_controls.addKeyMapping("StrafeRight", gdk::keyboard::Key::D);
     
     //pMouse->setCursorMode(gdk::mouse::CursorMode::Locked);
 
@@ -96,8 +105,8 @@ int main(int argc, char **argv)
             if (state.x || state.y) std::cout << i << ": {" << state.x << ", " << state.y  << "}, " << "\n";
         }*/
 
-        if (player_controls.get("Forward")) std::cout << "Moving forward!\n";
-        if (player_controls.get("Backward")) std::cout << "Moving backward!\n";
+        if (player_controls.get("Forward")) std::cout << "Moving Forward: " << player_controls.get("Forward") << "\n";
+        if (player_controls.get("Backward")) std::cout << "Moving Backward: " << player_controls.get("Backward") << "\n";
         if (player_controls.get("StrafeLeft")) std::cout << "Moving left!\n";
         if (player_controls.get("StrafeRight")) std::cout << "Moving right!\n";
         

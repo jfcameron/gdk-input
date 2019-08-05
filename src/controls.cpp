@@ -53,7 +53,19 @@ namespace gdk
 
                 for (const auto &axis : current_gamepad_iter->second.axes)
                 {
-                    if (const auto value = static_cast<float>(m_Gamepad->getAxis(axis))) return value;
+                    if (const auto value = static_cast<float>(m_Gamepad->getAxis(axis.first))) 
+                    {
+                        const float minimum = axis.second;
+
+                        if (minimum >= 0 && value > minimum) 
+                        {
+                            return value; 
+                        }
+                        else if (minimum < 0 && value < minimum) 
+                        {
+                            return value * -1;
+                        }
+                    }
                 }
             }
             else std::cerr << m_Gamepad->getName() << " not configured for these controls\n";
@@ -79,43 +91,27 @@ namespace gdk
     
     void controls::addKeyMapping(const std::string &aName, const keyboard::Key aKey)
     {
-        auto &keys = m_Inputs[aName].keys;
-
-        keys.insert(aKey);
+        m_Inputs[aName].keys.insert(aKey);
     }
     
     void controls::addMouseButtonMapping(const std::string &aName, const mouse::Button aButton)
     {
-        auto &buttons = m_Inputs[aName].mouse.buttons;
-
-        buttons.insert(aButton);
+        m_Inputs[aName].mouse.buttons.insert(aButton);
     }
 
-    void controls::addGamepadAxisMapping(const std::string &aInputName, const std::string &aGamepadName, const int aAxisIndex)
+    void controls::addGamepadAxisMapping(const std::string &aInputName, const std::string &aGamepadName, const int aAxisIndex, const float aMinimum)
     {
-        auto &current_gamepad = m_Inputs[aInputName].gamepads[aGamepadName];
-
-        current_gamepad.axes.insert(aAxisIndex);
+        m_Inputs[aInputName].gamepads[aGamepadName].axes.insert({aAxisIndex, aMinimum});
     }
 
     void controls::addGamepadHatMapping(const std::string &aInputName, const std::string &aGamepadName, const int aHatIndex, const gamepad::hat_state_type aHatState)
     {
-        //auto &current_gamepad = m_Inputs[aInputName].gamepads[aGamepadName];
-        
-        //current_gamepad.hats.insert({aHatIndex, aHatState});
-
         m_Inputs[aInputName].gamepads[aGamepadName].hats.insert({aHatIndex, aHatState});
- 
-        std::cout << aGamepadName << ", " << m_Inputs[aInputName].gamepads[aGamepadName].hats.size() << "\n";
-
-        //std::cout << aGamepadName << ", " << current_gamepad.hats.size() << "\n";
     }
 
     void controls::addGamepadButtonMapping(const std::string &aInputName, const std::string &aGamepadName, const int aButtonIndex)
     {
-        auto &current_gamepad = m_Inputs[aInputName].gamepads[aGamepadName];
-
-        current_gamepad.buttons.insert(aButtonIndex);
+        m_Inputs[aInputName].gamepads[aGamepadName].buttons.insert(aButtonIndex);
     }
 }
 
