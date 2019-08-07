@@ -46,7 +46,7 @@ std::shared_ptr<GLFWwindow> initGLFW()
     return {};
 }
 
-/// \brief user interface to the example manager
+/// \brief abstract factory for all types of input. This interface is user facing.
 class inputmanager
 {
 public:
@@ -60,7 +60,7 @@ public:
     virtual std::shared_ptr<gdk::gamepad> getGamepad(size_t index) = 0;
 };
 
-/// \brief basic example input manager implementation
+/// \brief concrete factory for glfw implementation. This is hidden from your user.
 class inputmanager_glfw : public inputmanager
 {
     std::shared_ptr<gdk::keyboard> m_Keyboard;

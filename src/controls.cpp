@@ -13,7 +13,7 @@ namespace gdk
     , m_Gamepad(aGamepad)
     {}
 
-    float controls::get(const std::string &aName) const
+    double controls::get(const std::string &aName) const
     {
         auto iter = m_Inputs.find(aName); 
 
@@ -35,6 +35,32 @@ namespace gdk
             }
 
             //TODO: Mouse axes
+            for (const auto &axis : iter->second.mouse.axes)
+            {
+                if (m_Mouse->getCursorMode() == gdk::mouse::CursorMode::Locked)
+                {
+                    const auto delta = m_Mouse->getCursorPosition();
+
+                    switch(axis.first)
+                    {
+                        case mouse::Axis::X:
+                            {
+                                const auto value = delta.x;
+
+                                if (axis.second >= 0 && delta.x >= 0) return value * axis.second; 
+
+                                if (axis.second <= 0 && delta.x <= 0) return value * axis.second; 
+                            } break;
+
+                        case mouse::Axis::Y:
+                            {
+                                if (const auto value = delta.y) return value * axis.second;
+                            } break;
+
+                        default: throw std::invalid_argument("unhandled axis type");
+                    }
+                }
+            }
         }
        
         if (m_Gamepad)
@@ -57,14 +83,8 @@ namespace gdk
                     {
                         const float minimum = axis.second;
 
-                        if (minimum >= 0 && value > minimum) 
-                        {
-                            return value; 
-                        }
-                        else if (minimum < 0 && value < minimum) 
-                        {
-                            return value * -1;
-                        }
+                        if (minimum >= 0 && value > minimum) return value; 
+                        else if (minimum < 0 && value < minimum) return value * -1;
                     }
                 }
             }
@@ -97,6 +117,11 @@ namespace gdk
     void controls::addMouseButtonMapping(const std::string &aName, const mouse::Button aButton)
     {
         m_Inputs[aName].mouse.buttons.insert(aButton);
+    }
+
+    void controls::addMouseAxisMapping(const std::string &aName, const mouse::Axis aAxis, const double aScaleAndDirection)
+    {
+        m_Inputs[aName].mouse.axes.insert({aAxis, aScaleAndDirection});
     }
 
     void controls::addGamepadAxisMapping(const std::string &aInputName, const std::string &aGamepadName, const int aAxisIndex, const float aMinimum)

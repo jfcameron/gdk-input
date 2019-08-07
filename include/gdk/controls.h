@@ -18,11 +18,11 @@ namespace gdk
     /// abstraction on top of gamepads, mouse, keyboards.
     class controls
     {
-        //TODO: mouse axis
         //TODO: serialize, deserialize methods. 
         using key_collection_type = std::set<keyboard::Key>;
 
         using mouse_button_collection_type = std::set<mouse::Button>;
+        using mouse_axis_collection_type = std::set<std::pair<mouse::Axis, /*scale and direction*/double>>;
         
         using gamepad_button_collection_type = std::set</*index*/int>;
         using gamepad_axis_collection_type = std::map</*index*/int, /*deadzone*/float>;
@@ -45,8 +45,7 @@ namespace gdk
             {
                 mouse_button_collection_type buttons;
 
-                //TODO mouse axes
-
+                mouse_axis_collection_type axes;
             } mouse;
 
             std::map<std::string, gamepad_bindings> gamepads; //!< bindings for supported gamepads
@@ -60,7 +59,7 @@ namespace gdk
 
     public:
         //! get value of an input
-        float get(const std::string &aName) const;
+        double get(const std::string &aName) const;
 
         //! [re]sets keyboard pointer
         void setKeyboard(std::shared_ptr<keyboard> aKeyboard);
@@ -75,7 +74,8 @@ namespace gdk
         void addKeyMapping(const std::string &aName, const keyboard::Key aKey);
 
         void addMouseButtonMapping(const std::string &aName, const mouse::Button aButton);
-        //void addMouseAxis(...)
+        
+        void addMouseAxisMapping(const std::string &aName, const mouse::Axis aAxis, const double scaleAndDirection);
 
         void addGamepadButtonMapping(const std::string &aInputName, const std::string &aGamepadName, const int aButtonIndex);
         

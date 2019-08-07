@@ -51,67 +51,77 @@ int main(int argc, char **argv)
 
     auto pWindow = initGLFW();
 
-    std::shared_ptr<gdk::mouse> pMouse = std::make_shared<gdk::mouse_glfw>(gdk::mouse_glfw(pWindow));
+    std::shared_ptr<gdk::gamepad_glfw> pGamepad = nullptr; //std::make_shared<gdk::gamepad_glfw>(0);
+    const auto gamepadName = pGamepad ? std::string(pGamepad->getName()) : "nah";
+
+    std::shared_ptr<gdk::mouse_glfw> pMouse = std::make_shared<gdk::mouse_glfw>(gdk::mouse_glfw(pWindow));
     std::shared_ptr<gdk::keyboard> pKeyboard = std::make_shared<gdk::keyboard_glfw>(gdk::keyboard_glfw(pWindow));
-    std::shared_ptr<gdk::gamepad_glfw> pGamepad = std::make_shared<gdk::gamepad_glfw>(0);
+
+    pMouse->setCursorMode(gdk::mouse::CursorMode::Locked);
 
     gdk::controls player_controls(pKeyboard, pMouse, pGamepad);
 
     player_controls.addKeyMapping("Jump", gdk::keyboard::Key::C);
-    player_controls.addGamepadButtonMapping("Jump", std::string(pGamepad->getName()), 0);
+    player_controls.addGamepadButtonMapping("Jump", std::string(gamepadName), 0);
 
-    player_controls.addKeyMapping("Run", gdk::keyboard::Key::X);
-    player_controls.addGamepadButtonMapping("Run", std::string(pGamepad->getName()), 1);
+    player_controls.addKeyMapping("Run", gdk::keyboard::Key::LeftShift);
+    player_controls.addGamepadButtonMapping("Run", std::string(gamepadName), 1);
 
-    player_controls.addGamepadHatMapping("Forward", std::string(pGamepad->getName()), 0, {0, +1});
-    player_controls.addGamepadAxisMapping("Forward", std::string(pGamepad->getName()), 1, -0.05);
+    player_controls.addGamepadHatMapping("Forward", std::string(gamepadName), 0, {0, +1});
+    player_controls.addGamepadAxisMapping("Forward", std::string(gamepadName), 1, -0.05);
     player_controls.addKeyMapping("Forward", gdk::keyboard::Key::W);
    
-    player_controls.addGamepadHatMapping("Backward", std::string(pGamepad->getName()), 0, {0, -1});
-    player_controls.addGamepadAxisMapping("Backward", std::string(pGamepad->getName()), 1, +0.05);
+    player_controls.addGamepadHatMapping("Backward", std::string(gamepadName), 0, {0, -1});
+    player_controls.addGamepadAxisMapping("Backward", std::string(gamepadName), 1, +0.05);
     player_controls.addKeyMapping("Backward", gdk::keyboard::Key::S);
     
-    player_controls.addGamepadHatMapping("StrafeLeft", std::string(pGamepad->getName()), 0, {-1, 0});
-    player_controls.addGamepadAxisMapping("StrafeLeft", std::string(pGamepad->getName()), 0, -0.05);
+    player_controls.addGamepadHatMapping("StrafeLeft", std::string(gamepadName), 0, {-1, 0});
+    player_controls.addGamepadAxisMapping("StrafeLeft", std::string(gamepadName), 0, -0.05);
     player_controls.addKeyMapping("StrafeLeft", gdk::keyboard::Key::A);
 
-    player_controls.addGamepadHatMapping("StrafeRight", std::string(pGamepad->getName()), 0, {+1, 0});
-    player_controls.addGamepadAxisMapping("StrafeRight", std::string(pGamepad->getName()), 0, +0.05);
+    player_controls.addGamepadHatMapping("StrafeRight", std::string(gamepadName), 0, {+1, 0});
+    player_controls.addGamepadAxisMapping("StrafeRight", std::string(gamepadName), 0, +0.05);
     player_controls.addKeyMapping("StrafeRight", gdk::keyboard::Key::D);
-    
-    //pMouse->setCursorMode(gdk::mouse::CursorMode::Locked);
+
+    /* //BRAINSTORMING on "stick acceleration" etc. functions that modify raw stick to some function of it.
+    player_controls.addGamepadAxisMapping(
+        "LookLeft", //Name of the control
+        std::string(gamepadName), //Name of the supported hardware
+        1, 
+        {
+            -0.05, //deadzone and direction of axis
+            [](const float raw) // functor that converts raw axis value to output value. //TODO: this function should probably be interpreted, so this function can be loaded as data. ulisp or lua. or some kind of curve description?
+            {
+                return raw; //in this case the relationship is linear.
+            }
+        }
+    );
+    */
+
+    player_controls.addMouseAxisMapping("LookLeft" , gdk::mouse::Axis::X, -1);
+    player_controls.addKeyMapping("LookLeft", gdk::keyboard::Key::LeftArrow);
+
+    player_controls.addMouseAxisMapping("LookRight" , gdk::mouse::Axis::Y, -1);
+    player_controls.addKeyMapping("LookRight", gdk::keyboard::Key::RightArrow);
 
     while(!glfwWindowShouldClose(pWindow.get()))
     { 
         glfwPollEvents();
 
-        //auto coord = pMouse->getCursorPosition();
-        //auto coord = pMouse->getDelta();
-        //std::cout << coord.x << ", " << coord.y << "\n";
+        if (pGamepad) pGamepad->update();
 
-        pGamepad->update();
-
-        /*if (pMouse->getButtonDown(gdk::mouse::Button::Left))  std::cout << "Left\n";
-        if (pMouse->getButtonDown(gdk::mouse::Button::Right)) std::cout << "Right\n";*/
-        
-        /*if (pKeyboard->getKeyDown(gdk::keyboard::Key::Q)) std::cout << "Q\n";
-        if (pKeyboard->getKeyDown(gdk::keyboard::Key::W)) std::cout << "W\n";
-        if (pKeyboard->getKeyDown(gdk::keyboard::Key::E)) std::cout << "E\n";*/
-
-        /*for (size_t i = 0, s = gamepad.getHatCount(); i < s; ++i)
-        {
-            auto state = gamepad.getHat(i);
-
-            if (state.x || state.y) std::cout << i << ": {" << state.x << ", " << state.y  << "}, " << "\n";
-        }*/
-
-        if (player_controls.get("Forward")) std::cout << "Moving Forward: " << player_controls.get("Forward") << "\n";
+        /*if (player_controls.get("Forward")) std::cout << "Moving Forward: " << player_controls.get("Forward") << "\n";
         if (player_controls.get("Backward")) std::cout << "Moving Backward: " << player_controls.get("Backward") << "\n";
         if (player_controls.get("StrafeLeft")) std::cout << "Moving left!\n";
         if (player_controls.get("StrafeRight")) std::cout << "Moving right!\n";
         
         if (player_controls.get("Jump")) std::cout << "Jumping!\n";
-        if (player_controls.get("Run")) std::cout << "Running!\n";
+        if (player_controls.get("Run")) std::cout << "Running!\n";*/
+        
+        if (const auto value = player_controls.get("LookLeft")) std::cout << "LookLeft: " << value << "\n";
+        if (const auto value = player_controls.get("LookRight")) std::cout << "LookRight: " << value << "\n";
+
+        //if (auto delta = pMouse->getDelta(); delta.x != 0 || delta.y != 0) std::cout << "x: " << delta.x << ", y: " << delta.y << "\n";
     }
 
     return EXIT_SUCCESS;

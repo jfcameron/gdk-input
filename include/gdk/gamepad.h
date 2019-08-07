@@ -1,7 +1,7 @@
 // © 2019 Joseph Cameron - All Rights Reserved
 
-#ifndef GDK_GAMEPADS_H
-#define GDK_GAMEPADS_H
+#ifndef GDK_GAMEPAD_H
+#define GDK_GAMEPAD_H
 
 #include <memory>
 #include <string>

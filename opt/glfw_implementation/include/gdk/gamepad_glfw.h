@@ -28,6 +28,10 @@ namespace gdk
         std::vector<unsigned char> m_Hats;
 
     public:
+        //! updates the state of this gamepad
+        /// \attention must be called periodically.
+        void update();
+
         virtual float getAxis(int index) const override;
 
         virtual gamepad::size_type getAxisCount() const override;
@@ -42,8 +46,6 @@ namespace gdk
 
         virtual std::string_view getName() const override;
 
-        //! updates the state of this gamepad
-        void update();
 
         gamepad_glfw(const int joystickID);
     };

@@ -58,6 +58,13 @@ namespace gdk
         }
 
         glfwSetInputMode(m_pWindow.get(), GLFW_CURSOR, cursorModeBuffer);
+
+        m_CursorMode = aCursorMode;
+    }
+
+    mouse::CursorMode mouse_glfw::getCursorMode()
+    {
+        return m_CursorMode;    
     }
 
     mouse::cursor_2d_type mouse_glfw::getCursorPosition()
@@ -68,7 +75,7 @@ namespace gdk
         return {x, y};
     }
 
-    mouse::cursor_2d_type mouse_glfw::getDelta()
+    /*mouse::cursor_2d_type mouse_glfw::getDelta()
     {
         auto currentCursorPosition = getCursorPosition();
        
@@ -77,9 +84,9 @@ namespace gdk
         deltaBuffer.x = currentCursorPosition.x - m_LastDeltaCallCursorPosition.x;
         deltaBuffer.y = currentCursorPosition.y - m_LastDeltaCallCursorPosition.y;
 
-        m_LastDeltaCallCursorPosition = currentCursorPosition;
+        //m_LastDeltaCallCursorPosition = currentCursorPosition;
         
         return deltaBuffer;
-    }
+    }*/
 }
 

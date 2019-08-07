@@ -25,12 +25,19 @@ namespace gdk
             Eight 
         };
 
-        /// \brief mode
+        /// \brief mode affects cursor behaviour
         enum class CursorMode
         {
             Normal,
             Hidden,
             Locked
+        };
+
+        /// \brief represents the two axes of a mouse
+        enum class Axis
+        {
+            X,
+            Y
         };
         
         /// \brief Used to represent cursor delta or position within a window
@@ -48,11 +55,14 @@ namespace gdk
         /// \brief change cursor mode
         virtual void setCursorMode(const CursorMode aCursorMode) = 0;
 
+        /// \brief check cursor mode
+        virtual mouse::CursorMode getCursorMode() = 0;
+
         /// \brief Viewcoordinate of cursor
         virtual cursor_2d_type getCursorPosition() = 0;
 
         /// \brief Get amount of cursor movement since the last frame
-        virtual cursor_2d_type getDelta() = 0;
+        //virtual cursor_2d_type getDelta() = 0;
 
         ///
         //virtual setCursorGraphic(standardShapeEnum) = 0;
