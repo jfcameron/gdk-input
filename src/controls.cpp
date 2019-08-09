@@ -39,23 +39,23 @@ namespace gdk
             {
                 if (m_Mouse->getCursorMode() == gdk::mouse::CursorMode::Locked)
                 {
-                    const auto delta = m_Mouse->getCursorPosition();
+                    const auto delta = m_Mouse->getDelta();
 
                     switch(axis.first)
                     {
                         case mouse::Axis::X:
-                            {
-                                const auto value = delta.x;
+                        {
+                            const auto value = delta.x;
 
-                                if (axis.second >= 0 && delta.x >= 0) return value * axis.second; 
+                            if (axis.second > 0 && delta.x > 0) return value * axis.second; 
 
-                                if (axis.second <= 0 && delta.x <= 0) return value * axis.second; 
-                            } break;
+                            if (axis.second < 0 && delta.x < 0) return value * axis.second; 
+                        } break;
 
                         case mouse::Axis::Y:
-                            {
-                                if (const auto value = delta.y) return value * axis.second;
-                            } break;
+                        {
+                            if (const auto value = delta.y) return value * axis.second;
+                        } break;
 
                         default: throw std::invalid_argument("unhandled axis type");
                     }

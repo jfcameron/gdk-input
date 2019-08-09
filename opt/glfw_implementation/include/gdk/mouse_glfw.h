@@ -19,24 +19,30 @@ namespace gdk
         //! ptr to the glfw window
         std::shared_ptr<GLFWwindow> m_pWindow;
 
-        //! buffer containing the cursor's position when delta was last called. used to calculate the delta.
-        //cursor_2d_type m_LastDeltaCallCursorPosition = {0, 0};
-
+        //! state of the cursor
         mouse::CursorMode m_CursorMode = CursorMode::Normal;
 
+        //! buffer used to calculate per-frame cursor delta
+        mouse::cursor_2d_type m_LastDeltaCallCursorPosition = {0, 0};
+
+        //! cursor delta buffer
+        mouse::cursor_2d_type m_Delta;
+
     public:
-        virtual bool getButtonDown(const mouse::Button aButtonCode) override;
+        /// \attention must be called for proper behaviour of getDelta
+        void update();
 
         virtual void setCursorMode(const CursorMode aCursorMode) override;
 
-        virtual cursor_2d_type getCursorPosition() override;
+        virtual bool getButtonDown(const mouse::Button aButtonCode) const override;
 
-        //virtual cursor_2d_type getDelta() override;
-        virtual mouse::CursorMode getCursorMode() override;
+        virtual cursor_2d_type getCursorPosition() const override;
 
-        mouse_glfw(decltype(m_pWindow) pWindow)
-        : m_pWindow(pWindow)
-        {}
+        virtual cursor_2d_type getDelta() const override;
+
+        virtual mouse::CursorMode getCursorMode() const override;
+
+        mouse_glfw(decltype(m_pWindow) pWindow);
     };
 }
 

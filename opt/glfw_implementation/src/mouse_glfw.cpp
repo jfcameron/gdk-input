@@ -13,14 +13,14 @@ static inline int glfwmouseButtonFromButton(const gdk::mouse::Button a)
 {
     switch(a)
     {
-        case gdk::mouse::Button::Left:   return GLFW_MOUSE_BUTTON_LEFT;
-        case gdk::mouse::Button::Right:  return GLFW_MOUSE_BUTTON_RIGHT;
+        case gdk::mouse::Button::Left: return GLFW_MOUSE_BUTTON_LEFT;
+        case gdk::mouse::Button::Right: return GLFW_MOUSE_BUTTON_RIGHT;
         case gdk::mouse::Button::Middle: return GLFW_MOUSE_BUTTON_MIDDLE;
-        case gdk::mouse::Button::Four:   return GLFW_MOUSE_BUTTON_4;
-        case gdk::mouse::Button::Five:   return GLFW_MOUSE_BUTTON_5;
-        case gdk::mouse::Button::Six:    return GLFW_MOUSE_BUTTON_6;
-        case gdk::mouse::Button::Seven:  return GLFW_MOUSE_BUTTON_7;
-        case gdk::mouse::Button::Eight:  return GLFW_MOUSE_BUTTON_8;
+        case gdk::mouse::Button::Four: return GLFW_MOUSE_BUTTON_4;
+        case gdk::mouse::Button::Five: return GLFW_MOUSE_BUTTON_5;
+        case gdk::mouse::Button::Six: return GLFW_MOUSE_BUTTON_6;
+        case gdk::mouse::Button::Seven: return GLFW_MOUSE_BUTTON_7;
+        case gdk::mouse::Button::Eight: return GLFW_MOUSE_BUTTON_8;
     }
     
     throw std::invalid_argument(std::string("Unable to convert mouse button \"").append(std::to_string(static_cast< std::underlying_type< decltype(a)>::type>(a))).append("\" to GLFW_MOUSE_BUTTON")); 
@@ -28,7 +28,12 @@ static inline int glfwmouseButtonFromButton(const gdk::mouse::Button a)
 
 namespace gdk
 {
-    bool mouse_glfw::getButtonDown(const mouse::Button aButton)
+    mouse_glfw::mouse_glfw(decltype(m_pWindow) pWindow)
+    : m_pWindow(pWindow)
+    , m_LastDeltaCallCursorPosition(getCursorPosition())
+    {}
+
+    bool mouse_glfw::getButtonDown(const mouse::Button aButton) const
     {
         return static_cast<bool>(glfwGetMouseButton(m_pWindow.get(), glfwmouseButtonFromButton(aButton)));
     }
@@ -62,31 +67,33 @@ namespace gdk
         m_CursorMode = aCursorMode;
     }
 
-    mouse::CursorMode mouse_glfw::getCursorMode()
+    mouse::CursorMode mouse_glfw::getCursorMode() const
     {
         return m_CursorMode;    
     }
 
-    mouse::cursor_2d_type mouse_glfw::getCursorPosition()
+    mouse::cursor_2d_type mouse_glfw::getCursorPosition() const
     {
-        double x,y;
-        glfwGetCursorPos(m_pWindow.get(), &x, &y);
+        mouse::cursor_2d_type position;
 
-        return {x, y};
+        glfwGetCursorPos(m_pWindow.get(), &position.x, &position.y);
+
+        return position;
+    }
+    
+    mouse::cursor_2d_type mouse_glfw::getDelta() const
+    {
+        return m_Delta;
     }
 
-    /*mouse::cursor_2d_type mouse_glfw::getDelta()
+    void mouse_glfw::update()
     {
         auto currentCursorPosition = getCursorPosition();
-       
-        mouse::cursor_2d_type deltaBuffer;
 
-        deltaBuffer.x = currentCursorPosition.x - m_LastDeltaCallCursorPosition.x;
-        deltaBuffer.y = currentCursorPosition.y - m_LastDeltaCallCursorPosition.y;
+        m_Delta.x = currentCursorPosition.x - m_LastDeltaCallCursorPosition.x;
+        m_Delta.y = currentCursorPosition.y - m_LastDeltaCallCursorPosition.y;
 
-        //m_LastDeltaCallCursorPosition = currentCursorPosition;
-        
-        return deltaBuffer;
-    }*/
+        m_LastDeltaCallCursorPosition = currentCursorPosition;
+    }
 }
 

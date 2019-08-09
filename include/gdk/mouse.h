@@ -50,19 +50,19 @@ namespace gdk
         //virtual bool getButton(const Button &aKeyCode) = 0;
         
         /// \brief Check if the button is being held down
-        virtual bool getButtonDown(const Button aKeyCode) = 0;
+        virtual bool getButtonDown(const Button aKeyCode) const = 0;
 
         /// \brief change cursor mode
         virtual void setCursorMode(const CursorMode aCursorMode) = 0;
 
         /// \brief check cursor mode
-        virtual mouse::CursorMode getCursorMode() = 0;
+        virtual mouse::CursorMode getCursorMode() const = 0;
 
         /// \brief Viewcoordinate of cursor
-        virtual cursor_2d_type getCursorPosition() = 0;
+        virtual cursor_2d_type getCursorPosition() const = 0;
 
         /// \brief Get amount of cursor movement since the last frame
-        //virtual cursor_2d_type getDelta() = 0;
+        virtual cursor_2d_type getDelta() const = 0;
 
         ///
         //virtual setCursorGraphic(standardShapeEnum) = 0;

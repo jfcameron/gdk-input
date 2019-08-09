@@ -101,7 +101,7 @@ int main(int argc, char **argv)
     player_controls.addMouseAxisMapping("LookLeft" , gdk::mouse::Axis::X, -1);
     player_controls.addKeyMapping("LookLeft", gdk::keyboard::Key::LeftArrow);
 
-    player_controls.addMouseAxisMapping("LookRight" , gdk::mouse::Axis::Y, -1);
+    player_controls.addMouseAxisMapping("LookRight" , gdk::mouse::Axis::X, +1);
     player_controls.addKeyMapping("LookRight", gdk::keyboard::Key::RightArrow);
 
     while(!glfwWindowShouldClose(pWindow.get()))
@@ -109,6 +109,8 @@ int main(int argc, char **argv)
         glfwPollEvents();
 
         if (pGamepad) pGamepad->update();
+        
+        if (pMouse) pMouse->update();
 
         /*if (player_controls.get("Forward")) std::cout << "Moving Forward: " << player_controls.get("Forward") << "\n";
         if (player_controls.get("Backward")) std::cout << "Moving Backward: " << player_controls.get("Backward") << "\n";
@@ -121,7 +123,10 @@ int main(int argc, char **argv)
         if (const auto value = player_controls.get("LookLeft")) std::cout << "LookLeft: " << value << "\n";
         if (const auto value = player_controls.get("LookRight")) std::cout << "LookRight: " << value << "\n";
 
-        //if (auto delta = pMouse->getDelta(); delta.x != 0 || delta.y != 0) std::cout << "x: " << delta.x << ", y: " << delta.y << "\n";
+        /*if (auto delta = pMouse->getDelta(), pos = pMouse->getCursorPosition(); delta.x != 0 || delta.y != 0)
+        {
+            std::cout << "x: " << delta.x << ", y: " << delta.y << "| x: " << pos.x << ", y: " << pos.y << "\n";
+        }*/
     }
 
     return EXIT_SUCCESS;
