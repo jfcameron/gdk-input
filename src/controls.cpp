@@ -8,9 +8,9 @@
 namespace gdk
 {
     controls::controls(std::shared_ptr<keyboard> aKeyboard, std::shared_ptr<mouse> aMouse, std::shared_ptr<gamepad> aGamepad)    
-    : m_Keyboard(aKeyboard)
-    , m_Mouse(aMouse)
-    , m_Gamepad(aGamepad)
+    : m_pKeyboard(aKeyboard)
+    , m_pMouse(aMouse)
+    , m_pGamepad(aGamepad)
     {}
 
     double controls::get(const std::string &aName) const
@@ -19,27 +19,27 @@ namespace gdk
 
         if (iter == m_Inputs.end()) throw std::invalid_argument(std::string("TAG").append("not a valid button: ").append(aName));
 
-        if (m_Keyboard)
+        if (m_pKeyboard)
         {
             for (const auto &key : iter->second.keys)
             {
-                if (const auto value = static_cast<float>(m_Keyboard->getKeyDown(key))) return value;
+                if (const auto value = static_cast<float>(m_pKeyboard->getKeyDown(key))) return value;
             }
         }
 
-        if (m_Mouse) 
+        if (m_pMouse) 
         {
             for (const auto &button : iter->second.mouse.buttons)
             {
-                if (const auto value = static_cast<float>(m_Mouse->getButtonDown(button))) return value;
+                if (const auto value = static_cast<float>(m_pMouse->getButtonDown(button))) return value;
             }
 
             //TODO: Mouse axes
             for (const auto &axis : iter->second.mouse.axes)
             {
-                if (m_Mouse->getCursorMode() == gdk::mouse::CursorMode::Locked)
+                if (m_pMouse->getCursorMode() == gdk::mouse::CursorMode::Locked)
                 {
-                    const auto delta = m_Mouse->getDelta();
+                    const auto delta = m_pMouse->getDelta();
 
                     switch(axis.first)
                     {
@@ -54,7 +54,11 @@ namespace gdk
 
                         case mouse::Axis::Y:
                         {
-                            if (const auto value = delta.y) return value * axis.second;
+                            const auto value = delta.y;
+
+                            if (axis.second > 0 && delta.y > 0) return value * axis.second; 
+
+                            if (axis.second < 0 && delta.y < 0) return value * axis.second; 
                         } break;
 
                         default: throw std::invalid_argument("unhandled axis type");
@@ -63,23 +67,23 @@ namespace gdk
             }
         }
        
-        if (m_Gamepad)
+        if (m_pGamepad)
         {
-            if (const auto current_gamepad_iter = iter->second.gamepads.find(std::string(m_Gamepad->getName())); current_gamepad_iter != iter->second.gamepads.end())
+            if (const auto current_gamepad_iter = iter->second.gamepads.find(std::string(m_pGamepad->getName())); current_gamepad_iter != iter->second.gamepads.end())
             {
                 for (const auto &button : current_gamepad_iter->second.buttons)
                 {   
-                    if (const auto value = static_cast<float>(m_Gamepad->getButtonDown(button))) return value;
+                    if (const auto value = static_cast<float>(m_pGamepad->getButtonDown(button))) return value;
                 }
 
                 for (const auto &hat : current_gamepad_iter->second.hats)
                 {   
-                    if (auto a = hat.second, b = m_Gamepad->getHat(hat.first); a.x == b.x && a.y == b.y) return 1;
+                    if (auto a = hat.second, b = m_pGamepad->getHat(hat.first); a.x == b.x && a.y == b.y) return 1;
                 }
 
                 for (const auto &axis : current_gamepad_iter->second.axes)
                 {
-                    if (const auto value = static_cast<float>(m_Gamepad->getAxis(axis.first))) 
+                    if (const auto value = static_cast<float>(m_pGamepad->getAxis(axis.first))) 
                     {
                         const float minimum = axis.second;
 
@@ -88,7 +92,7 @@ namespace gdk
                     }
                 }
             }
-            else std::cerr << m_Gamepad->getName() << " not configured for these controls\n";
+            else std::cerr << m_pGamepad->getName() << " not configured for these controls\n";
         }
 
         return 0;
@@ -96,17 +100,17 @@ namespace gdk
 
     void controls::setKeyboard(std::shared_ptr<keyboard> aKeyboard)
     {
-        m_Keyboard = aKeyboard;
+        m_pKeyboard = aKeyboard;
     }
 
     void controls::setMouse(std::shared_ptr<mouse> aMouse)
     {
-        m_Mouse = aMouse;
+        m_pMouse = aMouse;
     }
 
     void controls::setGamepad(std::shared_ptr<gamepad> aGamepad)
     {
-        m_Gamepad = aGamepad;
+        m_pGamepad = aGamepad;
     }
     
     void controls::addKeyMapping(const std::string &aName, const keyboard::Key aKey)

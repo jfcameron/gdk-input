@@ -53,9 +53,9 @@ namespace gdk
 
         std::map<std::string, bindings> m_Inputs; //TODO: rename to input map?
 
-        std::shared_ptr<keyboard> m_Keyboard;
-        std::shared_ptr<mouse>    m_Mouse;
-        std::shared_ptr<gamepad>  m_Gamepad;
+        std::shared_ptr<keyboard> m_pKeyboard;
+        std::shared_ptr<mouse>    m_pMouse;
+        std::shared_ptr<gamepad>  m_pGamepad;
 
     public:
         //! get value of an input

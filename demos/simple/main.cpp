@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <sstream>
 
 #include <GLFW/glfw3.h>
 
@@ -61,7 +62,7 @@ int main(int argc, char **argv)
 
     gdk::controls player_controls(pKeyboard, pMouse, pGamepad);
 
-    player_controls.addKeyMapping("Jump", gdk::keyboard::Key::C);
+    player_controls.addKeyMapping("Jump", gdk::keyboard::Key::Space);
     player_controls.addGamepadButtonMapping("Jump", std::string(gamepadName), 0);
 
     player_controls.addKeyMapping("Run", gdk::keyboard::Key::LeftShift);
@@ -104,6 +105,12 @@ int main(int argc, char **argv)
     player_controls.addMouseAxisMapping("LookRight" , gdk::mouse::Axis::X, +1);
     player_controls.addKeyMapping("LookRight", gdk::keyboard::Key::RightArrow);
 
+    player_controls.addMouseAxisMapping("LookUp" , gdk::mouse::Axis::Y, -1);
+    player_controls.addKeyMapping("LookUp", gdk::keyboard::Key::UpArrow);
+
+    player_controls.addMouseAxisMapping("LookDown" , gdk::mouse::Axis::Y, +1);
+    player_controls.addKeyMapping("LookDown", gdk::keyboard::Key::DownArrow);
+
     while(!glfwWindowShouldClose(pWindow.get()))
     { 
         glfwPollEvents();
@@ -112,21 +119,39 @@ int main(int argc, char **argv)
         
         if (pMouse) pMouse->update();
 
-        /*if (player_controls.get("Forward")) std::cout << "Moving Forward: " << player_controls.get("Forward") << "\n";
+        if (player_controls.get("Forward")) std::cout << "Moving Forward: " << player_controls.get("Forward") << "\n";
         if (player_controls.get("Backward")) std::cout << "Moving Backward: " << player_controls.get("Backward") << "\n";
         if (player_controls.get("StrafeLeft")) std::cout << "Moving left!\n";
         if (player_controls.get("StrafeRight")) std::cout << "Moving right!\n";
         
         if (player_controls.get("Jump")) std::cout << "Jumping!\n";
-        if (player_controls.get("Run")) std::cout << "Running!\n";*/
-        
-        if (const auto value = player_controls.get("LookLeft")) std::cout << "LookLeft: " << value << "\n";
-        if (const auto value = player_controls.get("LookRight")) std::cout << "LookRight: " << value << "\n";
+        if (player_controls.get("Run")) std::cout << "Running!\n";
 
-        /*if (auto delta = pMouse->getDelta(), pos = pMouse->getCursorPosition(); delta.x != 0 || delta.y != 0)
+        float up = 0, down = 0, left = 0, right = 0;
+
+        if (const auto value = player_controls.get("LookLeft")) left = value;
+        if (const auto value = player_controls.get("LookRight")) right = value;
+
+        if (const auto value = player_controls.get("LookUp")) up = value;
+        if (const auto value = player_controls.get("LookDown")) down = value;
+
+
+        bool shouldPrint = false;
+
+        std::stringstream output;
+
+        output << "{ ";
+
+        if (up || down || left || right)
         {
-            std::cout << "x: " << delta.x << ", y: " << delta.y << "| x: " << pos.x << ", y: " << pos.y << "\n";
-        }*/
+            shouldPrint = true;
+
+            output << "\"Look\": { \"L\": " << left << ", \"R\": " << right << ", \"U\": " << up << ", \"D\": " << down << "}";
+        }
+
+        output << " }\n";
+
+        if (shouldPrint) std::cout << output.str();
     }
 
     return EXIT_SUCCESS;
