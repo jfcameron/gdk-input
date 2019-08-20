@@ -15,6 +15,13 @@
 
 static auto constexpr TAG = "demo";
 
+const char *JSONControlsMappingString = R"V0G0N(
+[
+    {},
+    {}
+]
+)V0G0N";
+
 /// \brief init glfw, create a window
 std::shared_ptr<GLFWwindow> initGLFW()
 {
@@ -62,30 +69,69 @@ int main(int argc, char **argv)
 
     gdk::controls player_controls(pKeyboard, pMouse, pGamepad);
 
-    player_controls.addKeyMapping("Jump", gdk::keyboard::Key::Space);
-    player_controls.addGamepadButtonMapping("Jump", std::string(gamepadName), 0);
+    player_controls.addKeyToMapping("Jump", gdk::keyboard::Key::Space);
+    player_controls.addKeyToMapping("Jump", gdk::keyboard::Key::Q);
+    player_controls.addGamepadButtonToMapping("Jump", std::string(gamepadName), 0);
 
-    player_controls.addKeyMapping("Run", gdk::keyboard::Key::LeftShift);
-    player_controls.addGamepadButtonMapping("Run", std::string(gamepadName), 1);
+    player_controls.addKeyToMapping("Run", gdk::keyboard::Key::LeftShift);
+    player_controls.addGamepadButtonToMapping("Run", std::string(gamepadName), 1);
 
-    player_controls.addGamepadHatMapping("Forward", std::string(gamepadName), 0, {0, +1});
-    player_controls.addGamepadAxisMapping("Forward", std::string(gamepadName), 1, -0.05);
-    player_controls.addKeyMapping("Forward", gdk::keyboard::Key::W);
+    player_controls.addGamepadHatToMapping("Forward", std::string(gamepadName), 0, {0, +1});
+    player_controls.addGamepadAxisToMapping("Forward", std::string(gamepadName), 1, -0.05);
+    player_controls.addKeyToMapping("Forward", gdk::keyboard::Key::W);
    
-    player_controls.addGamepadHatMapping("Backward", std::string(gamepadName), 0, {0, -1});
-    player_controls.addGamepadAxisMapping("Backward", std::string(gamepadName), 1, +0.05);
-    player_controls.addKeyMapping("Backward", gdk::keyboard::Key::S);
+    player_controls.addGamepadHatToMapping("Backward", std::string(gamepadName), 0, {0, -1});
+    player_controls.addGamepadAxisToMapping("Backward", std::string(gamepadName), 1, +0.05);
+    player_controls.addKeyToMapping("Backward", gdk::keyboard::Key::S);
     
-    player_controls.addGamepadHatMapping("StrafeLeft", std::string(gamepadName), 0, {-1, 0});
-    player_controls.addGamepadAxisMapping("StrafeLeft", std::string(gamepadName), 0, -0.05);
-    player_controls.addKeyMapping("StrafeLeft", gdk::keyboard::Key::A);
+    player_controls.addGamepadHatToMapping("StrafeLeft", std::string(gamepadName), 0, {-1, 0});
+    player_controls.addGamepadAxisToMapping("StrafeLeft", std::string(gamepadName), 0, -0.05);
+    player_controls.addKeyToMapping("StrafeLeft", gdk::keyboard::Key::A);
 
-    player_controls.addGamepadHatMapping("StrafeRight", std::string(gamepadName), 0, {+1, 0});
-    player_controls.addGamepadAxisMapping("StrafeRight", std::string(gamepadName), 0, +0.05);
-    player_controls.addKeyMapping("StrafeRight", gdk::keyboard::Key::D);
+    player_controls.addGamepadHatToMapping("StrafeRight", std::string(gamepadName), 0, {+1, 0});
+    player_controls.addGamepadAxisToMapping("StrafeRight", std::string(gamepadName), 0, +0.05);
+    player_controls.addKeyToMapping("StrafeRight", gdk::keyboard::Key::D);
+
+    /*
+    {
+        "Mappings": [
+            { 
+                Name: "Jump"
+                , Keys: [
+                ]
+                , "Mouse": {
+                    "Buttons": [
+                    ]
+                    , "Axes": [
+                    ]
+                }
+                , "Gamepads": [
+                    { 
+                        "Name": "Xbox360"
+                        , "Buttons": [
+                        ]
+                        , "Axes": [
+                        ]
+                        , "Hats": [
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+    */
+    /*
+    struct Mapping
+    {
+        std::string Name;
+
+        std::vector<
+    };
+
+    */
 
     /* //BRAINSTORMING on "stick acceleration" etc. functions that modify raw stick to some function of it.
-    player_controls.addGamepadAxisMapping(
+    player_controls.addGamepadAxisToMapping(
         "LookLeft", //Name of the control
         std::string(gamepadName), //Name of the supported hardware
         1, 
@@ -99,17 +145,19 @@ int main(int argc, char **argv)
     );
     */
 
-    player_controls.addMouseAxisMapping("LookLeft" , gdk::mouse::Axis::X, -1);
-    player_controls.addKeyMapping("LookLeft", gdk::keyboard::Key::LeftArrow);
+    player_controls.addMouseAxisToMapping("LookLeft", gdk::mouse::Axis::X, -1);
+    player_controls.addKeyToMapping("LookLeft", gdk::keyboard::Key::LeftArrow);
 
-    player_controls.addMouseAxisMapping("LookRight" , gdk::mouse::Axis::X, +1);
-    player_controls.addKeyMapping("LookRight", gdk::keyboard::Key::RightArrow);
+    player_controls.addMouseAxisToMapping("LookRight" , gdk::mouse::Axis::X, +1);
+    player_controls.addKeyToMapping("LookRight", gdk::keyboard::Key::RightArrow);
 
-    player_controls.addMouseAxisMapping("LookUp" , gdk::mouse::Axis::Y, -1);
-    player_controls.addKeyMapping("LookUp", gdk::keyboard::Key::UpArrow);
+    player_controls.addMouseAxisToMapping("LookUp" , gdk::mouse::Axis::Y, -1);
+    player_controls.addKeyToMapping("LookUp", gdk::keyboard::Key::UpArrow);
 
-    player_controls.addMouseAxisMapping("LookDown" , gdk::mouse::Axis::Y, +1);
-    player_controls.addKeyMapping("LookDown", gdk::keyboard::Key::DownArrow);
+    player_controls.addMouseAxisToMapping("LookDown" , gdk::mouse::Axis::Y, +1);
+    player_controls.addKeyToMapping("LookDown", gdk::keyboard::Key::DownArrow);
+
+    player_controls.addMappingsFromJSON(JSONControlsMappingString);
 
     while(!glfwWindowShouldClose(pWindow.get()))
     { 

@@ -43,6 +43,7 @@ jfc_project(library
 
     PRIVATE_INCLUDE_DIRECTORIES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include
+        ${nlohmann_INCLUDE_DIR}
 
     SOURCE_LIST 
         ${CMAKE_CURRENT_SOURCE_DIR}/src/controls.cpp

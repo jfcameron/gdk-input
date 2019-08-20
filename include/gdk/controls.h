@@ -15,7 +15,9 @@
 namespace gdk
 {
     /// \brief user input mapping abstraction
-    /// abstraction on top of gamepads, mouse, keyboards.
+    /// unify gamepad, mouse, keyboard input behind a single binding
+    /// e.g: a "Jump" binding that is non-zero when spacebar or gamepad button zero is pressed
+    /// e.g: a "Look up" binding that is non-zero when up arrow or mouse axis y or gamepad axis 0 etc.
     class controls
     {
         //TODO: serialize, deserialize methods. 
@@ -70,18 +72,26 @@ namespace gdk
         //! [re]sets gamepad pointer
         void setGamepad(std::shared_ptr<gamepad> aGamepad);
 
-        //! adds a mapping to an existing input OR creates a new input and adds to that
-        void addKeyMapping(const std::string &aName, const keyboard::Key aKey);
+        //! adds a key to a mapping, creating a new mapping if it did not already exist.
+        void addKeyToMapping(const std::string &aMappingName, const keyboard::Key aKey);
 
-        void addMouseButtonMapping(const std::string &aName, const mouse::Button aButton);
+        //! adds a mouse button to a mapping, creating a new mapping if it did not already exist.
+        void addMouseButtonToMapping(const std::string &aMappingName, const mouse::Button aButton);
         
-        void addMouseAxisMapping(const std::string &aName, const mouse::Axis aAxis, const double scaleAndDirection);
+        //! adds a mouse axis to a mapping, creating a new mapping if it did not already exist.
+        void addMouseAxisToMapping(const std::string &aMappingName, const mouse::Axis aAxis, const double scaleAndDirection);
 
-        void addGamepadButtonMapping(const std::string &aInputName, const std::string &aGamepadName, const int aButtonIndex);
+        //! adds a gamepad button to a mapping for a specific gamepad type, creating a new mapping if it did not already exist.
+        void addGamepadButtonToMapping(const std::string &aMappingName, const std::string &aGamepadName, const int aButtonIndex);
         
-        void addGamepadAxisMapping(const std::string &aInputName, const std::string &aGamepadName, const int aAxisIndex, const float aMinimum);
+        //! adds a gamepad axis to a mapping for a specific gamepad type, creating a new mapping if it did not already exist.
+        void addGamepadAxisToMapping(const std::string &aMappingName, const std::string &aGamepadName, const int aAxisIndex, const float aMinimum);
        
-        void addGamepadHatMapping(const std::string &aInputName, const std::string &aGamepadName, const int aHatIndex, const gamepad::hat_state_type aHatState);
+        //! adds a gamepad hat to a mapping for a specific gamepad type, creating a new mapping if it did not already exist.
+        void addGamepadHatToMapping(const std::string &aMappingName, const std::string &aGamepadName, const int aHatIndex, const gamepad::hat_state_type aHatState);
+
+        //! adds bindings from a string containing JSON data
+        void addMappingsFromJSON(const std::string &aJSONData);
 
         controls(std::shared_ptr<keyboard> aKeyboard = nullptr, std::shared_ptr<mouse> aMouse = nullptr, std::shared_ptr<gamepad> aGamepad = nullptr);
     };

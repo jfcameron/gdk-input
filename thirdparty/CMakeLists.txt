@@ -2,6 +2,7 @@
 
 set(dependencies
     "glfw"
+    "nlohmann"
 )
 
 jfc_add_dependencies(${dependencies})

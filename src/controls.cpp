@@ -3,7 +3,11 @@
 #include <type_traits>
 #include <iostream>
 
+#include <nlohmann/json.hpp>
+
 #include <gdk/controls.h>
+
+using namespace nlohmann;
 
 namespace gdk
 {
@@ -113,95 +117,62 @@ namespace gdk
         m_pGamepad = aGamepad;
     }
     
-    void controls::addKeyMapping(const std::string &aName, const keyboard::Key aKey)
+    void controls::addKeyToMapping(const std::string &aName, const keyboard::Key aKey)
     {
         m_Inputs[aName].keys.insert(aKey);
     }
     
-    void controls::addMouseButtonMapping(const std::string &aName, const mouse::Button aButton)
+    void controls::addMouseButtonToMapping(const std::string &aName, const mouse::Button aButton)
     {
         m_Inputs[aName].mouse.buttons.insert(aButton);
     }
 
-    void controls::addMouseAxisMapping(const std::string &aName, const mouse::Axis aAxis, const double aScaleAndDirection)
+    void controls::addMouseAxisToMapping(const std::string &aName, const mouse::Axis aAxis, const double aScaleAndDirection)
     {
         m_Inputs[aName].mouse.axes.insert({aAxis, aScaleAndDirection});
     }
 
-    void controls::addGamepadAxisMapping(const std::string &aInputName, const std::string &aGamepadName, const int aAxisIndex, const float aMinimum)
+    void controls::addGamepadAxisToMapping(const std::string &aInputName, const std::string &aGamepadName, const int aAxisIndex, const float aMinimum)
     {
         m_Inputs[aInputName].gamepads[aGamepadName].axes.insert({aAxisIndex, aMinimum});
     }
 
-    void controls::addGamepadHatMapping(const std::string &aInputName, const std::string &aGamepadName, const int aHatIndex, const gamepad::hat_state_type aHatState)
+    void controls::addGamepadHatToMapping(const std::string &aInputName, const std::string &aGamepadName, const int aHatIndex, const gamepad::hat_state_type aHatState)
     {
         m_Inputs[aInputName].gamepads[aGamepadName].hats.insert({aHatIndex, aHatState});
     }
 
-    void controls::addGamepadButtonMapping(const std::string &aInputName, const std::string &aGamepadName, const int aButtonIndex)
+    void controls::addGamepadButtonToMapping(const std::string &aInputName, const std::string &aGamepadName, const int aButtonIndex)
     {
         m_Inputs[aInputName].gamepads[aGamepadName].buttons.insert(aButtonIndex);
     }
+        
+    void controls::addMappingsFromJSON(const std::string &aJSONData)
+    {
+        constexpr auto addKeyMappingFromJSON = [](const std::string &aJSON)
+        {
+
+        };
+        
+        //TODO: mouse and gamepad
+
+        //
+        const auto root = json::parse(aJSONData);
+
+        if (root.type() == json::value_t::array)
+        {
+            std::cout << "is array\n";
+
+            for (const auto item : root)
+            {
+                if (item.type() == json::value_t::object)
+                {
+
+                }
+            }
+        }
+
+        std::cout << "wip[\n";
+    }
 }
 
-/*
-"Configuration":
-{
-    "Input": [
-        {
-            "Name": "Up",
-            "Keys": [ 
-                Q
-            ],
-            "Gamepads": [
-                {
-                    "Name": "XboxController",
-                    "Button_Indicies": [
-                        0
-                    ],
-                    "Hats": [
-                        { "Index": 0, "Hat_State": {0, 1} }
-                    ],
-                    "Axes_Indicies": [
-                        0 
-                    ]
-                },
-                {
-                    "Name": "Logitech",
-                    "Button_Indicies": [
-                        1
-                    ],
-                    "Hats": [
-                        { "Index": 2, "Hat_State": {0, -1} }
-                    ],
-                    "Axes_Indicies": [
-                        3 
-                    ]
-                }
-            ]
-        }
-    ]
-    }
- */
-
-        /*controls(
-            std::vector< //inputs
-                std::tuple<
-                    std::string, //name of this input (e.g: Up)
-                    std::vector<Key>, //mapped keys
-                    std::vector< //List of supported gamepads
-                        std::tuple<
-                            std::string, //gamepad name (e.g: Xbox)
-                            std::vector<int>, //button indicies
-                            std::vector< //hats
-                                std::pair<
-                                    int, //hat index
-                                    hat_state_type //hat state
-                                >
-                            >,
-                            std::vector<int>, //Axes indicies
-                        >
-                    >
-                >
-            >
-        )*/
