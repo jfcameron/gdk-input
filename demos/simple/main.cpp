@@ -16,10 +16,35 @@
 static auto constexpr TAG = "demo";
 
 const char *JSONControlsMappingString = R"V0G0N(
-[
-    {},
-    {}
-]
+{
+    "Name": "Jump",
+    "Keys": [
+       "A",
+       "Space"
+    ],
+    "Mouse": {
+        "Buttons": [
+            "Left"
+        ],
+        "Axes": [
+            "X"
+        ] 
+    },
+    "Gamepads": [
+        { 
+            "Name": "Xbox360"
+            , "Buttons": [
+                1
+            ]
+            , "Axes": [
+                0
+            ]
+            , "Hats": [
+                0
+            ]
+        }
+    ]
+}
 )V0G0N";
 
 /// \brief init glfw, create a window
