@@ -146,94 +146,113 @@ namespace gdk
     {
         m_Inputs[aInputName].gamepads[aGamepadName].buttons.insert(aButtonIndex);
     }
-        
-    void controls::addMappingsFromJSON(const std::string &aJSONData)
+      
+namespace jfc::nlohmann::json_util
+{
+    std::optional<json> get_property(const json &object, const std::string &propertyName, const json::value_t &type)
     {
-        constexpr auto parseMapping = [] (const json &root)
+        return object.contains(propertyName) && object[propertyName].type() == type
+            ? std::optional<json>(object[propertyName])
+            : std::nullopt;
+    }
+}
+
+using namespace jfc::nlohmann;
+
+void controls::addMappingsFromJSON(const std::string &aJSONData)
+{
+    constexpr auto deserializeMapping = [] (const json &root)
+    {
+        //TOOD: possibly catch nlohmanns exceptions and throw ones more appropriate? nolhman is a hidden dependency. 
+        //dont expose?
+
+        auto mappingName(root.at("Name").get<std::string>());
+        //auto mappingName = json_util::get_optional_property<std::string, json_util::required_type>(root, "Name");
+
+        std::cout << "mapname: " << mappingName << "\n";
+
+        if (const auto keys = json_util::get_property(root, "Keys", json::value_t::array))
         {
-            //TOOD: possibly catch nlohmanns exceptions and throw ones more appropriate? nolhman is a hidden dependency. 
-            //dont expose?
-
-            auto mappingName(root.at("Name").get<std::string>());
-
-            std::cout << "mapname: " << mappingName << "\n";
-
-            if (root.contains("Keys"))// && root["Keys"].type() == json::value_t::array)
+            for (const auto &key : *keys)
             {
-                for (const auto &key : root["Keys"])
+                if (key.type() == json::value_t::string)
                 {
-                    //TODO: 
-                    //addKeyToMapping(mappingName, stringToKeyboardKeyEnum(key.get<std::string>());
-                    std::cout << "JSON keys: " <<  key.get<std::string>() << "\n";
+                //TODO: 
+                //addKeyToMapping(mappingName, stringToKeyboardKeyEnum(key.get<std::string>());
+                std::cout << "JSON keys: " <<  key.get<std::string>() << "\n";
+                }
+                else
+                {
+                    
                 }
             }
+        }
 
-            if (root.contains("Mouse"))// && root["Mouse"].type() == json::value_t::object)
+        if (const auto mouse = json_util::get_property(root, "Mouse", json::value_t::object))
+        {
+            if (mouse->contains("Buttons")) for (const auto &mouseButton : (*mouse)["Buttons"])
             {
-                const auto mouse = root["Mouse"];
-
-                if (mouse.contains("Buttons")) for (const auto &mouseButton : mouse["Buttons"])
-                {
-                    //TODO: button to string fucntion needed
-                    std::cout << "JSON mouse buttons: " << mouseButton.get<std::string>() << "\n";
-                }
-
-                if (mouse.contains("Axes")) for (const auto &mouseAxis : mouse["Axes"])
-                {
-                    //TODO: 
-                    std::cout << "JSON mouse axes: " << mouseAxis.get<std::string>() << "\n";
-                }
+                //TODO: button to string fucntion needed
+                //std::cout << "JSON mouse buttons: " << mouseButton.get<std::string>() << "\n";
             }
 
-            if (root.contains("Gamepads") && root["Gamepads"].type() == json::value_t::array)
+
+            if (mouse->contains("Axes")) for (const auto &mouseAxis : (*mouse)["Axes"])
             {
-                for (const auto gamepad : root["Gamepads"])
+                //TODO: 
+                //std::cout << "JSON mouse axes: " << mouseAxis.get<std::string>() << "\n";
+            }
+        }
+
+        if (root.contains("Gamepads") && root["Gamepads"].type() == json::value_t::array)
+        {
+            for (const auto gamepad : root["Gamepads"])
+            {
+                if (gamepad.contains("Name") && gamepad["Name"].type() == json::value_t::string)
                 {
-                    if (gamepad.contains("Name") && gamepad["Name"].type() == json::value_t::string)
+                    const auto name = gamepad["Name"].get<std::string>();
+
+                    if (gamepad.contains("Buttons") && gamepad["Buttons"].type() == json::value_t::array)
                     {
-                        const auto name = gamepad["Name"].get<std::string>();
-
-                        if (gamepad.contains("Buttons") && gamepad["Buttons"].type() == json::value_t::array)
+                        for (const auto button : gamepad["Buttons"])
                         {
-                            for (const auto button : gamepad["Buttons"])
-                            {
-                                //TODO:
-                                std::cout << "JSON gamepad buttons: " << button.get<int>() << "\n";
-                            }
+                            //TODO:
+                            std::cout << "JSON gamepad buttons: " << button.get<int>() << "\n";
                         }
-                        
-                        if (gamepad.contains("Axes") && gamepad["Axes"].type() == json::value_t::array)
+                    }
+                    
+                    if (gamepad.contains("Axes") && gamepad["Axes"].type() == json::value_t::array)
+                    {
+                        for (const auto axis : gamepad["Axes"])
                         {
-                            for (const auto axis : gamepad["Axes"])
-                            {
-                                //TODO:
-                                std::cout << "JSON gamepad axes: " << axis.get<int>() << "\n";
-                            }
+                            //TODO:
+                            std::cout << "JSON gamepad axes: " << axis.get<int>() << "\n";
                         }
-                        
-                        if (gamepad.contains("Hats") && gamepad["Hats"].type() == json::value_t::array)
+                    }
+                    
+                    if (gamepad.contains("Hats") && gamepad["Hats"].type() == json::value_t::array)
+                    {
+                        for (const auto hat : gamepad["Hats"])
                         {
-                            for (const auto hat : gamepad["Hats"])
-                            {
-                                //TODO:
-                                std::cout << "JSON gamepad hats: " << hat.get<int>() << "\n";
-                            }
+                            //TODO:
+                            std::cout << "JSON gamepad hats: " << hat.get<int>() << "\n";
                         }
                     }
                 }
             }
-        };
-        
-        const auto root = json::parse(aJSONData);
-
-        switch (root.type())
-        {
-            case json::value_t::array: for (const auto &item : root) parseMapping(item); break;
-
-            case json::value_t::object: parseMapping(root); break;
-
-            default: throw std::invalid_argument("mapping should be an array (multiple mappings) or an object (single mapping)");
         }
+    };
+    
+    const auto root = json::parse(aJSONData);
+
+    switch (root.type())
+    {
+        case json::value_t::array: for (const auto &item : root) deserializeMapping(item); break;
+
+        case json::value_t::object: deserializeMapping(root); break;
+
+        default: throw std::invalid_argument("mapping should be an array (multiple mappings) or an object (single mapping)");
     }
+}
 }
 
