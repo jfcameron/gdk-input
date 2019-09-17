@@ -20,9 +20,9 @@ namespace gdk
     : m_JoystickIndex(aJoystickIndex)
     , m_Name([aJoystickIndex]()
     {
-        const char *name = glfwJoystickIsGamepad(aJoystickIndex) //if a joystick "is a gamepad" then it is present in the sdl db. //TODO: redirect gets and sets if this is a gamepad
+        const char *name = /*glfwJoystickIsGamepad(aJoystickIndex) //if a joystick "is a gamepad" then it is present in the sdl db. //TODO: redirect gets and sets if this is a gamepad //This is not thought out.
             ? "standard_gamepad" 
-            : glfwGetJoystickName(aJoystickIndex); //the returned char* is non-owning.
+            :*/ glfwGetJoystickName(aJoystickIndex); //the returned char* is non-owning.
 
         if (!name) throw std::invalid_argument(std::string(TAG).append(": no gamepad at index: ").append(std::to_string(aJoystickIndex)));
 
@@ -54,11 +54,20 @@ namespace gdk
     {
         const auto hat_state_glfw = m_Hats[index];
     
-        if (hat_state_glfw == GLFW_HAT_CENTERED) return {0, 0};
+        if (hat_state_glfw == GLFW_HAT_CENTERED) return {hat_state_type::horizontal_direction::Center, hat_state_type::vertical_direction::Center};
 
         return {
-            hat_state_glfw & GLFW_HAT_RIGHT ? short(1) : hat_state_glfw & GLFW_HAT_LEFT ? short(-1) : short(0), 
-            hat_state_glfw & GLFW_HAT_UP    ? short(1) : hat_state_glfw & GLFW_HAT_DOWN ? short(-1) : short(0)
+            hat_state_glfw & GLFW_HAT_RIGHT 
+                ? hat_state_type::horizontal_direction::Right
+                : hat_state_glfw & GLFW_HAT_LEFT 
+                    ? hat_state_type::horizontal_direction::Left
+                    : hat_state_type::horizontal_direction::Center, 
+
+            hat_state_glfw & GLFW_HAT_UP 
+                ? hat_state_type::vertical_direction::Up
+                : hat_state_glfw & GLFW_HAT_DOWN 
+                    ? hat_state_type::vertical_direction::Down
+                    : hat_state_type::vertical_direction::Center
         };
     }
 
@@ -74,7 +83,7 @@ namespace gdk
 
     void gamepad_glfw::update()
     {
-        if (GLFW_TRUE == glfwJoystickPresent(m_JoystickIndex))
+        if (GLFW_TRUE == glfwJoystickPresent(m_JoystickIndex)) //TODO: here take advantage of gamepad mappings? https://www.glfw.org/docs/latest/input_guide.html#gamepad_mapping. Map like this: a = 0, b = 1 ....
         {
             m_Name = glfwGetJoystickName(m_JoystickIndex);
 

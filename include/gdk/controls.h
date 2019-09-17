@@ -4,6 +4,7 @@
 #define GDK_CONTROLS_H
 
 #include <map>
+#include <memory>
 #include <set>
 #include <string>
 #include <string_view>
@@ -14,86 +15,65 @@
 
 namespace gdk
 {
-    /// \brief user input mapping abstraction
-    /// unify gamepad, mouse, keyboard input behind a single binding
-    /// e.g: a "Jump" binding that is non-zero when spacebar or gamepad button zero is pressed
-    /// e.g: a "Look up" binding that is non-zero when up arrow or mouse axis y or gamepad axis 0 etc.
+    /// \brief provides a way to map raw input from a gamepad, mouse, and keyboard behind a single logical input
+    /// e.g: create a "Jump" binding that is non-zero when spacebar or gamepad button zero is pressed
+    /// e.g: a "Look up" binding that is non-zero when up arrow or mouse axis y or gamepad axis 0 is interacted with.
     class controls
     {
-        //TODO: serialize, deserialize methods. 
-        using key_collection_type = std::set<keyboard::Key>;
-
-        using mouse_button_collection_type = std::set<mouse::Button>;
-        using mouse_axis_collection_type = std::set<std::pair<mouse::Axis, /*scale and direction*/double>>;
-        
-        using gamepad_button_collection_type = std::set</*index*/int>;
-        using gamepad_axis_collection_type = std::map</*index*/int, /*deadzone*/float>;
-        using gamepad_hat_collection_type = std::map</*index*/int, /*hat direction*/gamepad::hat_state_type>;
-
-        struct gamepad_bindings
-        {
-            gamepad_button_collection_type buttons;
-            
-            gamepad_axis_collection_type axes;
-
-            gamepad_hat_collection_type hats;
-        };
-
-        struct bindings
-        {
-            key_collection_type keys;
-
-            struct
-            {
-                mouse_button_collection_type buttons;
-
-                mouse_axis_collection_type axes;
-            } mouse;
-
-            std::map<std::string, gamepad_bindings> gamepads; //!< bindings for supported gamepads
-        };
-
-        std::map<std::string, bindings> m_Inputs; //TODO: rename to input map?
-
-        std::shared_ptr<keyboard> m_pKeyboard;
-        std::shared_ptr<mouse>    m_pMouse;
-        std::shared_ptr<gamepad>  m_pGamepad;
-
     public:
+        //! construct an empty instance
+        static std::unique_ptr<controls> make(std::shared_ptr<keyboard> aKeyboard = nullptr, 
+            std::shared_ptr<mouse> aMouse = nullptr, 
+            std::shared_ptr<gamepad> aGamepad = nullptr);
+        
+        //! construct an instance from a string containing a JSON serialized controls instance
+        static std::unique_ptr<controls> make_from_json(const std::string &json,
+            std::shared_ptr<keyboard> aKeyboard = nullptr, 
+            std::shared_ptr<mouse> aMouse = nullptr, 
+            std::shared_ptr<gamepad> aGamepad = nullptr);
+
         //! get value of an input
-        double get(const std::string &aName) const;
+        virtual double get(const std::string &aName) const = 0;
+
+        //foreach input... 
 
         //! [re]sets keyboard pointer
-        void setKeyboard(std::shared_ptr<keyboard> aKeyboard);
+        virtual void setKeyboard(std::shared_ptr<keyboard> aKeyboard) = 0;
 
         //! [re]sets mouse pointer
-        void setMouse(std::shared_ptr<mouse> aMouse);
+        virtual void setMouse(std::shared_ptr<mouse> aMouse) = 0;
         
         //! [re]sets gamepad pointer
-        void setGamepad(std::shared_ptr<gamepad> aGamepad);
+        virtual void setGamepad(std::shared_ptr<gamepad> aGamepad) = 0;
 
         //! adds a key to a mapping, creating a new mapping if it did not already exist.
-        void addKeyToMapping(const std::string &aMappingName, const keyboard::Key aKey);
+        virtual void addKeyToMapping(const std::string &aMappingName, const keyboard::Key aKey) = 0;
 
         //! adds a mouse button to a mapping, creating a new mapping if it did not already exist.
-        void addMouseButtonToMapping(const std::string &aMappingName, const mouse::Button aButton);
+        virtual void addMouseButtonToMapping(const std::string &aMappingName, const mouse::Button aButton) = 0;
         
         //! adds a mouse axis to a mapping, creating a new mapping if it did not already exist.
-        void addMouseAxisToMapping(const std::string &aMappingName, const mouse::Axis aAxis, const double scaleAndDirection);
+        virtual void addMouseAxisToMapping(const std::string &aMappingName, const mouse::Axis aAxis, const double scaleAndDirection) = 0;
 
         //! adds a gamepad button to a mapping for a specific gamepad type, creating a new mapping if it did not already exist.
-        void addGamepadButtonToMapping(const std::string &aMappingName, const std::string &aGamepadName, const int aButtonIndex);
+        virtual void addGamepadButtonToMapping(const std::string &aMappingName, const std::string &aGamepadName, const int aButtonIndex) = 0;
         
         //! adds a gamepad axis to a mapping for a specific gamepad type, creating a new mapping if it did not already exist.
-        void addGamepadAxisToMapping(const std::string &aMappingName, const std::string &aGamepadName, const int aAxisIndex, const float aMinimum);
+        virtual void addGamepadAxisToMapping(const std::string &aMappingName, const std::string &aGamepadName, const int aAxisIndex, const float aMinimum) = 0;
        
         //! adds a gamepad hat to a mapping for a specific gamepad type, creating a new mapping if it did not already exist.
-        void addGamepadHatToMapping(const std::string &aMappingName, const std::string &aGamepadName, const int aHatIndex, const gamepad::hat_state_type aHatState);
+        virtual void addGamepadHatToMapping(const std::string &aMappingName, const std::string &aGamepadName, const int aHatIndex, const gamepad::hat_state_type aHatState) = 0;
 
         //! adds bindings from a string containing JSON data
-        void addMappingsFromJSON(const std::string &aJSONData);
+        //virtual void addMappingsFromJSON(const std::string &aJSONData) = 0;
 
-        controls(std::shared_ptr<keyboard> aKeyboard = nullptr, std::shared_ptr<mouse> aMouse = nullptr, std::shared_ptr<gamepad> aGamepad = nullptr);
+        //////////////////////////////
+        ////virtual void deserializeFromJSON(const std::string &json) = 0;
+        virtual std::string serializeToJSON() = 0;
+        
+        //////////////////////////////
+
+        virtual ~controls() = default;
     };
 }
 

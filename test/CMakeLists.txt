@@ -8,6 +8,7 @@ jfc_add_tests(
         "${CMAKE_CURRENT_LIST_DIR}/gamepad_test.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/keyboard_test.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/mouse_test.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/controls_test.cpp"
 
     INCLUDE_DIRECTORIES
         "${${PROJECT_NAME}_INCLUDE_DIRECTORIES}"

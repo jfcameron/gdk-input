@@ -2,7 +2,8 @@
 
 set(dependencies
     "glfw"
-    "nlohmann"
+    "jsoncons"
+    "magic_enum"
 )
 
 jfc_add_dependencies(${dependencies})

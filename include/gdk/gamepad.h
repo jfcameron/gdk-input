@@ -17,10 +17,21 @@ namespace gdk
         using button_state_type = bool;
         
         //! hat direction
-        /// left -1, right +1, up +1, down -1
+        /// left -1, right +1, up +1, down -1 TODO: I have changed my mind. dont like it. enum
         struct hat_state_type
         {
-            short int x, y;
+            enum class vertical_direction
+            {
+                Up, Down, Center
+            };
+
+            enum class horizontal_direction
+            {
+                Left, Right, Center
+            };
+
+            horizontal_direction x;
+            vertical_direction y;
         };
 
         //! human readable device name
