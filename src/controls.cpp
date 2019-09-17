@@ -35,34 +35,7 @@ namespace jfc::nlohmann::json_util
 using namespace jfc::nlohmann;
 */
 
-/// \brief data model for use storing/transmitting controls instance state
-/*struct controls_serial_model
-{
-    using key_collection_type = std::set<gdk::keyboard::Key>;
-    using mouse_button_collection_type = std::set<std::string>;
-
-    
-    ////////////////////
-    std::set<gdk::keyboard::Key> coolkeys;
-    ////////////////////
-
-    struct binding_type
-    {
-        key_collection_type keys;
-
-        struct
-        {
-            mouse_button_collection_type buttons;
-
-            //mouse_axis_collection_type axes;
-        } mouse;
-
-        //std::map<std::string, gamepad_bindings> gamepads; //!< bindings for supported gamepads
-    };
-    
-    std::map<std::string, binding_type> bindings;
-};*/
-
+///////////// ///////////// ///////////// /////////////
 //TODO: move to separate repo. jscons_wrapper? jsoncons+util? jsoncons_package? Yes. Expand magic enum requirements.
 #define JSONCONS_UTIL_ENUM_TRAITS_DECL_BASE(CharT, EnumType)  \
 namespace jsoncons \
@@ -194,6 +167,37 @@ namespace jsoncons \
 #define JSONCONS_UTIL_ENUM_TRAITS_DECL(EnumType)  \
     JSONCONS_UTIL_ENUM_TRAITS_DECL_BASE(char,EnumType) \
     //JSONCONS_UTIL_ENUM_TRAITS_DECL_BASE(wchar_t, EnumType) \ //magic_enum does nto output to wchar_t. Would have to modify to support type param for string_view
+
+/// TODO create serial_data_model, delete string _imp ctor, replace with data_model ctor. in factory methods, create model via bin or json, pass output serial data to ctor
+
+/// \brief data model for use storing/transmitting controls instance state
+/*struct controls_serial_model
+{
+    using key_collection_type = std::set<gdk::keyboard::Key>;
+    using mouse_button_collection_type = std::set<std::string>;
+
+    
+    ////////////////////
+    std::set<gdk::keyboard::Key> coolkeys;
+    ////////////////////
+
+    struct binding_type
+    {
+        key_collection_type keys;
+
+        struct
+        {
+            mouse_button_collection_type buttons;
+
+            //mouse_axis_collection_type axes;
+        } mouse;
+
+        //std::map<std::string, gamepad_bindings> gamepads; //!< bindings for supported gamepads
+    };
+    
+    std::map<std::string, binding_type> bindings;
+};*/
+///////////// ///////////// ///////////// /////////////
 
 namespace gdk
 {

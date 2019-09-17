@@ -32,6 +32,14 @@ namespace gdk
             std::shared_ptr<mouse> aMouse = nullptr, 
             std::shared_ptr<gamepad> aGamepad = nullptr);
 
+        //make_from_message_pack
+
+        //! adds bindings from a string containing JSON data
+        //virtual void addMappingsFromJSON(const std::string &aJSONData) = 0;
+
+        ////virtual void deserializeFromJSON(const std::string &json) = 0;
+        virtual std::string serializeToJSON() = 0;
+
         //! get value of an input
         virtual double get(const std::string &aName) const = 0;
 
@@ -63,16 +71,7 @@ namespace gdk
        
         //! adds a gamepad hat to a mapping for a specific gamepad type, creating a new mapping if it did not already exist.
         virtual void addGamepadHatToMapping(const std::string &aMappingName, const std::string &aGamepadName, const int aHatIndex, const gamepad::hat_state_type aHatState) = 0;
-
-        //! adds bindings from a string containing JSON data
-        //virtual void addMappingsFromJSON(const std::string &aJSONData) = 0;
-
-        //////////////////////////////
-        ////virtual void deserializeFromJSON(const std::string &json) = 0;
-        virtual std::string serializeToJSON() = 0;
         
-        //////////////////////////////
-
         virtual ~controls() = default;
     };
 }
