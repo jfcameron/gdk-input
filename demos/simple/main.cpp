@@ -21,6 +21,9 @@ const char *JSONControlsMappingString = R"(
         "gamepads": {
                 "8bitdo": {
                     "buttons": [0]
+                },
+                "sdl_gamepad": {
+                    "buttons": [1]
                 }
         },
         "keys": ["Q", "Space", "LeftControl"],

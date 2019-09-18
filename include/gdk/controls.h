@@ -32,27 +32,11 @@ namespace gdk
             std::shared_ptr<mouse> aMouse = nullptr, 
             std::shared_ptr<gamepad> aGamepad = nullptr);
 
-        //make_from_message_pack
-
-        //! adds bindings from a string containing JSON data
-        //virtual void addMappingsFromJSON(const std::string &aJSONData) = 0;
-
-        ////virtual void deserializeFromJSON(const std::string &json) = 0;
+        //! serialize state to string of json for e.g: disk storage, network transmission, ...
         virtual std::string serializeToJSON() = 0;
 
         //! get value of an input
         virtual double get(const std::string &aName) const = 0;
-
-        //foreach input... 
-
-        //! [re]sets keyboard pointer
-        virtual void setKeyboard(std::shared_ptr<keyboard> aKeyboard) = 0;
-
-        //! [re]sets mouse pointer
-        virtual void setMouse(std::shared_ptr<mouse> aMouse) = 0;
-        
-        //! [re]sets gamepad pointer
-        virtual void setGamepad(std::shared_ptr<gamepad> aGamepad) = 0;
 
         //! adds a key to a mapping, creating a new mapping if it did not already exist.
         virtual void addKeyToMapping(const std::string &aMappingName, const keyboard::Key aKey) = 0;

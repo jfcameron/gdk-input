@@ -194,12 +194,6 @@ namespace gdk
 
         virtual double get(const std::string &aName) const override;
 
-        void setKeyboard(std::shared_ptr<keyboard> aKeyboard) override;
-
-        void setMouse(std::shared_ptr<mouse> aMouse) override;
-        
-        void setGamepad(std::shared_ptr<gamepad> aGamepad) override;
-
         void addKeyToMapping(const std::string &aMappingName, const keyboard::Key aKey) override;
 
         void addMouseButtonToMapping(const std::string &aMappingName, const mouse::Button aButton) override;
@@ -347,21 +341,6 @@ namespace gdk
         return 0;
     }
 
-    void controls_impl::setKeyboard(std::shared_ptr<keyboard> aKeyboard)
-    {
-        m_pKeyboard = aKeyboard;
-    }
-
-    void controls_impl::setMouse(std::shared_ptr<mouse> aMouse)
-    {
-        m_pMouse = aMouse;
-    }
-
-    void controls_impl::setGamepad(std::shared_ptr<gamepad> aGamepad)
-    {
-        m_pGamepad = aGamepad;
-    }
-    
     void controls_impl::addKeyToMapping(const std::string &aName, const keyboard::Key aKey)
     {
         m_Inputs[aName].keys.insert(aKey);

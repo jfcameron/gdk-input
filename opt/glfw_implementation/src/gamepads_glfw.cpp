@@ -14,17 +14,17 @@
 
 static constexpr char TAG[] = "gamepad_glfw";
 
+static constexpr char SDL_GAMEPAD_NAME[] = "sdl_gamepad";
+
 namespace gdk
 {
     gamepad_glfw::gamepad_glfw(const int aJoystickIndex)
     : m_JoystickIndex(aJoystickIndex)
     , m_Name([aJoystickIndex]()
     {
-        //TODO: the class is at risk of becoming modal (sdlgamepad vs !sdlgamepad).. hard to read, hard to maintain.. factory time?
-        //if a joystick "is a gamepad" then it is present in the sdl db. //TODO: redirect gets and sets if this is a gamepad //This is not thought out.
         const char *name = glfwJoystickIsGamepad(aJoystickIndex)
-            ? "sdl_gamepad" 
-            : glfwGetJoystickName(aJoystickIndex); //the returned char* is non-owning.
+            ? SDL_GAMEPAD_NAME 
+            : glfwGetJoystickName(aJoystickIndex);
 
         if (!name) throw std::invalid_argument(std::string(TAG).append(": no gamepad at index: ").append(std::to_string(aJoystickIndex)));
 
@@ -85,12 +85,44 @@ namespace gdk
 
     void gamepad_glfw::update()
     {
-        ///Note: `This function returns whether the specified joystick is both present and has a gamepad mapping.`
-        //TODO: glfwJoystickIsGamepad ?
-
-        if (GLFW_TRUE == glfwJoystickPresent(m_JoystickIndex)) //TODO: here take advantage of gamepad mappings? https://www.glfw.org/docs/latest/input_guide.html#gamepad_mapping. Map like this: a = 0, b = 1 ....
+        //update is a bit silly because I am not dealing with disconnects properly. 
+        //this leads to a question every update: does this instance still point to the same hardware? To let these vary, I constantly reassign the name and check if its a joystick or gamepad. Think about this. Is a more elegant implementation of disconnect/reconnects possible with the glfw library? https://www.glfw.org/docs/latest/input_guide.html
+        if (glfwJoystickIsGamepad(m_JoystickIndex))
         {
-            m_Name = glfwGetJoystickName(m_JoystickIndex); // to do with flipping. silly.
+            m_Name = SDL_GAMEPAD_NAME;
+            
+            GLFWgamepadstate state; 
+            glfwGetGamepadState(m_JoystickIndex, &state);
+
+            m_Axes = decltype(m_Axes)(state.axes, state.axes + (sizeof(state.axes) / sizeof(state.axes[0])));
+
+            // Hats are appended to the back of the button array. They are also in fixed positions
+            // https://www.glfw.org/docs/latest/input_guide.html#gamepad "button indicies"
+            m_Buttons = decltype(m_Buttons)(state.buttons, state.buttons + GLFW_GAMEPAD_BUTTON_DPAD_UP - 1); //TODO test for off by one error.
+
+            m_Hats = { static_cast<decltype(m_Hats)::value_type>(
+                state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_RIGHT]
+                    ? state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_UP]
+                        ? GLFW_HAT_RIGHT_UP
+                        : state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_DOWN]
+                            ? GLFW_HAT_RIGHT_DOWN
+                            : GLFW_HAT_CENTERED
+                    : state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_LEFT]
+                        ? state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_UP]
+                            ? GLFW_HAT_LEFT_UP
+                            : state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_DOWN]
+                                ? GLFW_HAT_LEFT_DOWN
+                                : GLFW_HAT_CENTERED
+                        : state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_UP]
+                            ? GLFW_HAT_UP
+                            : state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_DOWN]
+                                ? GLFW_HAT_DOWN
+                                : GLFW_HAT_CENTERED)
+            };
+        }
+        else if (glfwJoystickPresent(m_JoystickIndex)) 
+        {
+            m_Name = glfwGetJoystickName(m_JoystickIndex);
 
             int count;
             
@@ -102,11 +134,11 @@ namespace gdk
 
             m_Axes = decltype(m_Axes)(axes, axes + count);
 
-            const unsigned char* hats = glfwGetJoystickHats(m_JoystickIndex, &count);
+            const unsigned char *hats = glfwGetJoystickHats(m_JoystickIndex, &count);
 
             m_Hats = decltype(m_Hats)(hats, hats + count);
         }
-        else // order can get confused if multiple controllers are disconnected at the same time.
+        else //Disconnected
         {
             m_Buttons.clear();
             m_Axes.clear();
