@@ -46,7 +46,6 @@ namespace gdk
 
         virtual std::string_view getName() const override;
 
-
         gamepad_glfw(const int joystickID);
     };
 }

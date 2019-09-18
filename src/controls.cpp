@@ -8,33 +8,6 @@
 
 #include <gdk/controls.h>
 
-/*#include <nlohmann/json.hpp>
-using namespace nlohmann;
-
-//TODO: move to separate library. To be used as a submodule containing a nlohmann json release + util header
-namespace jfc::nlohmann::json_util
-{
-    using namespace nlohmann;
-
-    std::optional<json> get_property_optional(const json &object, const std::string &propertyName, const json::value_t &type)
-    {
-        return object.contains(propertyName) && object[propertyName].type() == type
-            ? std::optional<json>(object[propertyName])
-            : std::nullopt;
-    }
-    
-    json get_property_required(const json &object, const std::string &propertyName, const json::value_t &type, const std::string &errorMessage = "")
-    {
-        if (object.contains(propertyName) && object[propertyName].type() == type) return object[propertyName];
-
-        throw std::invalid_argument(errorMessage == "" 
-            ? "required JSON property \"" + propertyName + "\" does not exist"
-            : errorMessage);
-    }
-}
-using namespace jfc::nlohmann;
-*/
-
 ///////////// ///////////// ///////////// /////////////
 //TODO: move to separate repo. jscons_wrapper? jsoncons+util? jsoncons_package? Yes. Expand magic enum requirements.
 #define JSONCONS_UTIL_ENUM_TRAITS_DECL_BASE(CharT, EnumType)  \
@@ -99,7 +72,7 @@ namespace jsoncons \
         { \
             if (!ajson.is_string()) \
             { \
-                JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not an enum")); \
+                JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not an enum: must be a json string type!")); \
             } \
  \
             const string_view_type s = ajson.template as<string_view_type>(); \
@@ -129,7 +102,7 @@ namespace jsoncons \
                 } \
                 else \
                 { \
-                    JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not an enum")); \
+                    JSONCONS_THROW(json_runtime_error<std::runtime_error>(std::string("Not an enum: ") + ajson.template as<std::string>())); \
                 } \
             } \
             return it->first; \
@@ -168,39 +141,11 @@ namespace jsoncons \
     JSONCONS_UTIL_ENUM_TRAITS_DECL_BASE(char,EnumType) \
     //JSONCONS_UTIL_ENUM_TRAITS_DECL_BASE(wchar_t, EnumType) \ //magic_enum does nto output to wchar_t. Would have to modify to support type param for string_view
 
-/// TODO create serial_data_model, delete string _imp ctor, replace with data_model ctor. in factory methods, create model via bin or json, pass output serial data to ctor
-
-/// \brief data model for use storing/transmitting controls instance state
-/*struct controls_serial_model
-{
-    using key_collection_type = std::set<gdk::keyboard::Key>;
-    using mouse_button_collection_type = std::set<std::string>;
-
-    
-    ////////////////////
-    std::set<gdk::keyboard::Key> coolkeys;
-    ////////////////////
-
-    struct binding_type
-    {
-        key_collection_type keys;
-
-        struct
-        {
-            mouse_button_collection_type buttons;
-
-            //mouse_axis_collection_type axes;
-        } mouse;
-
-        //std::map<std::string, gamepad_bindings> gamepads; //!< bindings for supported gamepads
-    };
-    
-    std::map<std::string, binding_type> bindings;
-};*/
-///////////// ///////////// ///////////// /////////////
-
 namespace gdk
 {
+
+    /// TODO create serial_data_model, delete string _imp ctor, replace with data_model ctor. in factory methods, create model via bin or json, pass output serial data to ctor
+
     /// \brief implementation of controls. hidden to break depedencies. went with factory + interface instead of pImpl since 
     /// both solutions would introduce deref costs but factory + interface leaves room for alternative implementations etc. 
     /// + is a pattern recognized outside of C++
@@ -218,11 +163,9 @@ namespace gdk
 
         struct gamepad_bindings
         {
+            gamepad_axis_collection_type   axes;
             gamepad_button_collection_type buttons;
-            
-            gamepad_axis_collection_type axes;
-
-            gamepad_hat_collection_type hats;
+            gamepad_hat_collection_type    hats;
         };
 
         struct bindings
@@ -231,21 +174,24 @@ namespace gdk
 
             struct
             {
+                mouse_axis_collection_type   axes;
                 mouse_button_collection_type buttons;
-
-                mouse_axis_collection_type axes;
             } mouse;
 
             std::map<std::string, gamepad_bindings> gamepads; //!< bindings for supported gamepads
         };
 
-        std::map<std::string, bindings> m_Inputs; //TODO: rename to input map?
+    private:
+        std::map<std::string, bindings> m_Inputs;
 
         std::shared_ptr<keyboard> m_pKeyboard;
         std::shared_ptr<mouse>    m_pMouse;
         std::shared_ptr<gamepad>  m_pGamepad;
 
     public:
+        /// \brief data model for use storing/transmitting state
+        using serial_data_model = decltype(controls_impl::m_Inputs);
+
         virtual double get(const std::string &aName) const override;
 
         void setKeyboard(std::shared_ptr<keyboard> aKeyboard) override;
@@ -266,63 +212,54 @@ namespace gdk
        
         void addGamepadHatToMapping(const std::string &aMappingName, const std::string &aGamepadName, const int aHatIndex, const gamepad::hat_state_type aHatState) override;
 
-        //! adds bindings from a string containing JSON data
-        //void addMappingsFromJSON(const std::string &aJSONData) override;
-
-        //virtual void deserializeFromJSON(const std::string &json) override;
-        
         virtual std::string serializeToJSON() override;
         
-        controls_impl(std::shared_ptr<keyboard> aKeyboard = nullptr, 
-            std::shared_ptr<mouse> aMouse = nullptr, 
-            std::shared_ptr<gamepad> aGamepad = nullptr);
+        controls_impl(std::shared_ptr<keyboard> aKeyboard = nullptr
+            , std::shared_ptr<mouse> aMouse = nullptr
+            , std::shared_ptr<gamepad> aGamepad = nullptr);
 
-        controls_impl(const std::string &json,
-                std::shared_ptr<keyboard> aKeyboard, 
-                std::shared_ptr<mouse> aMouse, 
-                std::shared_ptr<gamepad> aGamepad);
+        controls_impl(const serial_data_model &aDataModel
+            , std::shared_ptr<keyboard> aKeyboard
+            , std::shared_ptr<mouse> aMouse
+            , std::shared_ptr<gamepad> aGamepad);
 
         ~controls_impl() = default;
     };
     
-    std::unique_ptr<controls> controls::make(std::shared_ptr<keyboard> aKeyboard, 
-        std::shared_ptr<mouse> aMouse, 
-        std::shared_ptr<gamepad> aGamepad)
+    std::unique_ptr<controls> controls::make(std::shared_ptr<keyboard> aKeyboard
+        , std::shared_ptr<mouse> aMouse
+        , std::shared_ptr<gamepad> aGamepad)
     {
         return std::make_unique<controls_impl>(controls_impl(aKeyboard, aMouse, aGamepad));
     }
 
-    std::unique_ptr<controls> controls::make_from_json(const std::string &json,
-        std::shared_ptr<keyboard> aKeyboard, 
-        std::shared_ptr<mouse> aMouse, 
-        std::shared_ptr<gamepad> aGamepad)
+    std::unique_ptr<controls> controls::make_from_json(const std::string &json
+        , std::shared_ptr<keyboard> aKeyboard
+        , std::shared_ptr<mouse> aMouse
+        , std::shared_ptr<gamepad> aGamepad)
     {
-        auto instance = jsoncons::decode_json<gdk::controls_impl>(json);
+        const auto serialDataModel = jsoncons::decode_json<gdk::controls_impl::serial_data_model>(json);
 
-        //std::cout << 
-
-        return std::make_unique<controls_impl>(controls_impl(json, aKeyboard, aMouse, aGamepad));
+        return std::make_unique<controls_impl>(controls_impl(serialDataModel, aKeyboard, aMouse, aGamepad));
     }
 
-
-    controls_impl::controls_impl(std::shared_ptr<keyboard> aKeyboard, 
-        std::shared_ptr<mouse> aMouse, 
-        std::shared_ptr<gamepad> aGamepad)    
+    controls_impl::controls_impl(std::shared_ptr<keyboard> aKeyboard
+        , std::shared_ptr<mouse> aMouse
+        , std::shared_ptr<gamepad> aGamepad)    
     : m_pKeyboard(aKeyboard)
     , m_pMouse(aMouse)
     , m_pGamepad(aGamepad)
     {}
 
-    controls_impl::controls_impl(const std::string &json,
-        std::shared_ptr<keyboard> aKeyboard, 
-        std::shared_ptr<mouse> aMouse, 
-        std::shared_ptr<gamepad> aGamepad)    
+    controls_impl::controls_impl(const controls_impl::serial_data_model &serial_data_model
+        , std::shared_ptr<keyboard> aKeyboard
+        , std::shared_ptr<mouse> aMouse
+        , std::shared_ptr<gamepad> aGamepad)    
     : m_pKeyboard(aKeyboard)
     , m_pMouse(aMouse)
     , m_pGamepad(aGamepad)
-    {
-        ///...... todo.....
-    }
+    , m_Inputs(serial_data_model) 
+    {}
 
     double controls_impl::get(const std::string &aName) const
     {
@@ -345,7 +282,7 @@ namespace gdk
                 if (const auto value = static_cast<float>(m_pMouse->getButtonDown(button))) return value;
             }
 
-            //TODO: Mouse axes
+            //TODO: Normalize Mouse axes? what to normalize it over?
             for (const auto &axis : iter->second.mouse.axes)
             {
                 if (m_pMouse->getCursorMode() == gdk::mouse::CursorMode::Locked)
@@ -458,7 +395,7 @@ namespace gdk
     std::string controls_impl::serializeToJSON()
     {
         std::string s;
-        jsoncons::encode_json(*this, s, jsoncons::indenting::indent);
+        jsoncons::encode_json(m_Inputs, s, jsoncons::indenting::indent);
 
         return s;
     }
@@ -477,6 +414,4 @@ JSONCONS_MEMBER_TRAITS_DECL(gdk::gamepad::hat_state_type, x, y);
 JSONCONS_MEMBER_TRAITS_DECL(gdk::controls_impl::gamepad_bindings, buttons/*, axes, hats*/);
 JSONCONS_MEMBER_TRAITS_DECL(decltype(gdk::controls_impl::bindings::mouse), buttons);
 JSONCONS_MEMBER_TRAITS_DECL(gdk::controls_impl::bindings, keys, gamepads, mouse);
-
-JSONCONS_MEMBER_TRAITS_DECL(gdk::controls_impl, m_Inputs);
 

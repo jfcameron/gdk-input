@@ -15,104 +15,18 @@
 
 static auto constexpr TAG = "demo";
 
-
 const char *JSONControlsMappingString = R"(
 {
-    "m_Inputs": {
-        "Backward": {
-            "gamepads": {
-                "null": {
-                    "buttons": []
-                }
-            },
-                "keys": ["S"],
-                "mouse": {
-                    "buttons": []
+    "Jump": {
+        "gamepads": {
+                "8bitdo": {
+                    "buttons": [0]
                 }
         },
-            "Forward": {
-                "gamepads": {
-                    "null": {
-                        "buttons": []
-                    }
-                },
-                "keys": ["W"],
-                "mouse": {
-                    "buttons": []
-                }
-            },
-            "Jump": {
-                "gamepads": {
-                    "null": {
-                        "buttons": [0]
-                    }
-                },
-                "keys": ["Q", "Space"],
-                "mouse": {
-                    "buttons": []
-                }
-            },
-            "LookDown": {
-                "gamepads": {},
-                "keys": ["DownArrow"],
-                "mouse": {
-                    "buttons": []
-                }
-            },
-            "LookLeft": {
-                "gamepads": {},
-                "keys": ["LeftArrow"],
-                "mouse": {
-                    "buttons": []
-                }
-            },
-            "LookRight": {
-                "gamepads": {},
-                "keys": ["RightArrow"],
-                "mouse": {
-                    "buttons": []
-                }
-            },
-            "LookUp": {
-                "gamepads": {},
-                "keys": ["UpArrow"],
-                "mouse": {
-                    "buttons": []
-                }
-            },
-            "Run": {
-                "gamepads": {
-                    "null": {
-                        "buttons": [1]
-                    }
-                },
-                "keys": ["LeftShift"],
-                "mouse": {
-                    "buttons": []
-                }
-            },
-            "StrafeLeft": {
-                "gamepads": {
-                    "null": {
-                        "buttons": []
-                    }
-                },
-                "keys": ["A"],
-                "mouse": {
-                    "buttons": []
-                }
-            },
-            "StrafeRight": {
-                "gamepads": {
-                    "null": {
-                        "buttons": []
-                    }
-                },
-                "keys": ["D"],
-                "mouse": {
-                    "buttons": []
-                }
-            }
+        "keys": ["Q", "Space", "LeftControl"],
+        "mouse": {
+            "buttons": []
+        }
     }
 }
 )";
@@ -178,9 +92,9 @@ int main(int argc, char **argv)
     /*player_controls->addKeyToMapping("Jump", gdk::keyboard::Key::Space);
     player_controls->addKeyToMapping("Jump", gdk::keyboard::Key::Q);
 
-    player_controls->addGamepadButtonToMapping("Jump", std::string(gamepadName), 0);
+    player_controls->addGamepadButtonToMapping("Jump", std::string(gamepadName), 0);*/
 
-    player_controls->addKeyToMapping("Run", gdk::keyboard::Key::LeftShift);
+    /*player_controls->addKeyToMapping("Run", gdk::keyboard::Key::LeftShift);
     player_controls->addGamepadButtonToMapping("Run", std::string(gamepadName), 1);
 
     player_controls->addGamepadHatToMapping("Forward", std::string(gamepadName), 0, {gdk::gamepad::hat_state_type::horizontal_direction::Center, gdk::gamepad::hat_state_type::vertical_direction::Up});
@@ -211,9 +125,9 @@ int main(int argc, char **argv)
     player_controls->addMouseAxisToMapping("LookDown" , gdk::mouse::Axis::Y, +1);
     player_controls->addKeyToMapping("LookDown", gdk::keyboard::Key::DownArrow);*/
 
-    std::cout << player_controls->serializeToJSON();
-
-    //player_controls.addMappingsFromJSON(JSONControlsMappingString);
+    std::cout << "serializing...\n";
+    auto data = player_controls->serializeToJSON();
+    std::cout << data << "\n";
 
     while(!glfwWindowShouldClose(pWindow.get()))
     { 

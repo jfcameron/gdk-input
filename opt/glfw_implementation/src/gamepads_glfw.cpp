@@ -20,9 +20,11 @@ namespace gdk
     : m_JoystickIndex(aJoystickIndex)
     , m_Name([aJoystickIndex]()
     {
-        const char *name = /*glfwJoystickIsGamepad(aJoystickIndex) //if a joystick "is a gamepad" then it is present in the sdl db. //TODO: redirect gets and sets if this is a gamepad //This is not thought out.
-            ? "standard_gamepad" 
-            :*/ glfwGetJoystickName(aJoystickIndex); //the returned char* is non-owning.
+        //TODO: the class is at risk of becoming modal (sdlgamepad vs !sdlgamepad).. hard to read, hard to maintain.. factory time?
+        //if a joystick "is a gamepad" then it is present in the sdl db. //TODO: redirect gets and sets if this is a gamepad //This is not thought out.
+        const char *name = glfwJoystickIsGamepad(aJoystickIndex)
+            ? "sdl_gamepad" 
+            : glfwGetJoystickName(aJoystickIndex); //the returned char* is non-owning.
 
         if (!name) throw std::invalid_argument(std::string(TAG).append(": no gamepad at index: ").append(std::to_string(aJoystickIndex)));
 
@@ -83,9 +85,12 @@ namespace gdk
 
     void gamepad_glfw::update()
     {
+        ///Note: `This function returns whether the specified joystick is both present and has a gamepad mapping.`
+        //TODO: glfwJoystickIsGamepad ?
+
         if (GLFW_TRUE == glfwJoystickPresent(m_JoystickIndex)) //TODO: here take advantage of gamepad mappings? https://www.glfw.org/docs/latest/input_guide.html#gamepad_mapping. Map like this: a = 0, b = 1 ....
         {
-            m_Name = glfwGetJoystickName(m_JoystickIndex);
+            m_Name = glfwGetJoystickName(m_JoystickIndex); // to do with flipping. silly.
 
             int count;
             
