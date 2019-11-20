@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/jfc-cmake/jfclib.cmake")
 
-option(JFC_BUILD_DEMOS "Build demos" ON)
+option(JFC_BUILD_DEMO "Build demos" ON)
 option(JFC_BUILD_DOCS  "Build documentation" ON)
 option(JFC_BUILD_TESTS "Build unit tests" ON)
 
@@ -60,7 +60,7 @@ if (JFC_BUILD_DOCS)
     add_subdirectory(docs)
 endif()
 
-if (JFC_BUILD_DEMOS)
+if (JFC_BUILD_DEMO)
     add_subdirectory(demos)
 endif()
 
