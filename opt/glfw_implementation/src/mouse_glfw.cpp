@@ -6,6 +6,7 @@
 
 #include <iostream>
 #include <stdexcept>
+#include <string>
 
 static constexpr char TAG[] = "mouse";
 
