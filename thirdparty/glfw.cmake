@@ -13,7 +13,6 @@ jfc_git(COMMAND reset --hard WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/glfw")
 
 file(APPEND ${CMAKE_CURRENT_LIST_DIR}/glfw/src/CMakeLists.txt "
     # == Hack that copies output to expected location. If you see this, checkout this file
-    set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX \"lib\")
     add_custom_command(TARGET ${PROJECT_NAME}
         POST_BUILD COMMAND \${CMAKE_COMMAND} -E copy \$<TARGET_FILE:${PROJECT_NAME}> \"\${PROJECT_BINARY_DIR}/src/\$<TARGET_FILE_NAME:${PROJECT_NAME}>\")
     # == Hack that copies output to expected location. If you see this, checkout this file
@@ -36,9 +35,9 @@ if(CMAKE_SYSTEM_NAME MATCHES "Darwin" OR CMAKE_SYSTEM_NAME MATCHES "Linux" OR CM
         FIND_LIBRARY(CORE_VIDEO CoreVideo)
         FIND_LIBRARY(IO_KIT IOKit)
     elseif(CMAKE_SYSTEM_NAME MATCHES "Linux" OR CMAKE_SYSTEM_NAME MATCHES "Windows")
-        find_package(OpenGL REQUIRED)
+        #[[find_package(OpenGL REQUIRED)
 
-        project("GLEW") # Its weird to hide glew here but it works...
+        #project("GLEW") # Its weird to hide glew here but it works...
 
         add_library(${PROJECT_NAME} STATIC
             ${CMAKE_CURRENT_LIST_DIR}/glew-2.1.0/src/glew.c)
@@ -49,13 +48,11 @@ if(CMAKE_SYSTEM_NAME MATCHES "Darwin" OR CMAKE_SYSTEM_NAME MATCHES "Linux" OR CM
         set_target_properties(${PROJECT_NAME} PROPERTIES
             RULE_LAUNCH_COMPILE "${CMAKE_COMMAND} -E time")
 
-        set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "lib")
-
         add_custom_command(TARGET ${PROJECT_NAME}
             POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${PROJECT_NAME}> "${PROJECT_BINARY_DIR}/$<TARGET_FILE_NAME:${PROJECT_NAME}>")
 
-        set(GLEW_LIBRARIES ${PROJECT_BINARY_DIR}/libGLEW${CMAKE_STATIC_LIBRARY_SUFFIX})
-        set(GLEW_INCLUDE_DIR ${CMAKE_CURRENT_LIST_DIR}/glew-2.1.0/include)
+        set(GLEW_LIBRARIES ${PROJECT_BINARY_DIR}/libGLEW.a)
+        set(GLEW_INCLUDE_DIR ${CMAKE_CURRENT_LIST_DIR}/glew-2.1.0/include)]]
 
         if(CMAKE_SYSTEM_NAME MATCHES "Linux")
             find_package(X11 REQUIRED) # Mir? Wayland?
@@ -81,7 +78,7 @@ jfc_set_dependency_symbols(
         ${X11_INCLUDE_DIR}
 
     LIBRARIES
-        ${PROJECT_BINARY_DIR}/glfw/src/libglfw3${CMAKE_STATIC_LIBRARY_SUFFIX}
+        ${PROJECT_BINARY_DIR}/glfw/src/libglfw3.a
 
         # Graphics interface
         ${OPENGL_LIBRARIES}
