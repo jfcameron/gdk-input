@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="icon.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">gdk-input
-   &#160;<span id="projectnumber">259191a6388f5421d426b1df9a2511a00bcc2b8c</span>
+   &#160;<span id="projectnumber">aee1db81ca6ee86c2efe279579f369a669608778</span>
    </div>
   </td>
  </tr>
@@ -80,6 +80,12 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
+<tr class="memitem:af1c491b701726fe45702f48cc243d6a0"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdk_1_1keyboard.html#af1c491b701726fe45702f48cc243d6a0">Keystate</a> { <a class="el" href="classgdk_1_1keyboard.html#af1c491b701726fe45702f48cc243d6a0afbaedde498cdead4f2780217646e9ba1">Keystate::UP</a> = 0, 
+<a class="el" href="classgdk_1_1keyboard.html#af1c491b701726fe45702f48cc243d6a0adab50d141666131a9ec54949ccc047c0">Keystate::JUST_PRESSED</a>, 
+<a class="el" href="classgdk_1_1keyboard.html#af1c491b701726fe45702f48cc243d6a0a1eafb5632252d67980e4e08d9f46aa5e">Keystate::HELD_DOWN</a>
+ }<tr class="memdesc:af1c491b701726fe45702f48cc243d6a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">key state  <a href="classgdk_1_1keyboard.html#af1c491b701726fe45702f48cc243d6a0">More...</a><br /></td></tr>
+</td></tr>
+<tr class="separator:af1c491b701726fe45702f48cc243d6a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aafc81cd9039ebb5d7ca1e65373d2eb0a"><td class="memItemLeft" align="right" valign="top"><a id="aafc81cd9039ebb5d7ca1e65373d2eb0a"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdk_1_1keyboard.html#aafc81cd9039ebb5d7ca1e65373d2eb0a">Key</a> { <br />
 &#160;&#160;<b>Escape</b>, 
 <b>F1</b>, 
@@ -214,10 +220,14 @@ Public Types</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a7c43db408b5748f6ad3e3690f96f7d5a"><td class="memItemLeft" align="right" valign="top"><a id="a7c43db408b5748f6ad3e3690f96f7d5a"></a>
-virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdk_1_1keyboard.html#a7c43db408b5748f6ad3e3690f96f7d5a">getKeyDown</a> (const <a class="el" href="classgdk_1_1keyboard.html#aafc81cd9039ebb5d7ca1e65373d2eb0a">Key</a> &amp;aKeyCode)=0</td></tr>
-<tr class="memdesc:a7c43db408b5748f6ad3e3690f96f7d5a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if the key is being held down. <br /></td></tr>
-<tr class="separator:a7c43db408b5748f6ad3e3690f96f7d5a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad2538a9d5e73ba99d33ba4d95be0088a"><td class="memItemLeft" align="right" valign="top"><a id="ad2538a9d5e73ba99d33ba4d95be0088a"></a>
+virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdk_1_1keyboard.html#ad2538a9d5e73ba99d33ba4d95be0088a">getKeyDown</a> (const <a class="el" href="classgdk_1_1keyboard.html#aafc81cd9039ebb5d7ca1e65373d2eb0a">Key</a> &amp;aKeyCode) const =0</td></tr>
+<tr class="memdesc:ad2538a9d5e73ba99d33ba4d95be0088a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if the key is being held down. <br /></td></tr>
+<tr class="separator:ad2538a9d5e73ba99d33ba4d95be0088a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a97e10430cbbd54726d6734ff3a1527a2"><td class="memItemLeft" align="right" valign="top"><a id="a97e10430cbbd54726d6734ff3a1527a2"></a>
+virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdk_1_1keyboard.html#a97e10430cbbd54726d6734ff3a1527a2">getKeyJustDown</a> (const <a class="el" href="classgdk_1_1keyboard.html#aafc81cd9039ebb5d7ca1e65373d2eb0a">Key</a> &amp;aKeyCode) const =0</td></tr>
+<tr class="memdesc:a97e10430cbbd54726d6734ff3a1527a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">check if key was just pressed down <br /></td></tr>
+<tr class="separator:a97e10430cbbd54726d6734ff3a1527a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a48254e50b8fd9b0bb9a0dab6aadac384"><td class="memItemLeft" align="right" valign="top"><a id="a48254e50b8fd9b0bb9a0dab6aadac384"></a>
 virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdk_1_1keyboard.html#a48254e50b8fd9b0bb9a0dab6aadac384">~keyboard</a> ()=default</td></tr>
 <tr class="memdesc:a48254e50b8fd9b0bb9a0dab6aadac384"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if the key was just pressed. <br /></td></tr>
@@ -225,7 +235,40 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Get keystates for a given Window. </p>
-</div><hr/>The documentation for this class was generated from the following file:<ul>
+</div><h2 class="groupheader">Member Enumeration Documentation</h2>
+<a id="af1c491b701726fe45702f48cc243d6a0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af1c491b701726fe45702f48cc243d6a0">&#9670;&nbsp;</a></span>Keystate</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="classgdk_1_1keyboard.html#af1c491b701726fe45702f48cc243d6a0">gdk::keyboard::Keystate</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">strong</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>key state </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="af1c491b701726fe45702f48cc243d6a0afbaedde498cdead4f2780217646e9ba1"></a>UP&#160;</td><td class="fielddoc"><p>unpressed </p>
+</td></tr>
+<tr><td class="fieldname"><a id="af1c491b701726fe45702f48cc243d6a0adab50d141666131a9ec54949ccc047c0"></a>JUST_PRESSED&#160;</td><td class="fielddoc"><p>single frame down input </p>
+</td></tr>
+<tr><td class="fieldname"><a id="af1c491b701726fe45702f48cc243d6a0a1eafb5632252d67980e4e08d9f46aa5e"></a>HELD_DOWN&#160;</td><td class="fielddoc"><p>multiple frames </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<hr/>The documentation for this class was generated from the following file:<ul>
 <li>/home/travis/build/jfcameron/gdk-input/include/gdk/<a class="el" href="keyboard_8h_source.html">keyboard.h</a></li>
 </ul>
 </div><!-- contents -->
