@@ -8,10 +8,117 @@
 #include <stdexcept>
 #include <string>
 #include <type_traits>
+#include <functional>
+
+#include <set>
 
 using namespace gdk;
 
 static constexpr char TAG[] = "keyboard_glfw";
+
+static const std::set<decltype(GLFW_KEY_A)> KEY_SET{
+	GLFW_KEY_ESCAPE,
+	GLFW_KEY_F1,
+	GLFW_KEY_F2,
+	GLFW_KEY_F3,
+	GLFW_KEY_F4,
+	GLFW_KEY_F5,
+	GLFW_KEY_F6,
+	GLFW_KEY_F7,
+	GLFW_KEY_F8,
+	GLFW_KEY_F9,
+	GLFW_KEY_F10,
+	GLFW_KEY_F11,
+	GLFW_KEY_F12,
+	GLFW_KEY_PRINT_SCREEN,
+	GLFW_KEY_SCROLL_LOCK,
+	GLFW_KEY_PAUSE,
+	GLFW_KEY_Q,
+	GLFW_KEY_W,
+	GLFW_KEY_E,
+	GLFW_KEY_R,
+	GLFW_KEY_T,
+	GLFW_KEY_Y,
+	GLFW_KEY_U,
+	GLFW_KEY_I,
+	GLFW_KEY_O,
+	GLFW_KEY_P,
+	GLFW_KEY_A,
+	GLFW_KEY_S,
+	GLFW_KEY_D,
+	GLFW_KEY_F,
+	GLFW_KEY_G,
+	GLFW_KEY_H,
+	GLFW_KEY_J,
+	GLFW_KEY_K,
+	GLFW_KEY_L,
+	GLFW_KEY_Z,
+	GLFW_KEY_X,
+	GLFW_KEY_C,
+	GLFW_KEY_V,
+	GLFW_KEY_B,
+	GLFW_KEY_N,
+	GLFW_KEY_M,
+	GLFW_KEY_1,
+	GLFW_KEY_2,
+	GLFW_KEY_3,
+	GLFW_KEY_4,
+	GLFW_KEY_5,
+	GLFW_KEY_6,
+	GLFW_KEY_7,
+	GLFW_KEY_8,
+	GLFW_KEY_9,
+	GLFW_KEY_0,
+	GLFW_KEY_GRAVE_ACCENT,
+	GLFW_KEY_MINUS,
+	GLFW_KEY_EQUAL,
+	GLFW_KEY_BACKSPACE,
+	GLFW_KEY_HOME,
+	GLFW_KEY_END,
+	GLFW_KEY_TAB,
+	GLFW_KEY_LEFT_BRACKET,
+	GLFW_KEY_RIGHT_BRACKET,
+	GLFW_KEY_BACKSLASH,
+	GLFW_KEY_INSERT,
+	GLFW_KEY_PAGE_UP,
+	GLFW_KEY_CAPS_LOCK,
+	GLFW_KEY_SEMICOLON,
+	GLFW_KEY_APOSTROPHE,
+	GLFW_KEY_ENTER,
+	GLFW_KEY_DELETE,
+	GLFW_KEY_PAGE_DOWN,
+	GLFW_KEY_LEFT_SHIFT,
+	GLFW_KEY_COMMA,
+	GLFW_KEY_PERIOD,
+	GLFW_KEY_SLASH,
+	GLFW_KEY_RIGHT_SHIFT,
+	GLFW_KEY_LEFT_CONTROL,
+	GLFW_KEY_LEFT_ALT,
+	GLFW_KEY_SPACE,
+	GLFW_KEY_RIGHT_ALT,
+	GLFW_KEY_RIGHT_CONTROL,
+	GLFW_KEY_LEFT,
+	GLFW_KEY_RIGHT,
+	GLFW_KEY_UP,
+	GLFW_KEY_DOWN,
+	GLFW_KEY_NUM_LOCK,
+	GLFW_KEY_SLASH,
+	GLFW_KEY_KP_MULTIPLY,
+	GLFW_KEY_KP_SUBTRACT,
+	GLFW_KEY_KP_7,
+	GLFW_KEY_KP_8,
+	GLFW_KEY_KP_9,
+	GLFW_KEY_KP_ADD,
+	GLFW_KEY_KP_4,
+	GLFW_KEY_KP_5,
+	GLFW_KEY_KP_6,
+	GLFW_KEY_KP_1,
+	GLFW_KEY_KP_2,
+	GLFW_KEY_KP_3,
+	GLFW_KEY_KP_ENTER,
+	GLFW_KEY_KP_0,
+	GLFW_KEY_KP_DECIMAL
+};
 
 static inline int glfwKeyCodeFromKey(const keyboard::Key a)
 {
@@ -137,20 +244,81 @@ static inline int glfwKeyCodeFromKey(const keyboard::Key a)
         case keyboard::Key::NumPeriod:    return GLFW_KEY_KP_DECIMAL;
     }
 
-    throw std::invalid_argument(std::string("Unable to convert keyboard key \"").append(std::to_string( static_cast< std::underlying_type< decltype(a)>::type>(a))).append("\" to GLFW_KEY")); 
+    throw std::invalid_argument(std::string(
+		"Unable to convert keyboard key \"").append(
+			std::to_string(
+				static_cast< std::underlying_type< decltype(a)>::type>(a))).append("\" to GLFW_KEY")); 
 }
 
-namespace gdk
-{
-    bool keyboard_glfw::getKeyDown(const keyboard::Key &aKeyCode)
-    {
-        return static_cast<bool>(glfwGetKey(m_pWindow.get(), glfwKeyCodeFromKey(aKeyCode)));
-    }
+using namespace gdk;
 
-    /*bool keyboard::getKey(const Key &aKeyCode)
-    {
-        (void)aKeyCode;
-        
-        throw std::runtime_error(std::string(TAG).append("/keyboard::getKey(const Key &aKeyCode) not implemented"));
-    }*/
+//! stores key state for all active glfw windows
+
+
+keyboard_glfw::keyboard_glfw(decltype(m_pWindow) pWindow)
+	: m_pWindow(pWindow)
+{
+	/*glfwSetKeyCallback(pWindow, [](GLFWwindow *window, int key, int scancode, int action, int mods)
+	{
+		if (glfwWindowShouldClose(window)) keyboardsKeyStateMap.erase(window);
+		else
+		{
+			gdk::keyboard::Keystate state(gdk::keyboard::Keystate::UP);
+
+			if (action != GLFW_RELEASE)
+			{
+				state = keyboardsKeyStateMap[window][key] == gdk::keyboard::Keystate::UP
+					? gdk::keyboard::Keystate::JUST_PRESSED
+					: gdk::keyboard::Keystate::HELD_DOWN;
+			}
+
+			keyboardsKeyStateMap[window][key] = state;
+
+			std::cout << (int)state;
+		}
+	});*/
+}
+
+bool keyboard_glfw::getKeyDown(const keyboard::Key &aKeyCode) const
+{
+	bool value = false;
+
+	if (auto search = m_CurrentState.find(glfwKeyCodeFromKey(aKeyCode)); search != m_CurrentState.end())
+		value = search->second == gdk::keyboard::Keystate::HELD_DOWN || 
+				search->second == gdk::keyboard::Keystate::JUST_PRESSED;
+
+	return value;
+}
+
+bool keyboard_glfw::getKeyJustDown(const keyboard::Key& aKeyCode) const
+{
+	bool value = false;
+
+	if (auto search = m_CurrentState.find(glfwKeyCodeFromKey(aKeyCode)); search != m_CurrentState.end())
+		value = search->second == gdk::keyboard::Keystate::JUST_PRESSED;
+
+	return value;
+}
+
+void keyboard_glfw::update()
+{
+	for (const auto& glfwKey : KEY_SET)
+	{
+		auto lastKeyState = m_KeyboardLastState[glfwKey];
+
+		auto currentKeyState = glfwGetKey(m_pWindow, glfwKey);
+
+		auto newState = keyboard::Keystate::UP;
+
+		if (currentKeyState != GLFW_RELEASE)
+		{
+			newState = lastKeyState == GLFW_RELEASE
+				? newState = keyboard::Keystate::JUST_PRESSED
+				: newState = keyboard::Keystate::HELD_DOWN;
+		}
+
+		m_CurrentState[glfwKey] = newState;
+
+		m_KeyboardLastState[glfwKey] = currentKeyState;
+	}
 }

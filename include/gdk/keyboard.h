@@ -11,6 +11,14 @@ namespace gdk
     class keyboard
     {    
     public:
+		/// \brief key state
+		enum class Keystate
+		{
+			UP = 0, //!< unpressed
+			JUST_PRESSED, //!< single frame down input
+			HELD_DOWN //!< multiple frames
+		};
+
         /// \brief  Represents all detectable keys       
         enum class Key
         {
@@ -48,7 +56,10 @@ namespace gdk
         };
  
         /// \brief Check if the key is being held down
-        virtual bool getKeyDown(const Key &aKeyCode) = 0;
+        virtual bool getKeyDown(const Key &aKeyCode) const = 0;
+
+		/// \brief check if key was just pressed down
+		virtual bool getKeyJustDown(const Key& aKeyCode) const = 0;
             
         /// \brief Check if the key was just pressed
         //bool getKey(const Key &aKeyCode);

@@ -7,6 +7,10 @@
 
 #include <gdk/keyboard.h>
 
+#include <GLFW/glfw3.h>
+
+#include <unordered_map>
+
 struct GLFWwindow;
 
 namespace gdk
@@ -15,14 +19,22 @@ namespace gdk
     /// \attention glfwPollEvents() must be called periodically in order to update the keyboard state
     class keyboard_glfw : public keyboard
     {
-        std::shared_ptr<GLFWwindow> m_pWindow;
+        GLFWwindow *const m_pWindow;
+
+		std::unordered_map<decltype(GLFW_KEY_Q), decltype(GLFW_PRESS)> m_KeyboardLastState;
+
+		std::unordered_map<decltype(GLFW_KEY_Q), keyboard::Keystate> m_CurrentState;
 
     public:
-        virtual bool getKeyDown(const keyboard::Key &aKeyCode) override;
+		void asdf(GLFWwindow* window, int key, int scancode, int action, int mods);
 
-        keyboard_glfw(decltype(m_pWindow) pWindow)
-        : m_pWindow(pWindow)
-        {}
+        virtual bool getKeyDown(const keyboard::Key &aKeyCode) const override;
+
+		virtual bool getKeyJustDown(const keyboard::Key& aKeyCode) const override;
+
+		void update();
+
+		keyboard_glfw(decltype(m_pWindow) pWindow);
     };
 }
 

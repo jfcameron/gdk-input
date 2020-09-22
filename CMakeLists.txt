@@ -16,7 +16,8 @@ if (GDK_INPUT_IMPLEMENTATION_GLFW)
     set(implementation_source_list "${implementation_source_list}"
         ${CMAKE_CURRENT_SOURCE_DIR}/opt/glfw_implementation/src/gamepads_glfw.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/opt/glfw_implementation/src/keyboard_glfw.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/opt/glfw_implementation/src/mouse_glfw.cpp)
+        ${CMAKE_CURRENT_SOURCE_DIR}/opt/glfw_implementation/src/mouse_glfw.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/opt/glfw_implementation/src/glfw_context.cpp)
 
     set(implementation_header_paths "${implementation_header_paths}"
         ${CMAKE_CURRENT_SOURCE_DIR}/opt/glfw_implementation/include)
@@ -49,6 +50,7 @@ jfc_project(library
 
     SOURCE_LIST 
         ${CMAKE_CURRENT_SOURCE_DIR}/src/controls.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/input_context.cpp
         ${implementation_source_list}
 )
 
