@@ -120,7 +120,7 @@ static const std::set<decltype(GLFW_KEY_A)> KEY_SET{
 	GLFW_KEY_KP_DECIMAL
 };
 
-static inline int glfwKeyCodeFromKey(const keyboard::Key a)
+static inline decltype(GLFW_KEY_ESCAPE) glfwKeyCodeFromKey(const keyboard::Key a)
 {
     switch(a)
     {
@@ -250,34 +250,9 @@ static inline int glfwKeyCodeFromKey(const keyboard::Key a)
 				static_cast< std::underlying_type< decltype(a)>::type>(a))).append("\" to GLFW_KEY")); 
 }
 
-using namespace gdk;
-
-//! stores key state for all active glfw windows
-
-
 keyboard_glfw::keyboard_glfw(decltype(m_pWindow) pWindow)
 	: m_pWindow(pWindow)
-{
-	/*glfwSetKeyCallback(pWindow, [](GLFWwindow *window, int key, int scancode, int action, int mods)
-	{
-		if (glfwWindowShouldClose(window)) keyboardsKeyStateMap.erase(window);
-		else
-		{
-			gdk::keyboard::Keystate state(gdk::keyboard::Keystate::UP);
-
-			if (action != GLFW_RELEASE)
-			{
-				state = keyboardsKeyStateMap[window][key] == gdk::keyboard::Keystate::UP
-					? gdk::keyboard::Keystate::JUST_PRESSED
-					: gdk::keyboard::Keystate::HELD_DOWN;
-			}
-
-			keyboardsKeyStateMap[window][key] = state;
-
-			std::cout << (int)state;
-		}
-	});*/
-}
+{}
 
 bool keyboard_glfw::getKeyDown(const keyboard::Key &aKeyCode) const
 {
@@ -302,7 +277,7 @@ bool keyboard_glfw::getKeyJustDown(const keyboard::Key& aKeyCode) const
 
 void keyboard_glfw::update()
 {
-	for (const auto& glfwKey : KEY_SET)
+	for (const auto &glfwKey : KEY_SET)
 	{
 		auto lastKeyState = m_KeyboardLastState[glfwKey];
 
@@ -311,12 +286,10 @@ void keyboard_glfw::update()
 		auto newState = keyboard::Keystate::UP;
 
 		if (currentKeyState != GLFW_RELEASE)
-		{
 			newState = lastKeyState == GLFW_RELEASE
 				? newState = keyboard::Keystate::JUST_PRESSED
 				: newState = keyboard::Keystate::HELD_DOWN;
-		}
-
+		
 		m_CurrentState[glfwKey] = newState;
 
 		m_KeyboardLastState[glfwKey] = currentKeyState;
