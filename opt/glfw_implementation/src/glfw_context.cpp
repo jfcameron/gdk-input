@@ -18,6 +18,11 @@ bool glfw_context::get_key_just_pressed(const keyboard::Key& aKeyCode) const
 	return m_Keyboard.getKeyJustDown(aKeyCode);
 }
 
+bool glfw_context::get_key_just_released(const keyboard::Key& aKeyCode) const
+{
+	return m_Keyboard.getKeyJustReleased(aKeyCode);
+}
+
 void glfw_context::update()
 {
 	m_Keyboard.update();

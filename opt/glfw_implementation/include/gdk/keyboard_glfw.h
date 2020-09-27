@@ -32,6 +32,8 @@ namespace gdk
 
 		virtual bool getKeyJustDown(const keyboard::Key& aKeyCode) const override;
 
+		virtual bool getKeyJustReleased(const keyboard::Key& aKeyCode) const override;
+
 		void update();
 
 		keyboard_glfw(decltype(m_pWindow) pWindow);

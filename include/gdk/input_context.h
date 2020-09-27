@@ -34,6 +34,9 @@ namespace gdk::input
 		//! check if a key was just pressed
 		virtual bool get_key_just_pressed(const keyboard::Key& aKeyCode) const = 0;
 
+		// check if the key was just released
+		virtual bool get_key_just_released(const keyboard::Key& aKeyCode) const = 0;
+
 		//! must be called in your loop
 		virtual void update() = 0;
 

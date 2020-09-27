@@ -23,6 +23,8 @@ namespace gdk::input
 
 		virtual bool get_key_just_pressed(const keyboard::Key& aKeyCode) const override;
 
+		virtual bool get_key_just_released(const keyboard::Key& aKeyCode) const override;
+
 	 	glfw_context(GLFWwindow *const apGLFWWindow);
 
 		virtual void update() override;

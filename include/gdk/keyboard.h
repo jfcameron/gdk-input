@@ -16,6 +16,7 @@ namespace gdk
 		{
 			UP = 0, //!< unpressed
 			JUST_PRESSED, //!< single frame down input
+			JUST_RELEASED, //!< single frame release input
 			HELD_DOWN //!< multiple frames
 		};
 
@@ -61,8 +62,8 @@ namespace gdk
 		/// \brief check if key was just pressed down
 		virtual bool getKeyJustDown(const Key& aKeyCode) const = 0;
             
-        /// \brief Check if the key was just pressed
-        //bool getKey(const Key &aKeyCode);
+		/// \brief check if the key was just released
+		virtual bool getKeyJustReleased(const keyboard::Key& aKeyCode) const = 0;
 
         virtual ~keyboard() = default;
     };

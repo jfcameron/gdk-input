@@ -275,6 +275,16 @@ bool keyboard_glfw::getKeyJustDown(const keyboard::Key& aKeyCode) const
 	return value;
 }
 
+bool keyboard_glfw::getKeyJustReleased(const keyboard::Key& aKeyCode) const
+{
+	bool value = false;
+
+	if (auto search = m_CurrentState.find(glfwKeyCodeFromKey(aKeyCode)); search != m_CurrentState.end())
+		value = search->second == gdk::keyboard::Keystate::JUST_RELEASED;
+
+	return value;
+}
+
 void keyboard_glfw::update()
 {
 	for (const auto &glfwKey : KEY_SET)
@@ -285,7 +295,10 @@ void keyboard_glfw::update()
 
 		auto newState = keyboard::Keystate::UP;
 
-		if (currentKeyState != GLFW_RELEASE)
+		if (currentKeyState == GLFW_RELEASE && lastKeyState != GLFW_RELEASE)
+			newState = keyboard::Keystate::JUST_RELEASED;
+		
+		else if (currentKeyState != GLFW_RELEASE)
 			newState = lastKeyState == GLFW_RELEASE
 				? newState = keyboard::Keystate::JUST_PRESSED
 				: newState = keyboard::Keystate::HELD_DOWN;
