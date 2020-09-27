@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="icon.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">gdk-input
-   &#160;<span id="projectnumber">6355fa4af7caca60b2ea54a1a042441f09ef9d44</span>
+   &#160;<span id="projectnumber">1cf7fc251d0b7a12e58a7a8c8f59c84eec3f00c8</span>
    </div>
   </td>
  </tr>
@@ -82,6 +82,7 @@ $(function() {
 Public Types</h2></td></tr>
 <tr class="memitem:af1c491b701726fe45702f48cc243d6a0"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdk_1_1keyboard.html#af1c491b701726fe45702f48cc243d6a0">Keystate</a> { <a class="el" href="classgdk_1_1keyboard.html#af1c491b701726fe45702f48cc243d6a0afbaedde498cdead4f2780217646e9ba1">Keystate::UP</a> = 0, 
 <a class="el" href="classgdk_1_1keyboard.html#af1c491b701726fe45702f48cc243d6a0adab50d141666131a9ec54949ccc047c0">Keystate::JUST_PRESSED</a>, 
+<a class="el" href="classgdk_1_1keyboard.html#af1c491b701726fe45702f48cc243d6a0a7aebac60d8886879d0f930cfafc6bdfa">Keystate::JUST_RELEASED</a>, 
 <a class="el" href="classgdk_1_1keyboard.html#af1c491b701726fe45702f48cc243d6a0a1eafb5632252d67980e4e08d9f46aa5e">Keystate::HELD_DOWN</a>
  }<tr class="memdesc:af1c491b701726fe45702f48cc243d6a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">key state  <a href="classgdk_1_1keyboard.html#af1c491b701726fe45702f48cc243d6a0">More...</a><br /></td></tr>
 </td></tr>
@@ -228,10 +229,10 @@ virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdk_1_1keyboard.html#a97e10430cbbd54726d6734ff3a1527a2">getKeyJustDown</a> (const <a class="el" href="classgdk_1_1keyboard.html#aafc81cd9039ebb5d7ca1e65373d2eb0a">Key</a> &amp;aKeyCode) const =0</td></tr>
 <tr class="memdesc:a97e10430cbbd54726d6734ff3a1527a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">check if key was just pressed down <br /></td></tr>
 <tr class="separator:a97e10430cbbd54726d6734ff3a1527a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a48254e50b8fd9b0bb9a0dab6aadac384"><td class="memItemLeft" align="right" valign="top"><a id="a48254e50b8fd9b0bb9a0dab6aadac384"></a>
-virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdk_1_1keyboard.html#a48254e50b8fd9b0bb9a0dab6aadac384">~keyboard</a> ()=default</td></tr>
-<tr class="memdesc:a48254e50b8fd9b0bb9a0dab6aadac384"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if the key was just pressed. <br /></td></tr>
-<tr class="separator:a48254e50b8fd9b0bb9a0dab6aadac384"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abe7599a1fa426176552baf253d4dd608"><td class="memItemLeft" align="right" valign="top"><a id="abe7599a1fa426176552baf253d4dd608"></a>
+virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdk_1_1keyboard.html#abe7599a1fa426176552baf253d4dd608">getKeyJustReleased</a> (const <a class="el" href="classgdk_1_1keyboard.html#aafc81cd9039ebb5d7ca1e65373d2eb0a">keyboard::Key</a> &amp;aKeyCode) const =0</td></tr>
+<tr class="memdesc:abe7599a1fa426176552baf253d4dd608"><td class="mdescLeft">&#160;</td><td class="mdescRight">check if the key was just released <br /></td></tr>
+<tr class="separator:abe7599a1fa426176552baf253d4dd608"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Get keystates for a given Window. </p>
@@ -261,6 +262,8 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="af1c491b701726fe45702f48cc243d6a0afbaedde498cdead4f2780217646e9ba1"></a>UP&#160;</td><td class="fielddoc"><p>unpressed </p>
 </td></tr>
 <tr><td class="fieldname"><a id="af1c491b701726fe45702f48cc243d6a0adab50d141666131a9ec54949ccc047c0"></a>JUST_PRESSED&#160;</td><td class="fielddoc"><p>single frame down input </p>
+</td></tr>
+<tr><td class="fieldname"><a id="af1c491b701726fe45702f48cc243d6a0a7aebac60d8886879d0f930cfafc6bdfa"></a>JUST_RELEASED&#160;</td><td class="fielddoc"><p>single frame release input </p>
 </td></tr>
 <tr><td class="fieldname"><a id="af1c491b701726fe45702f48cc243d6a0a1eafb5632252d67980e4e08d9f46aa5e"></a>HELD_DOWN&#160;</td><td class="fielddoc"><p>multiple frames </p>
 </td></tr>
