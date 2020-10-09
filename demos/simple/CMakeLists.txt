@@ -12,6 +12,7 @@ jfc_project(executable
     
     PRIVATE_INCLUDE_DIRECTORIES
         "${gdkinput_INCLUDE_DIRECTORIES}"
+        "${DEMO_COMMON_HEADERS}"
 
     LIBRARIES
         "${gdkinput_LIBRARIES}"

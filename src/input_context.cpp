@@ -13,6 +13,3 @@ context::context_ptr_type context::make(GLFWwindow *const apGLFWWindow)
 	return std::make_unique<glfw_context>(glfw_context(apGLFWWindow));
 }
 
-
-
-

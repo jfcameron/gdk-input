@@ -15,15 +15,24 @@ namespace gdk
         /// \brief Represents all detectable mouse buttons
         enum class Button
         { 
-            Left, 
-            Right, 
-            Middle, 
-            Four, 
-            Five, 
-            Six, 
-            Seven, 
-            Eight 
+            Left, //!< left mouse button
+            Right, //!< right mouse button 
+            Middle, //!< middle mouse button
+            Four, //!< fourth button, if the mouse has one
+            Five, //!< fifth button, if the mouse has one
+            Six, //!< sixth button, if the mouse has one
+            Seven, //!< seventh button, if the mouse has one
+            Eight //!< eighth button, if the mouse has one
         };
+
+		/// \brief button state
+		enum class ButtonState
+		{
+			UP = 0, //!< unpressed
+			JUST_PRESSED, //!< single frame down input
+			JUST_RELEASED, //!< single frame release input
+			HELD_DOWN //!< multiple frames
+		};
 
         /// \brief mode affects cursor behaviour
         enum class CursorMode
@@ -45,31 +54,31 @@ namespace gdk
         {
             double x, y;
         };
-           
-        /// \brief Check if the button was just pressed
-        //virtual bool getButton(const Button &aKeyCode) = 0;
         
-        /// \brief Check if the button is being held down
-        virtual bool getButtonDown(const Button aKeyCode) const = 0;
+		/// \brief Check if the key is being held down
+		virtual bool getButtonDown(const Button aKeyCode) const = 0;
+
+		/// \brief check if key was just pressed down
+		virtual bool getButtonJustDown(const Button aKeyCode) const = 0;
+
+		/// \brief check if the key was just released
+		virtual bool getButtonJustReleased(const Button aKeyCode) const = 0;
+		
+		/// \brief Viewcoordinate of cursor
+		virtual cursor_2d_type getCursorPosition() const = 0;
+
+		/// \brief Get amount of cursor movement since the last frame
+		virtual cursor_2d_type getDelta() const = 0;
+
+		/// \brief affects values returned by getDelta
+		virtual void setDeltaSensitivity(double sens) = 0;
 
         /// \brief change cursor mode
         virtual void setCursorMode(const CursorMode aCursorMode) = 0;
 
         /// \brief check cursor mode
         virtual mouse::CursorMode getCursorMode() const = 0;
-
-        /// \brief Viewcoordinate of cursor
-        virtual cursor_2d_type getCursorPosition() const = 0;
-
-        /// \brief Get amount of cursor movement since the last frame
-        virtual cursor_2d_type getDelta() const = 0;
-
-        ///
-        //virtual setCursorGraphic(standardShapeEnum) = 0;
-        //virtual setCursorGraphic(2dbytearray) = 0;
-
-        //virtual void setCursorGraphic = 0;
-
+			   
         virtual ~mouse() = default;
     };
 }

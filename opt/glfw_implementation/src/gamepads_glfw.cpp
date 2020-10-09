@@ -26,37 +26,53 @@ namespace gdk
             ? SDL_GAMEPAD_NAME 
             : glfwGetJoystickName(aJoystickIndex);
 
-        if (!name) throw std::invalid_argument(std::string(TAG).append(": no gamepad at index: ").append(std::to_string(aJoystickIndex)));
+        /*if (!name) throw std::invalid_argument(std::string(TAG)
+			.append(": no gamepad at index: ")
+			.append(std::to_string(aJoystickIndex)));*/
+
+		if (!name) name = "disconnected"; //I dont like this at all but I dont think I can track gamepads with a unique id. see update()
 
         return name; 
     }())
     {}
 
-    float gamepad_glfw::getAxis(int index) const 
+    float gamepad_glfw::get_axis(int index) const 
     {
+		if (index >= m_Axes.size()) return 0;
+
         return m_Axes[index];
     }
 
-    gamepad::size_type gamepad_glfw::getAxisCount() const
+    gamepad::size_type gamepad_glfw::get_axis_count() const
     {
        return m_Axes.size(); 
     }
 
-    gamepad::button_state_type gamepad_glfw::getButtonDown(int index) const 
+    gamepad::button_state_type gamepad_glfw::get_button_down(int index) const 
     {
-        return m_Buttons[index];
+		if (index >= m_Buttons.size()) return 0;
+
+		return m_Buttons[index];
     }
 
-    gamepad::size_type gamepad_glfw::getButtonCount() const
+    gamepad::size_type gamepad_glfw::get_button_count() const
     {
        return m_Buttons.size(); 
     }
 
-    gamepad::hat_state_type gamepad_glfw::getHat(int index) const
+    gamepad::hat_state_type gamepad_glfw::get_hat(int index) const
     {
         const auto hat_state_glfw = m_Hats[index];
+
+		if (index >= m_Hats.size()) return {
+			hat_state_type::horizontal_direction::Center,
+			hat_state_type::vertical_direction::Center
+		};
     
-        if (hat_state_glfw == GLFW_HAT_CENTERED) return {hat_state_type::horizontal_direction::Center, hat_state_type::vertical_direction::Center};
+        if (hat_state_glfw == GLFW_HAT_CENTERED) return {
+			hat_state_type::horizontal_direction::Center, 
+			hat_state_type::vertical_direction::Center
+		};
 
         return {
             hat_state_glfw & GLFW_HAT_RIGHT 
@@ -73,12 +89,12 @@ namespace gdk
         };
     }
 
-    gamepad::size_type gamepad_glfw::getHatCount() const
+    gamepad::size_type gamepad_glfw::get_hat_count() const
     {
         return m_Hats.size();
     }
 
-    std::string_view gamepad_glfw::getName() const 
+    std::string_view gamepad_glfw::get_name() const 
     {
         return m_Name;
     }
@@ -86,7 +102,14 @@ namespace gdk
     void gamepad_glfw::update()
     {
         //update is a bit silly because I am not dealing with disconnects properly. 
-        //this leads to a question every update: does this instance still point to the same hardware? To let these vary, I constantly reassign the name and check if its a joystick or gamepad. Think about this. Is a more elegant implementation of disconnect/reconnects possible with the glfw library? https://www.glfw.org/docs/latest/input_guide.html
+        //this leads to a question every update: does this instance still point to the same hardware? 
+		//To let these vary, I constantly reassign the name and check if its a joystick or gamepad. 
+		//Think about this. Is a more elegant implementation of disconnect/reconnects possible with the glfw library? 
+		//https://www.glfw.org/docs/latest/input_guide.html
+		//
+		// the hardware gamepad can change underneath the gamepad_glfw instance. After looking into it, I dont think there is
+		// a way to assign a unique ID to gamepads within GLFW, which means this just will happen if players disconnect pads and reconnect them
+		// in differing orders.
         if (glfwJoystickIsGamepad(m_JoystickIndex))
         {
             m_Name = SDL_GAMEPAD_NAME;
@@ -146,4 +169,3 @@ namespace gdk
         }
     }
 }
-

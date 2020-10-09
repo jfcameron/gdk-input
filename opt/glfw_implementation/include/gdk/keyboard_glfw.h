@@ -26,8 +26,6 @@ namespace gdk
 		std::unordered_map<decltype(GLFW_KEY_Q), keyboard::Keystate> m_CurrentState;
 
     public:
-		void asdf(GLFWwindow* window, int key, int scancode, int action, int mods);
-
         virtual bool getKeyDown(const keyboard::Key &aKeyCode) const override;
 
 		virtual bool getKeyJustDown(const keyboard::Key& aKeyCode) const override;

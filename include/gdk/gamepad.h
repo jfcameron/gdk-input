@@ -14,6 +14,7 @@ namespace gdk
     {
     public:
         using size_type = size_t;
+
         using button_state_type = bool;
         
         //! hat direction
@@ -35,25 +36,25 @@ namespace gdk
         };
 
         //! human readable device name
-        virtual std::string_view getName() const = 0;
+        virtual std::string_view get_name() const = 0;
         
         //! normalized magnitude of axis. 0 = no input, 1 = full input
-        virtual float getAxis(int index) const = 0;
+        virtual float get_axis(int index) const = 0;
 
         //! number of axes
-        virtual size_type getAxisCount() const = 0;
+        virtual size_type get_axis_count() const = 0;
         
         //! whether or not the button is being held down by the user
-        virtual button_state_type getButtonDown(int index) const = 0;
+        virtual button_state_type get_button_down(int index) const = 0;
 
         //! number of buttons
-        virtual size_type getButtonCount() const = 0;
+        virtual size_type get_button_count() const = 0;
 
         //! value of a hat direction by index
-        virtual hat_state_type getHat(int index) const = 0;
+        virtual hat_state_type get_hat(int index) const = 0;
 
         //! number of hats
-        virtual size_type getHatCount() const = 0;
+        virtual size_type get_hat_count() const = 0;
 
         virtual ~gamepad() = default;
     };

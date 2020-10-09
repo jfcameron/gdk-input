@@ -245,9 +245,9 @@ static inline decltype(GLFW_KEY_ESCAPE) glfwKeyCodeFromKey(const keyboard::Key a
     }
 
     throw std::invalid_argument(std::string(
-		"Unable to convert keyboard key \"").append(
-			std::to_string(
-				static_cast< std::underlying_type< decltype(a)>::type>(a))).append("\" to GLFW_KEY")); 
+		"Unable to convert keyboard key \"")
+		.append(std::to_string(static_cast< std::underlying_type< decltype(a)>::type>(a)))
+		.append("\" to GLFW_KEY")); 
 }
 
 keyboard_glfw::keyboard_glfw(decltype(m_pWindow) pWindow)
@@ -256,7 +256,7 @@ keyboard_glfw::keyboard_glfw(decltype(m_pWindow) pWindow)
 
 bool keyboard_glfw::getKeyDown(const keyboard::Key &aKeyCode) const
 {
-	bool value = false;
+	bool value(false);
 
 	if (auto search = m_CurrentState.find(glfwKeyCodeFromKey(aKeyCode)); search != m_CurrentState.end())
 		value = search->second == gdk::keyboard::Keystate::HELD_DOWN || 
@@ -267,7 +267,7 @@ bool keyboard_glfw::getKeyDown(const keyboard::Key &aKeyCode) const
 
 bool keyboard_glfw::getKeyJustDown(const keyboard::Key& aKeyCode) const
 {
-	bool value = false;
+	bool value(false);
 
 	if (auto search = m_CurrentState.find(glfwKeyCodeFromKey(aKeyCode)); search != m_CurrentState.end())
 		value = search->second == gdk::keyboard::Keystate::JUST_PRESSED;
@@ -277,7 +277,7 @@ bool keyboard_glfw::getKeyJustDown(const keyboard::Key& aKeyCode) const
 
 bool keyboard_glfw::getKeyJustReleased(const keyboard::Key& aKeyCode) const
 {
-	bool value = false;
+	bool value(false);
 
 	if (auto search = m_CurrentState.find(glfwKeyCodeFromKey(aKeyCode)); search != m_CurrentState.end())
 		value = search->second == gdk::keyboard::Keystate::JUST_RELEASED;
