@@ -13,9 +13,13 @@ namespace gdk
     class gamepad
     {
     public:
-        using size_type = size_t;
+        using size_type = size_t; //TODO: delete?
 
         using button_state_type = bool;
+
+		using index_type = size_t;
+
+		using button_collection_type = std::vector<button_state_type>;
         
         //! hat direction
         /// left -1, right +1, up +1, down -1 TODO: I have changed my mind. dont like it. enum
@@ -39,22 +43,16 @@ namespace gdk
         virtual std::string_view get_name() const = 0;
         
         //! normalized magnitude of axis. 0 = no input, 1 = full input
-        virtual float get_axis(int index) const = 0;
+        virtual float get_axis(index_type index) const = 0;
 
-        //! number of axes
-        virtual size_type get_axis_count() const = 0;
-        
         //! whether or not the button is being held down by the user
-        virtual button_state_type get_button_down(int index) const = 0;
-
-        //! number of buttons
-        virtual size_type get_button_count() const = 0;
+        virtual button_state_type get_button_down(index_type index) const = 0;
 
         //! value of a hat direction by index
-        virtual hat_state_type get_hat(int index) const = 0;
+        virtual hat_state_type get_hat(index_type index) const = 0;
 
-        //! number of hats
-        virtual size_type get_hat_count() const = 0;
+		//! state of all buttons
+		virtual button_collection_type get_buttons() const = 0;
 
         virtual ~gamepad() = default;
     };

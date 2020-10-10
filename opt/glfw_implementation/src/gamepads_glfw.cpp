@@ -31,36 +31,35 @@ namespace gdk
 			.append(std::to_string(aJoystickIndex)));*/
 
 		if (!name) name = "disconnected"; //I dont like this at all but I dont think I can track gamepads with a unique id. see update()
+		// maybe add a is_connected member & getmethod
 
         return name; 
     }())
     {}
 
-    float gamepad_glfw::get_axis(int index) const 
+    float gamepad_glfw::get_axis(gamepad::index_type index) const
     {
 		if (index >= m_Axes.size()) return 0;
 
         return m_Axes[index];
     }
 
-    gamepad::size_type gamepad_glfw::get_axis_count() const
-    {
-       return m_Axes.size(); 
-    }
-
-    gamepad::button_state_type gamepad_glfw::get_button_down(int index) const 
+    gamepad::button_state_type gamepad_glfw::get_button_down(gamepad::index_type index) const
     {
 		if (index >= m_Buttons.size()) return 0;
 
 		return m_Buttons[index];
     }
 
-    gamepad::size_type gamepad_glfw::get_button_count() const
-    {
-       return m_Buttons.size(); 
-    }
+	gamepad::button_collection_type gamepad_glfw::get_buttons() const
+	{
+		return {
+			m_Buttons.begin(),
+			m_Buttons.end()
+		};
+	}
 
-    gamepad::hat_state_type gamepad_glfw::get_hat(int index) const
+    gamepad::hat_state_type gamepad_glfw::get_hat(gamepad::index_type index) const
     {
         const auto hat_state_glfw = m_Hats[index];
 
@@ -87,11 +86,6 @@ namespace gdk
                     ? hat_state_type::vertical_direction::Down
                     : hat_state_type::vertical_direction::Center
         };
-    }
-
-    gamepad::size_type gamepad_glfw::get_hat_count() const
-    {
-        return m_Hats.size();
     }
 
     std::string_view gamepad_glfw::get_name() const 

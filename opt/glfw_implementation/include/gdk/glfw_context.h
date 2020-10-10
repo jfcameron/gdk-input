@@ -31,6 +31,8 @@ namespace gdk::input
 		std::array<glfw_gamepad_ptr, 1 + GLFW_JOYSTICK_LAST - GLFW_JOYSTICK_1> m_Gamepads;
 
     public:
+		[[nodiscard]] virtual std::vector<std::pair<keyboard::Key, bool>> get_keys() const override;
+
 		[[nodiscard]] virtual bool get_key_down(const keyboard::Key& aKeyCode) const override;
 
 		[[nodiscard]] virtual bool get_key_just_pressed(const keyboard::Key& aKeyCode) const override;
@@ -56,6 +58,8 @@ namespace gdk::input
 
 
 		virtual gamepad_ptr get_gamepad(const size_t index) override;
+
+		virtual gamepad_collection_type get_gamepads() override;
 
 		//virtual size_t get_gamepad_maximum_count() const override;
 

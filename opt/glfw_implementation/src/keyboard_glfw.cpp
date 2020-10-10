@@ -16,6 +16,110 @@ using namespace gdk;
 
 static constexpr char TAG[] = "keyboard_glfw";
 
+static const std::set<keyboard::Key> GDK_INPUT_KEY_SET{
+keyboard::Key::Escape,
+keyboard::Key::F1,
+keyboard::Key::F2,
+keyboard::Key::F3,
+keyboard::Key::F4,
+keyboard::Key::F5,
+keyboard::Key::F6,
+keyboard::Key::F7,
+keyboard::Key::F8,
+keyboard::Key::F9,
+keyboard::Key::F10,
+keyboard::Key::F11,
+keyboard::Key::F12,
+keyboard::Key::PrintScreen,
+keyboard::Key::ScrollLock,
+keyboard::Key::PauseBreak,
+keyboard::Key::Q,
+keyboard::Key::W,
+keyboard::Key::E,
+keyboard::Key::R,
+keyboard::Key::T,
+keyboard::Key::Y,
+keyboard::Key::U,
+keyboard::Key::I,
+keyboard::Key::O,
+keyboard::Key::P,
+keyboard::Key::A,
+keyboard::Key::S,
+keyboard::Key::D,
+keyboard::Key::F,
+keyboard::Key::G,
+keyboard::Key::H,
+keyboard::Key::J,
+keyboard::Key::K,
+keyboard::Key::L,
+keyboard::Key::Z,
+keyboard::Key::X,
+keyboard::Key::C,
+keyboard::Key::V,
+keyboard::Key::B,
+keyboard::Key::N,
+keyboard::Key::M,
+keyboard::Key::One,
+keyboard::Key::Two,
+keyboard::Key::Three,
+keyboard::Key::Four,
+keyboard::Key::Five,
+keyboard::Key::Six,
+keyboard::Key::Seven,
+keyboard::Key::Eight,
+keyboard::Key::Nine,
+keyboard::Key::Zero,
+keyboard::Key::Tilda,
+keyboard::Key::Minus,
+keyboard::Key::Equals,
+keyboard::Key::Backspace,
+keyboard::Key::Home,
+keyboard::Key::End,
+keyboard::Key::Tab,
+keyboard::Key::OpenBracket,
+keyboard::Key::CloseBracket,
+keyboard::Key::Backslash,
+keyboard::Key::Insert,
+keyboard::Key::PageUp,
+keyboard::Key::Capslock,
+keyboard::Key::SemiColon,
+keyboard::Key::Quote,
+keyboard::Key::Enter,
+keyboard::Key::Delete,
+keyboard::Key::PageDown,
+keyboard::Key::LeftShift,
+keyboard::Key::Comma,
+keyboard::Key::Period,
+keyboard::Key::ForwardSlash,
+keyboard::Key::RightShift,
+keyboard::Key::LeftControl,
+keyboard::Key::LeftAlt,
+keyboard::Key::Space,
+keyboard::Key::RightAlt,
+keyboard::Key::RightControl,
+keyboard::Key::LeftArrow,
+keyboard::Key::RightArrow,
+keyboard::Key::UpArrow,
+keyboard::Key::DownArrow,
+keyboard::Key::Numlock,
+keyboard::Key::NumSlash,
+keyboard::Key::NumAsterisk,
+keyboard::Key::NumMinus,
+keyboard::Key::Num7,
+keyboard::Key::Num8,
+keyboard::Key::Num9,
+keyboard::Key::NumPlus,
+keyboard::Key::Num4,
+keyboard::Key::Num5,
+keyboard::Key::Num6,
+keyboard::Key::Num1,
+keyboard::Key::Num2,
+keyboard::Key::Num3,
+keyboard::Key::NumEnter,
+keyboard::Key::Num0,
+keyboard::Key::NumPeriod
+};
+
 static const std::set<decltype(GLFW_KEY_A)> KEY_SET{
 	GLFW_KEY_ESCAPE,
 	GLFW_KEY_F1,
@@ -253,6 +357,20 @@ static inline decltype(GLFW_KEY_ESCAPE) glfwKeyCodeFromKey(const keyboard::Key a
 keyboard_glfw::keyboard_glfw(decltype(m_pWindow) pWindow)
 	: m_pWindow(pWindow)
 {}
+
+std::vector<std::pair<keyboard::Key, bool>> keyboard_glfw::getKeys() const
+{
+	std::vector<std::pair<keyboard::Key, bool>> keys;
+	
+	keys.reserve(GDK_INPUT_KEY_SET.size());
+
+	for (const auto key : GDK_INPUT_KEY_SET)
+	{
+		keys.push_back({ key, getKeyDown(key) });
+	}
+
+	return keys;
+}
 
 bool keyboard_glfw::getKeyDown(const keyboard::Key &aKeyCode) const
 {

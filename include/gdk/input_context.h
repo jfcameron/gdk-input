@@ -27,10 +27,16 @@ namespace gdk::input
 		/// \brief shared ptr to a gamepad
 		using gamepad_ptr = std::shared_ptr<gamepad>;
 
+		/// \brief collection of gamepads
+		using gamepad_collection_type = std::vector<gamepad_ptr>;
+
 		/// \brief create a context from a glfw window
 		/// \warn the implementation does not have any ownership over the pointer. It is up to the user to guarantee
 		/// the glfw window's lifetime exceeds the context
 		[[nodiscard]] static context_ptr_type make(GLFWwindow* const apGLFWWindow);
+
+		/// \brief returns the current state of all keys
+		[[nodiscard]] virtual std::vector<std::pair<keyboard::Key, bool>> get_keys() const = 0;
 
 		/// \brief check if a key is down (held or just pressed)
 		[[nodiscard]] virtual bool get_key_down(const keyboard::Key& aKeyCode) const = 0;
@@ -77,6 +83,9 @@ namespace gdk::input
 		/// the gamepad ptr is guaranteed not to be null, even if there are less than N gamepads connected,
 		/// such a gamepad will simply return 0 for all input polling.
 		[[nodiscard]] virtual gamepad_ptr get_gamepad(const size_t index) = 0;
+
+		/// \brief returns array of all gamepads
+		[[nodiscard]] virtual gamepad_collection_type get_gamepads() = 0;
 
 		/// \brief returns maximum number of connected gamepads this library can handle
 		//[[nodiscard]] virtual size_t get_gamepad_maximum_count() const = 0;

@@ -14,6 +14,11 @@ glfw_context::glfw_context(GLFWwindow *const apGLFWWindow)
 		m_Gamepads[i] = glfw_gamepad_ptr(new gamepad_glfw(i));
 }
 
+std::vector<std::pair<keyboard::Key, bool>> glfw_context::get_keys() const
+{
+	return m_Keyboard.getKeys();
+}
+
 bool glfw_context::get_key_down(const keyboard::Key& aKeyCode) const
 {
 	return m_Keyboard.getKeyDown(aKeyCode);
@@ -75,6 +80,11 @@ context::gamepad_ptr glfw_context::get_gamepad(const size_t index)
 		std::to_string(index) + "/" + std::to_string(m_Gamepads.size()));
 
 	return std::static_pointer_cast<gamepad>(m_Gamepads[index]);
+}
+
+context::gamepad_collection_type glfw_context::get_gamepads()
+{
+	return {m_Gamepads.front(), m_Gamepads.back()};
 }
 
 /*size_t glfw_context::get_gamepad_maximum_count() const

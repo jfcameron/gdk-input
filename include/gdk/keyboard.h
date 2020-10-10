@@ -4,6 +4,8 @@
 #define GDK_INPUT_KEYBOARD_H
 
 #include <memory>
+#include <vector>
+#include <map>
 
 namespace gdk
 {
@@ -43,7 +45,7 @@ namespace gdk
             LeftShift, Comma, Period, ForwardSlash, RightShift, 
             
             //Bottom row
-            LeftControl, LeftAlt, Space, RightAlt, RightControl,  //macos "command" button? windows "windows" button?
+            LeftControl, LeftAlt, Space, RightAlt, RightControl,
             
             //Arrow keys
             LeftArrow, RightArrow, UpArrow, DownArrow, 
@@ -55,6 +57,8 @@ namespace gdk
             Num1, Num2, Num3, NumEnter, 
             Num0, NumPeriod
         };
+
+		virtual std::vector<std::pair<keyboard::Key, bool>> getKeys() const = 0;
  
         /// \brief Check if the key is being held down
         virtual bool getKeyDown(const Key &aKeyCode) const = 0;
