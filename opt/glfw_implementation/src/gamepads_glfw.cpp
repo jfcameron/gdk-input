@@ -14,7 +14,7 @@
 
 static constexpr char TAG[] = "gamepad_glfw";
 
-static constexpr char SDL_GAMEPAD_NAME[] = "sdl_gamepad";
+static constexpr char SDL_GAMEPAD_NAME[] = "standard_gamepad";
 
 namespace gdk
 {
@@ -22,26 +22,41 @@ namespace gdk
     : m_JoystickIndex(aJoystickIndex)
     , m_Name([aJoystickIndex]()
     {
+		//NOTE: since glfw gamepads can shift in real time, no setup work should be done in the ctor.
+		//see update. should add a private method that shares commonalities of setup, call here and there.
         const char *name = glfwJoystickIsGamepad(aJoystickIndex)
             ? SDL_GAMEPAD_NAME 
             : glfwGetJoystickName(aJoystickIndex);
 
-        /*if (!name) throw std::invalid_argument(std::string(TAG)
-			.append(": no gamepad at index: ")
-			.append(std::to_string(aJoystickIndex)));*/
-
-		if (!name) name = "disconnected"; //I dont like this at all but I dont think I can track gamepads with a unique id. see update()
-		// maybe add a is_connected member & getmethod
+		//likely should be a bool member not this stringy stuff
+		// add a is_connected member & getmethod
+		if (!name) name = "disconnected"; 
 
         return name; 
     }())
     {}
 
-    float gamepad_glfw::get_axis(gamepad::index_type index) const
+    float gamepad_glfw::get_axis(gamepad::index_type index, axis_value_type threshold) const
     {
 		if (index >= m_Axes.size()) return 0;
 
-        return m_Axes[index];
+		auto value = m_Axes[index];
+
+		if (std::abs(value) < threshold) return 0;
+
+		// Gamepad triggers are -1 when untouched.
+		// This normalizes the value. instead of weird range of [-1 - +1], go to [0 - 1]
+		// gdk always presents a value of 0 as unpressed
+		if (m_Name == SDL_GAMEPAD_NAME)
+		{
+			if (index == GLFW_GAMEPAD_AXIS_LEFT_TRIGGER || index == GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER)
+			{
+				value += 1.f;
+				value /= 2.f;
+			}
+		}
+
+        return value;
     }
 
     gamepad::button_state_type gamepad_glfw::get_button_down(gamepad::index_type index) const
@@ -51,41 +66,61 @@ namespace gdk
 		return m_Buttons[index];
     }
 
-	gamepad::button_collection_type gamepad_glfw::get_buttons() const
+	std::optional<gamepad::button_collection_type::size_type> gamepad_glfw::get_any_button_down() const
 	{
-		return {
-			m_Buttons.begin(),
-			m_Buttons.end()
-		};
+		for (decltype(m_Buttons)::size_type i(0); i < m_Buttons.size(); ++i)
+		{
+			if (m_Buttons[i]) return i;
+		}
+
+		return {};
+	}
+
+	std::optional<std::pair<int, gamepad::hat_state_type>> gamepad_glfw::get_any_hat_down() const
+	{
+		for (decltype(m_Hats)::size_type i(0); i < m_Hats.size(); ++i)
+		{
+			if (m_Hats[i]) return 
+			{{i, get_hat(i)}};
+		}
+
+		return {};
+	}
+
+	std::optional<std::pair<int, gamepad_glfw::axis_value_type>> gamepad_glfw::get_any_axis_down(axis_value_type threshold) const
+	{
+		for (decltype(m_Axes)::size_type i(0); i < m_Axes.size(); ++i)
+		{
+			if (m_Axes[i])
+			{
+				if (auto val = get_axis(i, threshold)) return {{
+					i,
+					val
+				}};
+			}
+		}
+
+		return {};
 	}
 
     gamepad::hat_state_type gamepad_glfw::get_hat(gamepad::index_type index) const
     {
-        const auto hat_state_glfw = m_Hats[index];
-
-		if (index >= m_Hats.size()) return {
+		gamepad::hat_state_type hat {
 			hat_state_type::horizontal_direction::Center,
 			hat_state_type::vertical_direction::Center
 		};
-    
-        if (hat_state_glfw == GLFW_HAT_CENTERED) return {
-			hat_state_type::horizontal_direction::Center, 
-			hat_state_type::vertical_direction::Center
-		};
 
-        return {
-            hat_state_glfw & GLFW_HAT_RIGHT 
-                ? hat_state_type::horizontal_direction::Right
-                : hat_state_glfw & GLFW_HAT_LEFT 
-                    ? hat_state_type::horizontal_direction::Left
-                    : hat_state_type::horizontal_direction::Center, 
+		if (index >= m_Hats.size()) return hat;
 
-            hat_state_glfw & GLFW_HAT_UP 
-                ? hat_state_type::vertical_direction::Up
-                : hat_state_glfw & GLFW_HAT_DOWN 
-                    ? hat_state_type::vertical_direction::Down
-                    : hat_state_type::vertical_direction::Center
-        };
+        const auto hat_state_glfw = m_Hats[index];
+
+		if      (hat_state_glfw & GLFW_HAT_LEFT) hat.x  = hat_state_type::horizontal_direction::Left;
+		if (hat_state_glfw & GLFW_HAT_RIGHT) hat.x = hat_state_type::horizontal_direction::Right;
+
+		if      (hat_state_glfw & GLFW_HAT_UP) hat.y   = hat_state_type::vertical_direction::Up;
+		if (hat_state_glfw & GLFW_HAT_DOWN) hat.y = hat_state_type::vertical_direction::Down;
+
+		return hat;
     }
 
     std::string_view gamepad_glfw::get_name() const 
@@ -117,25 +152,28 @@ namespace gdk
             // https://www.glfw.org/docs/latest/input_guide.html#gamepad "button indicies"
             m_Buttons = decltype(m_Buttons)(state.buttons, state.buttons + GLFW_GAMEPAD_BUTTON_DPAD_UP - 1); //TODO test for off by one error.
 
-            m_Hats = { static_cast<decltype(m_Hats)::value_type>(
-                state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_RIGHT]
-                    ? state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_UP]
-                        ? GLFW_HAT_RIGHT_UP
-                        : state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_DOWN]
-                            ? GLFW_HAT_RIGHT_DOWN
-                            : GLFW_HAT_CENTERED
-                    : state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_LEFT]
-                        ? state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_UP]
-                            ? GLFW_HAT_LEFT_UP
-                            : state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_DOWN]
-                                ? GLFW_HAT_LEFT_DOWN
-                                : GLFW_HAT_CENTERED
-                        : state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_UP]
-                            ? GLFW_HAT_UP
-                            : state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_DOWN]
-                                ? GLFW_HAT_DOWN
-                                : GLFW_HAT_CENTERED)
-            };
+			auto a(GLFW_HAT_CENTERED);
+	
+			if (state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_RIGHT])
+			{
+				a = GLFW_HAT_RIGHT;
+
+				if (state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_UP]) a = GLFW_HAT_RIGHT_UP;
+				if (state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_DOWN]) a = GLFW_HAT_RIGHT_DOWN;
+			}
+			else if (state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_LEFT])
+			{
+				a = GLFW_HAT_LEFT;
+
+				if (state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_UP]) a = GLFW_HAT_LEFT_UP;
+				if (state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_DOWN]) a = GLFW_HAT_LEFT_DOWN;
+			}
+			else if (state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_UP]) a = GLFW_HAT_UP;
+			else if (state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_DOWN]) a = GLFW_HAT_DOWN;
+
+			m_Hats = {
+				static_cast<decltype(m_Hats)::value_type>(a)
+			};
         }
         else if (glfwJoystickPresent(m_JoystickIndex)) 
         {

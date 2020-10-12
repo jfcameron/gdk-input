@@ -1,4 +1,4 @@
-// © 2020 Joseph Cameron - All Rights Reserved
+// Â© 2020 Joseph Cameron - All Rights Reserved
 
 #include <demo/glfw_init.h>
 #include <demo/state_machine.h> //This is copied from flappy. when connection back, remove this and split flappy impl to separate module

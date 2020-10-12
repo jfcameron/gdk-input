@@ -26,7 +26,7 @@ namespace gdk
 		std::unordered_map<decltype(GLFW_KEY_Q), keyboard::Keystate> m_CurrentState;
 
     public:
-		virtual std::vector<std::pair<keyboard::Key, bool>> getKeys() const override;
+		virtual std::optional<keyboard::Key> getAnyKeyDown() const override;
 
         virtual bool getKeyDown(const keyboard::Key &aKeyCode) const override;
 

@@ -143,13 +143,7 @@ namespace jsoncons \
 
 namespace gdk
 {
-
-    /// TODO create serial_data_model, delete string _imp ctor, replace with data_model ctor. in factory methods, create model via bin or json, pass output serial data to ctor
-
-    /// \brief implementation of controls. hidden to break depedencies. went with factory + interface instead of pImpl since 
-    /// both solutions would introduce deref costs but factory + interface leaves room for alternative implementations etc. 
-    /// + is a pattern recognized outside of C++
-    class controls_impl : public controls
+    class controls_impl  : public controls
     {
     public:
         using key_collection_type = std::set<keyboard::Key>;
@@ -158,8 +152,11 @@ namespace gdk
         using mouse_axis_collection_type = std::set<std::pair<mouse::Axis, /*scale and direction*/double>>;
         
         using gamepad_button_collection_type = std::set</*index*/int>;
-        using gamepad_axis_collection_type = std::map</*index*/int, /*deadzone*/float>;
-        using gamepad_hat_collection_type = std::map</*index*/int, /*hat direction*/gamepad::hat_state_type>;
+        using gamepad_axis_collection_type = std::map</*index*//*int*/std::string, /*deadzone*/float>;
+        using gamepad_hat_collection_type = std::map</*index*//*int*/std::string, /*hat direction*/gamepad::hat_state_type>;
+
+		gamepad_hat_collection_type hat_test;
+		gamepad_axis_collection_type axes_test;
 
         struct gamepad_bindings
         {
@@ -196,27 +193,33 @@ namespace gdk
 
 		virtual bool get_just_released(const std::string& aName) const override;
 
-        void addKeyToMapping(const std::string &aMappingName, const keyboard::Key aKey) override;
+        virtual void bind(const std::string &aMappingName, const keyboard::Key aKey) override;
 
-        void addMouseButtonToMapping(const std::string &aMappingName, const mouse::Button aButton) override;
-        
-        void addMouseAxisToMapping(const std::string &aMappingName, const mouse::Axis aAxis, const double scaleAndDirection) override;
+		virtual void unbind(const std::string& aMappingName, const keyboard::Key aKey) override;
 
-        void addGamepadButtonToMapping(const std::string &aMappingName, const std::string &aGamepadName, const int aButtonIndex) override;
+		virtual void unbind(const std::string& aMappingName, const mouse::Button aButton) override;
+
+		virtual void unbind(const std::string& aMappingName, const std::string& aGamepadName, const int aButtonIndex) override;
+
+        virtual void bind(const std::string &aMappingName, const mouse::Button aButton) override;
         
-        void addGamepadAxisToMapping(const std::string &aMappingName, const std::string &aGamepadName, const int aAxisIndex, const float aMinimum) override;
+        virtual void bind(const std::string &aMappingName, const mouse::Axis aAxis, const double scaleAndDirection) override;
+
+        virtual void bind(const std::string &aMappingName, const std::string &aGamepadName, const int aButtonIndex) override;
+        
+        virtual void bind(const std::string &aMappingName, const std::string &aGamepadName, const int aAxisIndex, const float aMinimum) override;
        
-        void addGamepadHatToMapping(const std::string &aMappingName, const std::string &aGamepadName, const int aHatIndex, const gamepad::hat_state_type aHatState) override;
+        virtual void bind(const std::string &aMappingName, const std::string &aGamepadName, const int aHatIndex, const gamepad::hat_state_type aHatState) override;
 
-        virtual std::string serializeToJSON() override;
+        virtual std::string serialize_to_json() override;
         
-        controls_impl(const serial_data_model &aDataModel
-			, gdk::input::context::context_shared_ptr_type aInput);
+        controls_impl(const serial_data_model &aDataModel, 
+			gdk::input::context::context_shared_ptr_type aInput);
 
         ~controls_impl() = default;
     };
     
-    std::unique_ptr<controls> controls::make_from_json(gdk::input::context::context_shared_ptr_type aInput,
+    std::unique_ptr<controls> controls::make(gdk::input::context::context_shared_ptr_type aInput,
 		const std::string& json)
     {
 		const auto serialDataModel = json.size() 
@@ -251,58 +254,49 @@ namespace gdk
         auto iter = m_Inputs.find(aName); 
 
 		if (iter == m_Inputs.end()) return 0;
-			//throw std::invalid_argument(std::string("TAG")
-			//.append("not a valid button: ").append(aName));
+		
+        for (const auto &key : iter->second.keys)
+			if (const auto value = m_pInput->get_key_down(key)) 
+				return static_cast<double>(value);
 
-        //if (m_pKeyboard)
-        {
-            for (const auto &key : iter->second.keys)
-            {
-                if (const auto value = static_cast<float>(m_pInput->get_key_down(key))) return value;
-            }
-        }
+		for (const auto& button : iter->second.mouse.buttons)
+			if (const auto value = m_pInput->get_mouse_button_down(button)) 
+				return static_cast<float>(value);
 
-        //if (m_pMouse) 
-        {
-            for (const auto &button : iter->second.mouse.buttons)
-            {
-                if (const auto value = static_cast<float>(m_pInput->get_mouse_button_down(button))) return value;
-            }
+		//TODO: Consider whether or not to support mouse delta in controls.
+		// the values of mouse delta cannot be normalized. although it does agree that 0 is no input.
+		for (const auto &axis : iter->second.mouse.axes)
+		{
+			if (m_pInput->get_mouse_cursor_mode() == gdk::mouse::CursorMode::Locked)
+			{
+				const auto delta(m_pInput->get_mouse_delta());
 
-            //TODO: Normalize Mouse axes? what to normalize it over?
-            for (const auto &axis : iter->second.mouse.axes)
-            {
-                if (m_pInput->get_mouse_cursor_mode() == gdk::mouse::CursorMode::Locked)
-                {
-                    const auto delta = m_pInput->get_mouse_delta();
+				switch(axis.first)
+				{
+					case mouse::Axis::X:
+					{
+						const auto value(delta.x);
 
-                    switch(axis.first)
-                    {
-                        case mouse::Axis::X:
-                        {
-                            const auto value = delta.x;
+						if (axis.second > 0 && delta.x > 0) return value * axis.second; 
 
-                            if (axis.second > 0 && delta.x > 0) return value * axis.second; 
+						if (axis.second < 0 && delta.x < 0) return value * axis.second; 
+					} break;
 
-                            if (axis.second < 0 && delta.x < 0) return value * axis.second; 
-                        } break;
+					case mouse::Axis::Y:
+				    {
+			            const auto value(delta.y);
 
-                        case mouse::Axis::Y:
-                        {
-                            const auto value = delta.y;
+		                if (axis.second > 0 && delta.y > 0) return value * axis.second; 
 
-                            if (axis.second > 0 && delta.y > 0) return value * axis.second; 
+	                    if (axis.second < 0 && delta.y < 0) return value * axis.second; 
+                    } break;
 
-                            if (axis.second < 0 && delta.y < 0) return value * axis.second; 
-                        } break;
-
-                        default: throw std::invalid_argument("unhandled axis type");
-                    }
-                }
+					default: throw std::invalid_argument("unhandled axis type");
+				}
             }
         }
        
-		auto m_pGamepad = m_pInput->get_gamepad(0);//TODO: change obviously //if (m_pGamepad)
+		auto m_pGamepad = m_pInput->get_gamepad(0);
         {
             if (const auto current_gamepad_iter = iter->second.gamepads.find(std::string(m_pGamepad->get_name())); current_gamepad_iter != iter->second.gamepads.end())
             {
@@ -313,12 +307,13 @@ namespace gdk
 
                 for (const auto &hat : current_gamepad_iter->second.hats)
                 {   
-                    if (auto a = hat.second, b = m_pGamepad->get_hat(hat.first); a.x == b.x && a.y == b.y) return 1;
+					//TODO: ignore center case. center should be permissive state
+                    if (auto a = hat.second, b = m_pGamepad->get_hat(std::stoi(hat.first)); a.x == b.x && a.y == b.y) return 1;
                 }
 
                 for (const auto &axis : current_gamepad_iter->second.axes)
                 {
-                    if (const auto value = static_cast<float>(m_pGamepad->get_axis(axis.first))) 
+                    if (const auto value = static_cast<float>(m_pGamepad->get_axis(std::stoi(axis.first)))) 
                     {
                         ////
                         const float minimum = axis.second;
@@ -328,43 +323,57 @@ namespace gdk
                     }
                 }
             }
-            //else std::cerr << m_pGamepad->get_name() << " not configured for these controls_impl\n";
         }
 
         return 0;
     }
 
-    void controls_impl::addKeyToMapping(const std::string &aName, const keyboard::Key aKey)
+    void controls_impl::bind(const std::string &aName, const keyboard::Key aKey)
     {
         m_Inputs[aName].keys.insert(aKey);
     }
-    
-    void controls_impl::addMouseButtonToMapping(const std::string &aName, const mouse::Button aButton)
+
+	void controls_impl::unbind(const std::string& aName, const keyboard::Key aKey)
+	{
+		m_Inputs[aName].keys.erase(aKey);
+	}
+
+    void controls_impl::bind(const std::string &aName, const mouse::Button aButton)
     {
         m_Inputs[aName].mouse.buttons.insert(aButton);
     }
 
-    void controls_impl::addMouseAxisToMapping(const std::string &aName, const mouse::Axis aAxis, const double aScaleAndDirection)
+	void controls_impl::unbind(const std::string& aName, const mouse::Button aButton)
+	{ 
+		m_Inputs[aName].mouse.buttons.erase(aButton);
+	}
+
+    void controls_impl::bind(const std::string &aName, const mouse::Axis aAxis, const double aScaleAndDirection)
     {
         m_Inputs[aName].mouse.axes.insert({aAxis, aScaleAndDirection});
     }
 
-    void controls_impl::addGamepadAxisToMapping(const std::string &aInputName, const std::string &aGamepadName, const int aAxisIndex, const float aMinimum)
+    void controls_impl::bind(const std::string &aInputName, const std::string &aGamepadName, const int aAxisIndex, const float aMinimum)
     {
-        m_Inputs[aInputName].gamepads[aGamepadName].axes.insert({aAxisIndex, aMinimum});
+        m_Inputs[aInputName].gamepads[aGamepadName].axes.insert({std::to_string(aAxisIndex), aMinimum});
     }
 
-    void controls_impl::addGamepadHatToMapping(const std::string &aInputName, const std::string &aGamepadName, const int aHatIndex, const gamepad::hat_state_type aHatState)
+    void controls_impl::bind(const std::string &aInputName, const std::string &aGamepadName, const int aHatIndex, const gamepad::hat_state_type aHatState)
     {
-        m_Inputs[aInputName].gamepads[aGamepadName].hats.insert({aHatIndex, aHatState});
+        m_Inputs[aInputName].gamepads[aGamepadName].hats.insert({std::to_string(aHatIndex), aHatState});
     }
 
-    void controls_impl::addGamepadButtonToMapping(const std::string &aInputName, const std::string &aGamepadName, const int aButtonIndex)
+    void controls_impl::bind(const std::string &aInputName, const std::string &aGamepadName, const int aButtonIndex)
     {
         m_Inputs[aInputName].gamepads[aGamepadName].buttons.insert(aButtonIndex);
     }
 
-    std::string controls_impl::serializeToJSON()
+	void controls_impl::unbind(const std::string& aMappingName, const std::string& aGamepadName, const int aButtonIndex)	
+	{ 
+		throw std::runtime_error("unimplemented"); 
+	}
+
+    std::string controls_impl::serialize_to_json()
     {
         std::string s;
         jsoncons::encode_json(m_Inputs, s, jsoncons::indenting::indent);
@@ -373,16 +382,24 @@ namespace gdk
     }
 }
 
+// keyboard
 JSONCONS_UTIL_ENUM_TRAITS_DECL(gdk::keyboard::Key);
 
+// mouse
 JSONCONS_UTIL_ENUM_TRAITS_DECL(gdk::mouse::Button);
-JSONCONS_UTIL_ENUM_TRAITS_DECL(gdk::mouse::Axis);
 
+JSONCONS_UTIL_ENUM_TRAITS_DECL(gdk::mouse::Axis);
+JSONCONS_MEMBER_TRAITS_DECL(decltype(gdk::controls_impl::bindings::mouse), buttons, axes);
+
+// gamepad
 JSONCONS_UTIL_ENUM_TRAITS_DECL(gdk::gamepad::hat_state_type::vertical_direction);
 JSONCONS_UTIL_ENUM_TRAITS_DECL(gdk::gamepad::hat_state_type::horizontal_direction);
+JSONCONS_MEMBER_TRAITS_DECL   (gdk::gamepad::hat_state_type, x, y);
 
-JSONCONS_MEMBER_TRAITS_DECL(gdk::gamepad::hat_state_type, x, y);
+JSONCONS_MEMBER_TRAITS_DECL(decltype(gdk::controls_impl::bindings::gamepads)::value_type::second_type, buttons, hats, axes);
 
-JSONCONS_MEMBER_TRAITS_DECL(gdk::controls_impl::gamepad_bindings, buttons/*, axes, hats*/);
-JSONCONS_MEMBER_TRAITS_DECL(decltype(gdk::controls_impl::bindings::mouse), buttons);
+// all
 JSONCONS_MEMBER_TRAITS_DECL(gdk::controls_impl::bindings, keys, gamepads, mouse);
+
+// test
+JSONCONS_MEMBER_TRAITS_DECL(gdk::controls_impl, hat_test, axes_test);

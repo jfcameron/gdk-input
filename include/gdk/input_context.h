@@ -4,6 +4,7 @@
 #define GDK_INPUT_CONTEXT_H
 
 #include <memory>
+#include <optional>
 
 #include <gdk/keyboard.h>
 #include <gdk/mouse.h>
@@ -35,9 +36,6 @@ namespace gdk::input
 		/// the glfw window's lifetime exceeds the context
 		[[nodiscard]] static context_ptr_type make(GLFWwindow* const apGLFWWindow);
 
-		/// \brief returns the current state of all keys
-		[[nodiscard]] virtual std::vector<std::pair<keyboard::Key, bool>> get_keys() const = 0;
-
 		/// \brief check if a key is down (held or just pressed)
 		[[nodiscard]] virtual bool get_key_down(const keyboard::Key& aKeyCode) const = 0;
 
@@ -47,6 +45,9 @@ namespace gdk::input
 		/// \brief check if the key was just released
 		[[nodiscard]] virtual bool get_key_just_released(const keyboard::Key& aKeyCode) const = 0;
 
+		/// \brief returns a key if one is down
+		[[nodiscard]] virtual std::optional<keyboard::Key> get_any_key_down() const = 0;
+
 		/// \brief  check if a mouse button is down (held or just pressed)
 		[[nodiscard]] virtual bool get_mouse_button_down(const mouse::Button& aButton) const = 0;
 
@@ -55,6 +56,11 @@ namespace gdk::input
 
 		/// \brief check if a mouse button was just released
 		[[nodiscard]] virtual bool get_mouse_button_just_released(const mouse::Button& aButton) const = 0;
+
+		/// \brief returns a mouse button if one is down
+		[[nodiscard]] virtual std::optional<mouse::Button> get_any_mouse_button_down() const = 0;
+
+		[[nodiscard]] virtual std::optional<mouse::Axis> get_any_mouse_axis_down(float threshold) const = 0;
 
 		/// \brief get the cursor coordinates
 		/// 

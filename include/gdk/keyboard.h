@@ -6,6 +6,7 @@
 #include <memory>
 #include <vector>
 #include <map>
+#include <optional>
 
 namespace gdk
 {
@@ -58,7 +59,7 @@ namespace gdk
             Num0, NumPeriod
         };
 
-		virtual std::vector<std::pair<keyboard::Key, bool>> getKeys() const = 0;
+		virtual std::optional<keyboard::Key> getAnyKeyDown() const = 0;
  
         /// \brief Check if the key is being held down
         virtual bool getKeyDown(const Key &aKeyCode) const = 0;

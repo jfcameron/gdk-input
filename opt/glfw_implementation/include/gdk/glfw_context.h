@@ -31,7 +31,7 @@ namespace gdk::input
 		std::array<glfw_gamepad_ptr, 1 + GLFW_JOYSTICK_LAST - GLFW_JOYSTICK_1> m_Gamepads;
 
     public:
-		[[nodiscard]] virtual std::vector<std::pair<keyboard::Key, bool>> get_keys() const override;
+		[[nodiscard]] virtual std::optional<keyboard::Key> get_any_key_down() const override;
 
 		[[nodiscard]] virtual bool get_key_down(const keyboard::Key& aKeyCode) const override;
 
@@ -45,6 +45,10 @@ namespace gdk::input
 		[[nodiscard]] virtual bool get_mouse_button_just_pressed(const mouse::Button& aButton) const override;
 
 		[[nodiscard]] virtual bool get_mouse_button_just_released(const mouse::Button& aButton) const override;
+
+		[[nodiscard]] virtual std::optional<mouse::Button> get_any_mouse_button_down() const override;
+
+		[[nodiscard]] virtual std::optional<mouse::Axis> get_any_mouse_axis_down(float threshold) const override;
 
 		[[nodiscard]] virtual mouse::cursor_2d_type get_mouse_cursor_position() const override;
 

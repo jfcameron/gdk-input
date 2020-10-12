@@ -32,7 +32,7 @@ namespace gdk
         /// \attention must be called periodically.
         void update();
 
-        virtual float get_axis(index_type index) const override;
+        virtual float get_axis(index_type index, axis_value_type threshold) const override;
         
         virtual gamepad::button_state_type get_button_down(index_type index) const override;
 
@@ -40,7 +40,11 @@ namespace gdk
 
         virtual std::string_view get_name() const override;
 
-		virtual button_collection_type get_buttons() const override;
+		virtual std::optional<button_collection_type::size_type> get_any_button_down() const override;
+
+		virtual std::optional<std::pair<int, hat_state_type>> get_any_hat_down() const override;
+
+		virtual std::optional<std::pair<int, axis_value_type>> get_any_axis_down(axis_value_type threshold) const override;
 
         gamepad_glfw(const int joystickID);
     };

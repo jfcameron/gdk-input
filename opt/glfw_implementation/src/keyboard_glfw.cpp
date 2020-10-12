@@ -358,18 +358,12 @@ keyboard_glfw::keyboard_glfw(decltype(m_pWindow) pWindow)
 	: m_pWindow(pWindow)
 {}
 
-std::vector<std::pair<keyboard::Key, bool>> keyboard_glfw::getKeys() const
+std::optional<keyboard::Key> keyboard_glfw::getAnyKeyDown() const
 {
-	std::vector<std::pair<keyboard::Key, bool>> keys;
-	
-	keys.reserve(GDK_INPUT_KEY_SET.size());
-
 	for (const auto key : GDK_INPUT_KEY_SET)
-	{
-		keys.push_back({ key, getKeyDown(key) });
-	}
+		if (getKeyDown(key)) return key;
 
-	return keys;
+	return {};
 }
 
 bool keyboard_glfw::getKeyDown(const keyboard::Key &aKeyCode) const
