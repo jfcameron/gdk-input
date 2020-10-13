@@ -13,6 +13,7 @@
 #include <vector>
 #include <iostream>
 #include <array>
+#include <sstream>
 
 using namespace gdk;
 
@@ -39,7 +40,7 @@ public:
 
 private:
 	//! state of this object
-	jfc::state_machine<state> m_StateMachine;
+	jfc::state_machine<state> m_StateMachine = {state::select_current_binding};
 
 	//! actions that can be taken on the current binding
 	std::map<std::string, std::function<void(decltype(m_StateMachine)&)>> binding_actions = {
@@ -49,14 +50,10 @@ private:
 		}},
 		{"add input", [](decltype(m_StateMachine)& a)
 		{
-			std::cout << "adding input\n";
-
 			a.set(state::bind_new_input);
 		}},
 		{"clear inputs", [](decltype(m_StateMachine)& a)
 		{
-			std::cout << "clearing inputs\n";
-
 			a.set(state::clear_current_binding_of_inputs);
 		}},
 	};
@@ -81,15 +78,24 @@ private:
 	//! functor called during confirm state
 	std::function<void()> m_ConfirmFunctor;
 
+	//! String representation of the last input
+	std::string m_LastInputString;
+
 public:
+	//! must be called in an update loop
 	void update();
 
+	//! deleting move semantics
 	configurator& operator=(configurator&&) = delete;
+	//! deleting move semantics
 	configurator(configurator&&) = delete;
 	
+	//! deleting copy semantics
 	configurator& operator=(const configurator&) = delete;
+	//! deleting copy semantics
 	configurator(const configurator&) = delete;
 
+	//! ctor
 	configurator(decltype(m_pInput) aInput,
 		decltype(m_pControl) aControl,
 		const bindings_type& aBindings);
@@ -103,7 +109,6 @@ configurator::configurator(decltype(m_pInput) aInput,
 	: m_pInput(aInput)
 	, m_pControl(aControl)
 	, m_Bindings(aBindings)
-	, m_StateMachine(state::select_current_binding)
 	, m_Observer(std::make_shared<decltype(m_Observer)::element_type>([this](state o, state n)
 {
 	switch (n)
@@ -117,19 +122,24 @@ configurator::configurator(decltype(m_pInput) aInput,
 
 	case state::choose_current_binding_action:
 	{
-		std::cout << (*m_iCurrentBinding) << " selected\n";
+		std::cout << "choose action to perform on " << (*m_iCurrentBinding) << "\n";
 
 		std::cout << m_iCurrentAction->first << "\n";
 	} break;
 
 	case state::confirm_new_input:
 	{
-		std::cout << "confirm new input\n";
+		std::cout << "confirm new input: " << m_LastInputString << "\n";
 	} break;
 
 	case state::clear_current_binding_of_inputs:
 	{
-		std::cout << "clearing inputs\n";
+		std::cout << "cleared all inputs from " << *m_iCurrentBinding << "\n";
+	} break;
+
+	case state::bind_new_input:
+	{
+		std::cout << "press any input to add it to the binding\n";
 	} break;
 	}
 }))
@@ -194,12 +204,17 @@ void configurator::update()
 
 	case state::bind_new_input:
 	{
+		std::stringstream s;
+
 		if (auto key = m_pInput->get_any_key_down())
 		{
 			m_ConfirmFunctor = [a = m_pControl, b = m_iCurrentBinding, c = key.value()]()
 			{
 				a->bind(*(b), c);
 			};
+
+			s << key.value();
+			m_LastInputString = s.str();
 
 			m_StateMachine.set(state::confirm_new_input);
 		}
@@ -210,6 +225,9 @@ void configurator::update()
 			{
 				m_pControl->bind(*(m_iCurrentBinding), button.value());
 			};
+
+			s << "Mouse " << button.value();
+			m_LastInputString = s.str();
 
 			m_StateMachine.set(state::confirm_new_input);
 		}
@@ -225,6 +243,9 @@ void configurator::update()
 						std::string(pGamepad->get_name()), button.value());
 				};
 
+				s << pGamepad->get_name() << " button " << button.value();
+				m_LastInputString = s.str();
+
 				m_StateMachine.set(state::confirm_new_input);
 			}
 
@@ -236,6 +257,9 @@ void configurator::update()
 					m_pControl->bind(*(m_iCurrentBinding),
 						std::string(pGamepad->get_name()), hat->first, hat->second);
 				};
+
+				s << pGamepad->get_name() << " hat " << hat->first;
+				m_LastInputString = s.str();
 
 				m_StateMachine.set(state::confirm_new_input);
 			}
@@ -249,9 +273,13 @@ void configurator::update()
 					value = std::floor(value / std::abs(value)) * 0.1f;
 					//float minimum = value * 0.1f; //parameterize the minimum 0.1 here
 
+
 					m_pControl->bind(*(m_iCurrentBinding),
 						std::string(pGamepad->get_name()), axis->first, value);
 				};
+
+				s << pGamepad->get_name() << " axis " << std::to_string(axis->first);
+				m_LastInputString = s.str();
 
 				m_StateMachine.set(state::confirm_new_input);
 			}
@@ -286,6 +314,8 @@ void configurator::update()
 	case state::clear_current_binding_of_inputs:
 	{
 		m_pControl->unbind(*m_iCurrentBinding);
+
+		m_StateMachine.set(state::choose_current_binding_action);
 	} break;
 	}
 }

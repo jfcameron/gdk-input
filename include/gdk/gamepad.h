@@ -70,6 +70,10 @@ namespace gdk
 
         virtual ~gamepad() = default;
     };
+
 }
+
+std::ostream& operator<<(std::ostream&, const gdk::gamepad::hat_state_type::vertical_direction);
+std::ostream& operator<<(std::ostream&, const gdk::gamepad::hat_state_type::horizontal_direction);
 
 #endif

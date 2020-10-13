@@ -74,4 +74,6 @@ namespace gdk
     };
 }
 
+std::ostream& operator<<(std::ostream&, const gdk::keyboard::Key k);
+
 #endif

@@ -83,4 +83,9 @@ namespace gdk
     };
 }
 
+std::ostream& operator<<(std::ostream&, const gdk::mouse::Button);
+std::ostream& operator<<(std::ostream&, const gdk::mouse::ButtonState);
+std::ostream& operator<<(std::ostream&, const gdk::mouse::CursorMode);
+std::ostream& operator<<(std::ostream&, const gdk::mouse::Axis);
+
 #endif
