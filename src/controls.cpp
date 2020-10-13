@@ -183,6 +183,12 @@ namespace gdk
 
         std::map<std::string, bindings> m_Inputs;
 
+		bool m_bKeyboardIsActive = true;
+
+		bool m_bMouseIsActive = true;
+
+		std::optional<size_t> m_ActiveGamepad = {};
+
     public:
         /// \brief data model for use storing/transmitting state
         using serial_data_model = decltype(controls_impl::m_Inputs);
@@ -214,27 +220,57 @@ namespace gdk
         virtual void bind(const std::string &aMappingName, const std::string &aGamepadName, const int aHatIndex, const gamepad::hat_state_type aHatState) override;
 
         virtual std::string serialize_to_json() override;
+
+		virtual void activate_keyboard() override;
+
+		virtual void deactivate_keyboard() override;
+
+		virtual bool is_keyboard_active() override;
+
+		virtual void activate_mouse() override;
+
+		virtual void deactivate_mouse() override;
+
+		virtual bool is_mouse_active() override;
+
+		virtual void activate_gamepad(size_t) override;
+
+		virtual void deactivate_gamepad() override;
+
+		virtual std::optional<size_t> is_gamepad_active() override;
         
         controls_impl(const serial_data_model &aDataModel, 
-			gdk::input::context::context_shared_ptr_type aInput);
+			gdk::input::context::context_shared_ptr_type aInput,
+			bool bKeyboardActive,
+			bool bMouseActive,
+			std::optional<size_t> gamepadActive);
 
         ~controls_impl() = default;
     };
     
     std::unique_ptr<controls> controls::make(gdk::input::context::context_shared_ptr_type aInput,
+		bool bKeyboardActive,
+		bool bMouseActive,
+		std::optional<size_t> gamepadActive,
 		const std::string& json)
     {
 		const auto serialDataModel = json.size() 
 			? jsoncons::decode_json<gdk::controls_impl::serial_data_model>(json) 
 			: gdk::controls_impl::serial_data_model();
 
-        return std::make_unique<controls_impl>(controls_impl(serialDataModel, aInput));
+        return std::make_unique<controls_impl>(controls_impl(serialDataModel, aInput, bKeyboardActive, bMouseActive, gamepadActive));
     }
 	    
-    controls_impl::controls_impl(const controls_impl::serial_data_model &serial_data_model
-		, gdk::input::context::context_shared_ptr_type aInput)    
-	: m_pInput(aInput)
-    , m_Inputs(serial_data_model) 
+    controls_impl::controls_impl(const controls_impl::serial_data_model &serial_data_model, 
+		gdk::input::context::context_shared_ptr_type aInput,
+		bool bKeyboardActive,
+		bool bMouseActive,
+		std::optional<size_t> gamepadActive)
+		: m_pInput(aInput)
+		, m_Inputs(serial_data_model) 
+		, m_bKeyboardIsActive(bKeyboardActive)
+		, m_bMouseIsActive(bMouseActive)
+		, m_ActiveGamepad(gamepadActive)
     {}
 
 	bool controls_impl::get_just_released(const std::string& aName) const
@@ -257,75 +293,85 @@ namespace gdk
 
 		if (iter == m_Inputs.end()) return 0;
 		
-        for (const auto &key : iter->second.keys)
-			if (const auto value = m_pInput->get_key_down(key)) 
-				return static_cast<double>(value);
-
-		for (const auto& button : iter->second.mouse.buttons)
-			if (const auto value = m_pInput->get_mouse_button_down(button)) 
-				return static_cast<float>(value);
-
-		//TODO: Consider whether or not to support mouse delta in controls.
-		// the values of mouse delta cannot be normalized. although it does agree that 0 is no input.
-		for (const auto &axis : iter->second.mouse.axes)
+		if (m_bKeyboardIsActive)
 		{
-			if (m_pInput->get_mouse_cursor_mode() == gdk::mouse::CursorMode::Locked)
-			{
-				const auto delta(m_pInput->get_mouse_delta());
+			for (const auto& key : iter->second.keys)
+				if (const auto value = m_pInput->get_key_down(key))
+					return static_cast<double>(value);
+		}
 
-				switch(axis.first)
+		if (m_bMouseIsActive)
+		{
+			for (const auto& button : iter->second.mouse.buttons)
+				if (const auto value = m_pInput->get_mouse_button_down(button))
+					return static_cast<float>(value);
+
+			//TODO: Consider whether or not to support mouse delta in controls.
+			// the values of mouse delta cannot be normalized. although it does agree that 0 is no input.
+			for (const auto& axis : iter->second.mouse.axes)
+			{
+				if (m_pInput->get_mouse_cursor_mode() == gdk::mouse::CursorMode::Locked)
 				{
+					const auto delta(m_pInput->get_mouse_delta());
+
+					switch (axis.first)
+					{
 					case mouse::Axis::X:
 					{
 						const auto value(delta.x);
 
-						if (axis.second > 0 && delta.x > 0) return value * axis.second; 
+						if (axis.second > 0 && delta.x > 0) return value * axis.second;
 
-						if (axis.second < 0 && delta.x < 0) return value * axis.second; 
+						if (axis.second < 0 && delta.x < 0) return value * axis.second;
 					} break;
 
 					case mouse::Axis::Y:
-				    {
-			            const auto value(delta.y);
+					{
+						const auto value(delta.y);
 
-		                if (axis.second > 0 && delta.y > 0) return value * axis.second; 
+						if (axis.second > 0 && delta.y > 0) return value * axis.second;
 
-	                    if (axis.second < 0 && delta.y < 0) return value * axis.second; 
-                    } break;
+						if (axis.second < 0 && delta.y < 0) return value * axis.second;
+					} break;
 
 					default: throw std::invalid_argument("unhandled axis type");
+					}
 				}
-            }
-        }
+			}
+		}
        
-		auto m_pGamepad = m_pInput->get_gamepad(0);
-        {
-            if (const auto current_gamepad_iter = iter->second.gamepads.find(std::string(m_pGamepad->get_name())); current_gamepad_iter != iter->second.gamepads.end())
-            {
-                for (const auto &button : current_gamepad_iter->second.buttons)
-                {   
-                    if (const auto value = static_cast<float>(m_pGamepad->get_button_down(button))) return value;
-                }
+		//if m_active_gamepad (should be an optional to a size_t?)
+		{
+			auto m_pGamepad = m_pInput->get_gamepad(0);
+			{
+				if (const auto current_gamepad_iter = iter->second.gamepads.find(std::string(m_pGamepad->get_name())); current_gamepad_iter != iter->second.gamepads.end())
+				{
+					for (const auto& button : current_gamepad_iter->second.buttons)
+					{
+						if (const auto value = static_cast<float>(m_pGamepad->get_button_down(button))) return value;
+					}
 
-                for (const auto &hat : current_gamepad_iter->second.hats)
-                {   
-					//TODO: ignore center case. center should be permissive state
-                    if (auto a = hat.second, b = m_pGamepad->get_hat(std::stoi(hat.first)); a.x == b.x && a.y == b.y) return 1;
-                }
+					for (const auto& hat : current_gamepad_iter->second.hats)
+					{
+						//TODO: ignore center case. center should be permissive state
+						if (auto a = hat.second, b = m_pGamepad->get_hat(std::stoi(hat.first)); a.x == b.x && a.y == b.y) return 1;
+					}
 
-                for (const auto &axis : current_gamepad_iter->second.axes)
-                {
-                    if (const auto value = static_cast<float>(m_pGamepad->get_axis(std::stoi(axis.first)))) 
-                    {
-                        ////
-                        const float minimum = axis.second;
+					for (const auto& axis : current_gamepad_iter->second.axes)
+					{
+						if (const auto value = static_cast<float>(m_pGamepad->get_axis(std::stoi(axis.first))))
+						{
+							const float minimum(axis.second);
 
-                        if (minimum >= 0 && value > minimum) return value; 
-                        else if (minimum < 0 && value < minimum) return value * -1;
-                    }
-                }
-            }
-        }
+							if (minimum >= 0 && value > minimum) 
+								return value;
+							else if (minimum < 0 && value < minimum) 
+								return static_cast<double>(value) * -1;
+						}
+					}
+				}
+			}
+		}
 
         return 0;
     }
@@ -397,6 +443,51 @@ namespace gdk
 
         return s;
     }
+
+	void controls_impl::activate_keyboard()
+	{
+		m_bKeyboardIsActive = true;
+	}
+
+	void controls_impl::deactivate_keyboard()
+	{
+		m_bKeyboardIsActive = false;
+	}
+
+	bool controls_impl::is_keyboard_active()
+	{
+		return m_bKeyboardIsActive;
+	}
+
+	void controls_impl::activate_mouse()
+	{
+		m_bMouseIsActive = true;
+	}
+
+	void controls_impl::deactivate_mouse()
+	{
+		m_bMouseIsActive = false;
+	}
+
+	bool controls_impl::is_mouse_active()
+	{
+		return m_bMouseIsActive;
+	}
+
+	void controls_impl::activate_gamepad(size_t i)
+	{
+		m_ActiveGamepad = {i};
+	}
+
+	void controls_impl::deactivate_gamepad()
+	{
+		m_ActiveGamepad = {};
+	}
+
+	std::optional<size_t> controls_impl::is_gamepad_active()
+	{
+		return m_ActiveGamepad;
+	}
 }
 
 // keyboard

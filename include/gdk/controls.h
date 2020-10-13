@@ -8,6 +8,7 @@
 #include <set>
 #include <string>
 #include <string_view>
+#include <optional>
 
 #include <gdk/gamepad.h>
 #include <gdk/keyboard.h>
@@ -24,6 +25,9 @@ namespace gdk
     public:
         //! construct an instance from a string containing a JSON serialized controls instance
         static std::unique_ptr<controls> make(gdk::input::context::context_shared_ptr_type aInput,
+			bool bKeyboardActive, 
+			bool bMouseActive, 
+			std::optional<size_t> gamepadActive,
 			const std::string &json = "");
 
         //! serialize state to string of json for e.g: disk storage, network transmission, ...
@@ -103,18 +107,34 @@ namespace gdk
 		
 		// void unbind_all() = 0; //unbind everything
 
-		// void enable_mouse()
-		// void disable_mouse()
-		// bool is_mouse_enabled()
+		//! controls will react to keyboard inputs
+		virtual void activate_keyboard() = 0;
+		
+		//! controls will ignore keyboard inputs
+		virtual void deactivate_keyboard() = 0;
+		
+		//! whether or not controls reacts to keyboard inputs
+		virtual bool is_keyboard_active() = 0;
 
-		// void enable_keyboard()
-		// void disable_keyboard()
-		// bool is_keyboard_enabled()
+		//! controls will react to mouse inputs
+		virtual void activate_mouse() = 0;
 
-		// enable_gamepad(index)
-		// disable_gamepad(index)
-		// disable_gamepads()
-        
+		//! controls will ignore mouse inputs
+		virtual void deactivate_mouse() = 0;
+
+		//! whether or not controls reacts to mouse inputs
+		virtual bool is_mouse_active() = 0;
+
+		//! controls will react to the specified gamepad
+		/// \warn controls will only ever react to a single gamepad at a time
+		virtual void activate_gamepad(size_t) = 0;
+
+		//! controls will ignore gamepad input
+		virtual void deactivate_gamepad() = 0;
+
+		//! which (if any) gamepad the controls reacts to
+		virtual std::optional<size_t> is_gamepad_active() = 0;
+
         virtual ~controls() = default;
     };
 }

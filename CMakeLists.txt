@@ -17,10 +17,12 @@ add_subdirectory(thirdparty)
 if (GDK_INPUT_IMPLEMENTATION_GLFW) 
     set(implementation_source_list "${implementation_source_list}"
         ${CMAKE_CURRENT_SOURCE_DIR}/opt/glfw_implementation/src/gamepads_glfw.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/opt/glfw_implementation/src/glfw_context.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/opt/glfw_implementation/src/keyboard_glfw.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/opt/glfw_implementation/src/mouse_glfw.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/opt/glfw_implementation/src/glfw_context.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/enum_ostreams.cpp)
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/configurator.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/enum_ostreams.cpp
+    )
 
     set(implementation_header_paths "${implementation_header_paths}"
         ${CMAKE_CURRENT_SOURCE_DIR}/opt/glfw_implementation/include)
