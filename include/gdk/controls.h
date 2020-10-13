@@ -68,6 +68,9 @@ namespace gdk
 			const int aHatIndex, 
 			const gamepad::hat_state_type aHatState) = 0;
 
+		//! unbind all inputs from a name
+		virtual void unbind(const std::string& aMappingName) = 0;
+
 		//! unbind a key
 		virtual void unbind(const std::string& aMappingName,
 			const keyboard::Key aKey) = 0;

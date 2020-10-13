@@ -16,462 +16,281 @@
 
 using namespace gdk;
 
-//TODO: parameterize
-const std::set<std::string> bindings{
-	"Up",
-	"Down",
-	"Left",
-	"Right",
-	"A",
-	"B",
-};
+/////////////// HEADER ////////////////////////////////////////////////////////////////////////////
 
-/// \brief interactive controls configuration object
+/// \brief interactive control configuration dialogue
 ///
-/// agnostic about presentation, so user must tie their own presentation
-/// strategy into the the state of the object
-///
-/// vocab: 
-///  binding: an association between a name and a number of inputs
-///  name: a string passed to one of control's get methods. e.g control::get_down("name")
-///  input: the name of a key, button, axis or hat on some human input device
-///
-/// proof of concept but I am extremely unhappy with the implementation here.
-/// I want to throw away most of it
-class configurator
+/// agnostic about presentation. user must provide functors to present dialogue state
+/// in their GUI
+class configurator final
 {
 public:
-	class behaviour;
+	using bindings_type = std::set<std::string>;
 
-	std::shared_ptr<behaviour> m_Normal;
-
-	std::shared_ptr<behaviour> m_pCurrent;
-
-	std::shared_ptr<input::context> pInput;
-
-	std::shared_ptr<controls> pControl;
-
-	decltype(bindings.begin()) current_binding;
-
+	//! state of the configurator
 	enum class state
 	{
-		init,
-		iterate_binding,
-		new_binds_loop
+		select_current_binding, //!< select a binding to perform an action on
+		choose_current_binding_action, //!< choose an action to perform on the selected binding
+		bind_new_input, //!< awaiting user input to bind
+		confirm_new_input, //!< add input if user confirms
+		clear_current_binding_of_inputs, //!< removes inputs from current binding
 	};
 
-	/// \brief stateful behaviour interface
-	class behaviour
-	{
-	public:
-		virtual bool update() = 0;
+private:
+	//! state of this object
+	jfc::state_machine<state> m_StateMachine;
+
+	//! actions that can be taken on the current binding
+	std::map<std::string, std::function<void(decltype(m_StateMachine)&)>> binding_actions = {
+		{"show bindings", [](decltype(m_StateMachine) &a)
+		{
+			std::cout << "showing binding TODO!\n";
+		}},
+		{"add input", [](decltype(m_StateMachine)& a)
+		{
+			std::cout << "adding input\n";
+
+			a.set(state::bind_new_input);
+		}},
+		{"clear inputs", [](decltype(m_StateMachine)& a)
+		{
+			std::cout << "clearing inputs\n";
+
+			a.set(state::clear_current_binding_of_inputs);
+		}},
 	};
 
-	/// \brief prompts user for a Y/N. 
-	/// then performs a user defined Y or N behaviour
-	class confirm : public behaviour
-	{
-		std::shared_ptr<input::context> pInput;
-
-		std::function<void()> m_YesBehaviour;
-
-		std::function<void()> m_NoBehaviour;
-
-		virtual bool update() override
-		{
-			if (pInput->get_key_just_released(keyboard::Key::F1)) //likely parameterize the keys
-			{
-				m_YesBehaviour();
-			}
-			else if (pInput->get_key_just_released(keyboard::Key::F2))
-			{
-				m_NoBehaviour();
-			}
-
-			return false;
-		}
-
-	public:
-		confirm(decltype(pInput) aInput,
-			std::string aquestion,
-			std::function<void()> aYesBehaviour,
-			std::function<void()> aNoBehaviour)
-			: pInput(aInput)
-			, m_YesBehaviour(aYesBehaviour)
-			, m_NoBehaviour(aNoBehaviour)
-		{
-			std::cout << aquestion << "\n";
-		}
-	};
-
-	/// \brief normal state & behaviour of configurator
-	///
-	/// iterates binding names and all user inputs, waiting for
-	/// the user to press something, at which point behaviour is swapped
-	/// to a confirm instance
-	class normal : public behaviour
-	{
-	public:
-		configurator* pConfig;
-
-		jfc::state_machine<state> sm = jfc::state_machine<state>(state::init);
-
-		std::shared_ptr<input::context> pInput;
-
-		virtual bool update() override
-		{
-			switch (sm.get())
-			{
-			case state::init:
-			{
-				std::cout << "init\n";
-
-				pConfig->current_binding = bindings.begin();
-
-				sm.set(state::iterate_binding);
-			} break;
-
-			case state::iterate_binding:
-			{
-				if (pConfig->current_binding != bindings.end())
-				{
-					sm.set(state::new_binds_loop);
-				}
-				else return true;
-			} break;
-
-			case state::new_binds_loop:
-			{
-				if (auto key = pInput->get_any_key_down())
-				{
-					pConfig->m_pCurrent = decltype(m_pCurrent)(new confirm(pInput,
-						"add key to current binding?",
-						[&, key]()
-						{
-							pConfig->pControl->bind(*(pConfig->current_binding), key.value());
-
-							pConfig->m_pCurrent = decltype(m_pCurrent)(new confirm(pInput,
-								"continue to next binding?",
-								[&]()
-								{
-									++pConfig->current_binding;
-
-									pConfig->m_pCurrent = pConfig->m_Normal;
-
-									sm.set(state::iterate_binding);
-								},
-								[&]()
-								{
-									pConfig->m_pCurrent = pConfig->m_Normal;
-
-									sm.set(state::iterate_binding);
-								}));
-						},
-						[&]() 
-						{
-							pConfig->m_pCurrent = decltype(m_pCurrent)(new confirm(pInput,
-								"continue to next binding?",
-								[&]()
-								{
-									++pConfig->current_binding;
-
-									pConfig->m_pCurrent = pConfig->m_Normal;
-
-									sm.set(state::new_binds_loop);
-								},
-								[&]()
-								{
-									pConfig->m_pCurrent = pConfig->m_Normal;
-
-									sm.set(state::new_binds_loop);
-								}));
-						}));
-				}
-
-				// mouse buttons
-				if (auto button = pInput->get_any_mouse_button_down())
-				{
-					pConfig->m_pCurrent = decltype(m_pCurrent)(new confirm(pInput,
-						"add mouse button to current binding?",
-						[&, button]()
-					{
-						pConfig->pControl->bind(*(pConfig->current_binding), button.value());
-
-						pConfig->m_pCurrent = decltype(m_pCurrent)(new confirm(pInput,
-							"continue to next binding?",
-							[&]()
-						{
-							++pConfig->current_binding;
-
-							pConfig->m_pCurrent = pConfig->m_Normal;
-
-							sm.set(state::iterate_binding);
-						},
-							[&]()
-						{
-							pConfig->m_pCurrent = pConfig->m_Normal;
-
-							sm.set(state::iterate_binding);
-						}));
-					},
-						[&]()
-					{
-						pConfig->m_pCurrent = decltype(m_pCurrent)(new confirm(pInput,
-							"continue to next binding?",
-							[&]()
-						{
-							++pConfig->current_binding;
-
-							pConfig->m_pCurrent = pConfig->m_Normal;
-
-							sm.set(state::new_binds_loop);
-						},
-							[&]()
-						{
-							pConfig->m_pCurrent = pConfig->m_Normal;
-
-							sm.set(state::new_binds_loop);
-						}));
-					}));
-				}
-
-				// mouse axes
-				/*if (auto axis = pInput->get_any_mouse_axis_down(0.9f))
-				{
-					pConfig->m_pCurrent = decltype(m_pCurrent)(new confirm(pInput,
-						"add mouse button to current binding?",
-						[&, axis]()
-					{
-						pConfig->pControl->addMouseAxisToMapping(*(pConfig->current_binding), axis.value(), 0.1f);
-
-						pConfig->m_pCurrent = decltype(m_pCurrent)(new confirm(pInput,
-							"continue to next binding?",
-							[&]()
-						{
-							++pConfig->current_binding;
-
-							pConfig->m_pCurrent = pConfig->m_Normal;
-
-							sm.set(state::iterate_binding);
-						},
-							[&]()
-						{
-							pConfig->m_pCurrent = pConfig->m_Normal;
-
-							sm.set(state::iterate_binding);
-						}));
-					},
-						[&]()
-					{
-						pConfig->m_pCurrent = decltype(m_pCurrent)(new confirm(pInput,
-							"continue to next binding?",
-							[&]()
-						{
-							++pConfig->current_binding;
-
-							pConfig->m_pCurrent = pConfig->m_Normal;
-
-							sm.set(state::new_binds_loop);
-						},
-							[&]()
-						{
-							pConfig->m_pCurrent = pConfig->m_Normal;
-
-							sm.set(state::new_binds_loop);
-						}));
-					}));
-				}*/
-
-				for (auto pGamepad : pInput->get_gamepads())
-				{
-					if (auto button = pGamepad->get_any_button_down())
-					{
-						pConfig->m_pCurrent = decltype(m_pCurrent)(new confirm(pInput,
-						"add gamepad button to current binding?",
-						[&, button, pGamepad]()
-						{
-							pConfig->pControl->bind(*(pConfig->current_binding), std::string(pGamepad->get_name()), button.value());
-
-							pConfig->m_pCurrent = decltype(m_pCurrent)(new confirm(pInput,
-								"continue to next binding?",
-								[&, pGamepad]()
-								{
-									++pConfig->current_binding;
-
-									pConfig->m_pCurrent = pConfig->m_Normal;
-
-									sm.set(state::iterate_binding);
-								},
-								[&]()
-								{
-									pConfig->m_pCurrent = pConfig->m_Normal;
-
-									sm.set(state::iterate_binding);
-								}));
-						},
-						[&]() 
-						{
-							pConfig->m_pCurrent = decltype(m_pCurrent)(new confirm(pInput,
-								"continue to next binding?",
-								[&]()
-								{
-									++pConfig->current_binding;
-
-									pConfig->m_pCurrent = pConfig->m_Normal;
-
-									sm.set(state::new_binds_loop);
-								},
-								[&]()
-								{
-									pConfig->m_pCurrent = pConfig->m_Normal;
-
-									sm.set(state::new_binds_loop);
-								}));
-						}));
-					}
-					
-					// gamepad hats
-					if (auto hat = pGamepad->get_any_hat_down())
-					{
-						pConfig->m_pCurrent = decltype(m_pCurrent)(new confirm(pInput,
-							"add gamepad hat to current binding?",
-							[&, hat, pGamepad]()
-						{
-							pConfig->pControl->bind(*(pConfig->current_binding),
-								std::string(pGamepad->get_name()), hat->first, hat->second);
-
-							pConfig->m_pCurrent = decltype(m_pCurrent)(new confirm(pInput,
-								"continue to next binding?",
-								[&, pGamepad]()
-							{
-								++pConfig->current_binding;
-
-								pConfig->m_pCurrent = pConfig->m_Normal;
-
-								sm.set(state::iterate_binding);
-							},
-								[&]()
-							{
-								pConfig->m_pCurrent = pConfig->m_Normal;
-
-								sm.set(state::iterate_binding);
-							}));
-						},
-							[&]()
-						{
-							pConfig->m_pCurrent = decltype(m_pCurrent)(new confirm(pInput,
-								"continue to next binding?",
-								[&]()
-							{
-								++pConfig->current_binding;
-
-								pConfig->m_pCurrent = pConfig->m_Normal;
-
-								sm.set(state::new_binds_loop);
-							},
-								[&]()
-							{
-								pConfig->m_pCurrent = pConfig->m_Normal;
-
-								sm.set(state::new_binds_loop);
-							}));
-						}));
-					}
-
-					// gamepad axes
-					if (auto axis = pGamepad->get_any_axis_down(0.9f))
-					{
-						auto value = axis->second;
-						value = std::floor(value / std::abs(value)) * 0.1f;
-						//float minimum = value * 0.1f; //parameterize the minimum 0.1 here
-						
-						pConfig->m_pCurrent = decltype(m_pCurrent)(new confirm(pInput,
-							"add gamepad axis to current binding?",
-							[&, axis, pGamepad, value]()
-						{
-							pConfig->pControl->bind(*(pConfig->current_binding),
-								std::string(pGamepad->get_name()), axis->first, value);
-
-							pConfig->m_pCurrent = decltype(m_pCurrent)(new confirm(pInput,
-								"continue to next binding?",
-								[&, pGamepad]()
-							{
-								++pConfig->current_binding;
-
-								pConfig->m_pCurrent = pConfig->m_Normal;
-
-								sm.set(state::iterate_binding);
-							},
-								[&]()
-							{
-								pConfig->m_pCurrent = pConfig->m_Normal;
-
-								sm.set(state::iterate_binding);
-							}));
-						},
-							[&]()
-						{
-							pConfig->m_pCurrent = decltype(m_pCurrent)(new confirm(pInput,
-								"continue to next binding?",
-								[&]()
-							{
-								++pConfig->current_binding;
-
-								pConfig->m_pCurrent = pConfig->m_Normal;
-
-								sm.set(state::new_binds_loop);
-							},
-								[&]()
-							{
-								pConfig->m_pCurrent = pConfig->m_Normal;
-
-								sm.set(state::new_binds_loop);
-							}));
-						}));
-					}
-				}
-			} break;
-
-			default: throw std::runtime_error("unhandled state");
-			}
-
-			return false;
-		}
-
-		std::shared_ptr<decltype(sm)::observer_type> observer;
-
-	public:
-		normal(decltype(pConfig) aConfig, decltype(pInput) aInput)
-			: pConfig(aConfig)
-			, pInput(aInput)
-		{
-			observer = std::make_shared<decltype(sm)::observer_type>([&](state o, state n)
-			{
-				if (n == state::new_binds_loop)
-				{
-					std::cout << "now binding: " << *(pConfig->current_binding) << "\n";
-				}
-			});
-
-			sm.add_observer(observer);
-		}
-	};
+	//! ptr to the input context
+	std::shared_ptr<input::context> m_pInput;
+
+	//! ptr to the control that will be modified
+	std::shared_ptr<controls> m_pControl;
+	
+	//! bindings provided at ctor time
+	bindings_type m_Bindings;
+
+	//! iterator to the current binding
+	decltype(m_Bindings)::iterator m_iCurrentBinding = m_Bindings.begin();
+
+	//! iterator to the current binding action
+	std::remove_const<decltype(binding_actions)::iterator>::type m_iCurrentAction = binding_actions.begin();
+	
+	std::shared_ptr<decltype(m_StateMachine)::observer_type> m_Observer;
+
+	//! functor called during confirm state
+	std::function<void()> m_ConfirmFunctor;
 
 public:
-	bool update()
-	{
-		return m_pCurrent->update();
-	}
+	void update();
 
-	configurator(decltype(pInput) aInput, decltype(pControl) aControl)
-		: m_Normal(new normal(this, aInput))
-		, pControl(aControl)
-	{
-		m_pCurrent = m_Normal;
-	}
+	configurator& operator=(configurator&&) = delete;
+	configurator(configurator&&) = delete;
+	
+	configurator& operator=(const configurator&) = delete;
+	configurator(const configurator&) = delete;
+
+	configurator(decltype(m_pInput) aInput,
+		decltype(m_pControl) aControl,
+		const bindings_type& aBindings);
 };
 
-bool bShouldExit = false;
+/////////////// CPP    ////////////////////////////////////////////////////////////////////////////
+
+configurator::configurator(decltype(m_pInput) aInput,
+	decltype(m_pControl) aControl,
+	const bindings_type& aBindings)
+	: m_pInput(aInput)
+	, m_pControl(aControl)
+	, m_Bindings(aBindings)
+	, m_StateMachine(state::select_current_binding)
+	, m_Observer(std::make_shared<decltype(m_Observer)::element_type>([this](state o, state n)
+{
+	switch (n)
+	{
+	case state::select_current_binding:
+	{
+		std::cout << "select a binding to perform an action to\n";
+
+		std::cout << *m_iCurrentBinding << "\n";
+	} break;
+
+	case state::choose_current_binding_action:
+	{
+		std::cout << (*m_iCurrentBinding) << " selected\n";
+
+		std::cout << m_iCurrentAction->first << "\n";
+	} break;
+
+	case state::confirm_new_input:
+	{
+		std::cout << "confirm new input\n";
+	} break;
+
+	case state::clear_current_binding_of_inputs:
+	{
+		std::cout << "clearing inputs\n";
+	} break;
+	}
+}))
+{
+	m_StateMachine.add_observer(m_Observer);
+
+	m_StateMachine.set(state::select_current_binding);
+}
+
+void configurator::update()
+{
+	switch (m_StateMachine.get())
+	{
+	case state::select_current_binding:
+	{
+		if (m_pInput->get_key_just_released(keyboard::Key::UpArrow))
+		{
+			if (m_iCurrentBinding != m_Bindings.begin()) m_iCurrentBinding--;
+
+			std::cout << *m_iCurrentBinding << "\n";
+		}
+
+		if (m_pInput->get_key_just_released(keyboard::Key::DownArrow))
+		{
+			if (m_iCurrentBinding != --m_Bindings.end()) m_iCurrentBinding++;
+
+			std::cout << *m_iCurrentBinding << "\n";
+		}
+
+		if (m_pInput->get_key_just_released(keyboard::Key::Enter))
+		{
+			m_StateMachine.set(state::choose_current_binding_action);
+		}
+	} break;
+
+	case state::choose_current_binding_action:
+	{
+		if (m_pInput->get_key_just_released(keyboard::Key::UpArrow))
+		{
+			if (m_iCurrentAction != binding_actions.begin()) m_iCurrentAction--;
+
+			std::cout << m_iCurrentAction->first << "\n";
+		}
+
+		if (m_pInput->get_key_just_released(keyboard::Key::DownArrow))
+		{
+			if (m_iCurrentAction != --binding_actions.end()) m_iCurrentAction++;
+
+			std::cout << m_iCurrentAction->first << "\n";
+		}
+
+		if (m_pInput->get_key_just_released(keyboard::Key::Enter))
+		{
+			m_iCurrentAction->second(m_StateMachine);
+		}
+
+		if (m_pInput->get_key_just_released(keyboard::Key::RightShift))
+		{
+			m_StateMachine.set(state::select_current_binding);
+		}
+	} break;
+
+	case state::bind_new_input:
+	{
+		if (auto key = m_pInput->get_any_key_down())
+		{
+			m_ConfirmFunctor = [a = m_pControl, b = m_iCurrentBinding, c = key.value()]()
+			{
+				a->bind(*(b), c);
+			};
+
+			m_StateMachine.set(state::confirm_new_input);
+		}
+
+		if (auto button = m_pInput->get_any_mouse_button_down())
+		{
+			m_ConfirmFunctor = [=]()
+			{
+				m_pControl->bind(*(m_iCurrentBinding), button.value());
+			};
+
+			m_StateMachine.set(state::confirm_new_input);
+		}
+
+		for (auto pGamepad : m_pInput->get_gamepads())
+		{
+			// gamepad buttons
+			if (auto button = pGamepad->get_any_button_down())
+			{
+				m_ConfirmFunctor = [=]()
+				{
+					m_pControl->bind(*(m_iCurrentBinding),
+						std::string(pGamepad->get_name()), button.value());
+				};
+
+				m_StateMachine.set(state::confirm_new_input);
+			}
+
+			// gamepad hats
+			if (auto hat = pGamepad->get_any_hat_down())
+			{
+				m_ConfirmFunctor = [=]()
+				{
+					m_pControl->bind(*(m_iCurrentBinding),
+						std::string(pGamepad->get_name()), hat->first, hat->second);
+				};
+
+				m_StateMachine.set(state::confirm_new_input);
+			}
+
+			// gamepad axes
+			if (auto axis = pGamepad->get_any_axis_down(0.9f))
+			{				
+				m_ConfirmFunctor = [=]()
+				{
+					auto value = axis->second;
+					value = std::floor(value / std::abs(value)) * 0.1f;
+					//float minimum = value * 0.1f; //parameterize the minimum 0.1 here
+
+					m_pControl->bind(*(m_iCurrentBinding),
+						std::string(pGamepad->get_name()), axis->first, value);
+				};
+
+				m_StateMachine.set(state::confirm_new_input);
+			}
+		}
+
+		// mouse axes
+		/*if (auto axis = pInput->get_any_mouse_axis_down(0.9f))
+		{
+			pConfig->pControl->addMouseAxisToMapping(*(pConfig->current_binding), axis.value(), 0.1f);
+		}*/
+	} break;
+
+	case state::confirm_new_input:
+	{
+		if (m_pInput->get_key_just_released(keyboard::Key::Enter))
+		{
+			m_ConfirmFunctor();
+
+			std::cout << "input added\n";
+
+			m_StateMachine.set(state::choose_current_binding_action);
+		}
+
+		if (m_pInput->get_key_just_released(keyboard::Key::RightShift))
+		{
+			std::cout << "input cancelled\n";
+
+			m_StateMachine.set(state::choose_current_binding_action);
+		}
+	} break;
+
+	case state::clear_current_binding_of_inputs:
+	{
+		m_pControl->unbind(*m_iCurrentBinding);
+	} break;
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////
 
 int main(int argc, char **argv)
 {
@@ -481,15 +300,22 @@ int main(int argc, char **argv)
 
 	auto pControl = std::shared_ptr<controls>(controls::make(pInput));
 
-	configurator c(pInput, pControl);
+	configurator c(pInput, pControl, {
+		"Up",
+		"Down",
+		"Left",
+		"Right",
+		"A",
+		"B",
+	});
 
-	while (!bShouldExit)
+	for (bool bShouldExit(false);!bShouldExit;)
 	{
 		glfwPollEvents();
 
 		pInput->update();
 
-		if (c.update()) bShouldExit = true;
+		c.update();
 
 		if (pInput->get_key_just_released(keyboard::Key::Escape)) bShouldExit = true;
 	}

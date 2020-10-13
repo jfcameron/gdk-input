@@ -195,6 +195,8 @@ namespace gdk
 
         virtual void bind(const std::string &aMappingName, const keyboard::Key aKey) override;
 
+		virtual void unbind(const std::string& aMappingName) override;
+
 		virtual void unbind(const std::string& aMappingName, const keyboard::Key aKey) override;
 
 		virtual void unbind(const std::string& aMappingName, const mouse::Button aButton) override;
@@ -332,6 +334,21 @@ namespace gdk
     {
         m_Inputs[aName].keys.insert(aKey);
     }
+
+	void controls_impl::unbind(const std::string& aName)
+	{
+		m_Inputs[aName].keys.clear();
+
+		m_Inputs[aName].mouse.axes.clear();
+		m_Inputs[aName].mouse.buttons.clear();
+
+		for (auto& g : m_Inputs[aName].gamepads)
+		{
+			g.second.axes.clear();
+			g.second.buttons.clear();
+			g.second.hats.clear();
+		}
+	}
 
 	void controls_impl::unbind(const std::string& aName, const keyboard::Key aKey)
 	{
