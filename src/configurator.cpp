@@ -50,7 +50,7 @@ configurator::configurator(decltype(m_pInput) aInput,
 , binding_actions({
 	{"show bindings", [](decltype(m_StateMachine)& a)
 	{
-		std::cout << "showing binding TODO!\n";
+		a.set(state::display_bindings);
 	}},
 	{"add input", [](decltype(m_StateMachine)& a)
 	{
@@ -183,12 +183,12 @@ void configurator::update()
 			}
 
 			// gamepad axes
-			if (auto axis = pGamepad->get_any_axis_down(0.9f))
+			if (auto axis = pGamepad->get_any_axis_down(0.9f)) //parameterize 0.9
 			{
 				m_ConfirmFunctor = [=]()
 				{
 					auto value = axis->second;
-					value = std::floor(value / std::abs(value)) * 0.1f;
+					value = std::floor(value / std::abs(value)) * 0.1f; //parameterize 0.1
 					//float minimum = value * 0.1f; //parameterize the minimum 0.1 here
 
 					m_pControl->bind(*(m_iCurrentBinding),
@@ -231,6 +231,17 @@ void configurator::update()
 	case state::clear_current_binding_of_inputs:
 	{
 		m_pControl->unbind(*m_iCurrentBinding);
+
+		m_StateMachine.set(state::choose_current_binding_action);
+	} break;
+
+	case state::display_bindings:
+	{
+		std::cout << "displaying bindings\n";
+
+		auto bindings = m_pControl->get_bindings(*m_iCurrentBinding);
+
+		std::cout << "display the bindings somehow or whatever\n";
 
 		m_StateMachine.set(state::choose_current_binding_action);
 	} break;

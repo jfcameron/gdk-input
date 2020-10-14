@@ -14,11 +14,9 @@ namespace gdk
     class gamepad
     {
     public:
-        using size_type = size_t; //TODO: delete?
-
         using button_state_type = bool;
 
-		using index_type = size_t;
+		using index_type = short unsigned int;
 
 		using button_collection_type = std::vector<button_state_type>;
 
@@ -60,11 +58,11 @@ namespace gdk
 
 		//! returns a hat and direction if a hat is down, otherwise the optional will be null
 		/// \warning If multiple hats are down, the first found is returned. Order should be considered arbitrary
-		virtual std::optional<std::pair<int, hat_state_type>> get_any_hat_down() const = 0;
+		virtual std::optional<std::pair<index_type, hat_state_type>> get_any_hat_down() const = 0;
 
 		//! returns an axis if one is down, otherwise the optional will be null
 		/// \warning If multiple axes are down, the first found is returned. Order should be considered arbitrary
-		virtual std::optional<std::pair<int, axis_value_type>> get_any_axis_down(axis_value_type threshold = 0.1f) const = 0;
+		virtual std::optional<std::pair<index_type, axis_value_type>> get_any_axis_down(axis_value_type threshold = 0.1f) const = 0;
 
 		//! return an axis if any are 
 

@@ -146,23 +146,27 @@ namespace gdk
     class controls_impl  : public controls
     {
     public:
-        using key_collection_type = std::set<keyboard::Key>;
+        //using key_collection_type = std::set<keyboard::Key>;
 
-        using mouse_button_collection_type = std::set<mouse::Button>;
-        using mouse_axis_collection_type = std::set<std::pair<mouse::Axis, /*scale and direction*/double>>;
+        //using mouse_button_collection_type = std::set<mouse::Button>;
+        //using mouse_axis_collection_type = std::set<std::pair<mouse::Axis, /*scale and direction*/double>>;
         
-        using gamepad_button_collection_type = std::set</*index*/int>;
-        using gamepad_axis_collection_type = std::map</*index*//*int*/std::string, /*deadzone*/float>;
-        using gamepad_hat_collection_type = std::map</*index*//*int*/std::string, /*hat direction*/gamepad::hat_state_type>;
+		// Note: strings as indicies is wrong. This has to do with jsoncons not supporting int keys in maps.
+		// Check if the project has improved since I pulled it in (early 2019). 
+		// If not, consider finding a different solution to json serialization.
+        // using gamepad_button_collection_type = std::set</*index*/int>;
+		// ideally just use controls::gamepad_axis_collection_type
+        using gamepad_axis_collection_type_impl = std::map</*index*//*int*/std::string, /*deadzone*/float>;
+        using gamepad_hat_collection_type_impl = std::map</*index*//*int*/std::string, /*hat direction*/gamepad::hat_state_type>;
 
-		gamepad_hat_collection_type hat_test;
-		gamepad_axis_collection_type axes_test;
+		gamepad_hat_collection_type_impl hat_test;
+		gamepad_axis_collection_type_impl axes_test;
 
         struct gamepad_bindings
         {
-            gamepad_axis_collection_type   axes;
+            gamepad_axis_collection_type_impl   axes;
             gamepad_button_collection_type buttons;
-            gamepad_hat_collection_type    hats;
+            gamepad_hat_collection_type_impl    hats;
         };
 
         struct bindings
@@ -175,7 +179,8 @@ namespace gdk
                 mouse_button_collection_type buttons;
             } mouse;
 
-            std::map<std::string, gamepad_bindings> gamepads; //!< bindings for supported gamepads
+			//! bindings for supported gamepads
+            std::map<std::string, gamepad_bindings> gamepads; 
         };
 
     private:
@@ -183,11 +188,11 @@ namespace gdk
 
         std::map<std::string, bindings> m_Inputs;
 
-		bool m_bKeyboardIsActive = true;
+		bool m_bKeyboardIsActive;
 
-		bool m_bMouseIsActive = true;
+		bool m_bMouseIsActive;
 
-		std::optional<size_t> m_ActiveGamepad = {};
+		std::optional<size_t> m_ActiveGamepad;
 
     public:
         /// \brief data model for use storing/transmitting state
@@ -238,6 +243,10 @@ namespace gdk
 		virtual void deactivate_gamepad() override;
 
 		virtual std::optional<size_t> is_gamepad_active() override;
+
+		virtual controls::bindings get_bindings(const std::string& aBindingName) override;
+
+		virtual std::map<std::string, controls::bindings> get_bindings() override;
         
         controls_impl(const serial_data_model &aDataModel, 
 			gdk::input::context::context_shared_ptr_type aInput,
@@ -275,14 +284,56 @@ namespace gdk
 
 	bool controls_impl::get_just_released(const std::string& aName) const
 	{
-		throw std::runtime_error("unimplemented");
+		auto iter = m_Inputs.find(aName);
+
+		if (iter == m_Inputs.end()) return 0;
+
+		if (m_bKeyboardIsActive)
+		{
+			for (const auto& key : iter->second.keys)
+				if (const auto value = m_pInput->get_key_just_released(key))
+					return static_cast<double>(value);
+		}
+
+		if (m_bMouseIsActive)
+		{
+			for (const auto& button : iter->second.mouse.buttons)
+				if (const auto value = m_pInput->get_mouse_button_just_released(button))
+					return static_cast<float>(value);
+		}
+
+		//TODO: gamepad buttons
+		//TODO: gamepad hats
+		//TODO: gamepad sticks
+		//if (m_ActiveGamepad)
 
 		return false;
 	}
 
 	bool controls_impl::get_just_pressed(const std::string& aName) const
 	{
-		throw std::runtime_error("unimplemented");
+		auto iter = m_Inputs.find(aName);
+
+		if (iter == m_Inputs.end()) return 0;
+
+		if (m_bKeyboardIsActive)
+		{
+			for (const auto& key : iter->second.keys)
+				if (const auto value = m_pInput->get_key_just_pressed(key))
+					return static_cast<double>(value);
+		}
+
+		if (m_bMouseIsActive)
+		{
+			for (const auto& button : iter->second.mouse.buttons)
+				if (const auto value = m_pInput->get_mouse_button_just_pressed(button))
+					return static_cast<float>(value);
+		}
+
+		//TODO: gamepad buttons
+		//TODO: gamepad hats
+		//TODO: gamepad sticks
+		//if (m_ActiveGamepad)
 
 		return false;
 	}
@@ -321,7 +372,6 @@ namespace gdk
 						const auto value(delta.x);
 
 						if (axis.second > 0 && delta.x > 0) return value * axis.second;
-
 						if (axis.second < 0 && delta.x < 0) return value * axis.second;
 					} break;
 
@@ -330,7 +380,6 @@ namespace gdk
 						const auto value(delta.y);
 
 						if (axis.second > 0 && delta.y > 0) return value * axis.second;
-
 						if (axis.second < 0 && delta.y < 0) return value * axis.second;
 					} break;
 
@@ -339,18 +388,18 @@ namespace gdk
 				}
 			}
 		}
-       
-		//if m_active_gamepad (should be an optional to a size_t?)
+        
+		if (m_ActiveGamepad)
 		{
-			auto m_pGamepad = m_pInput->get_gamepad(0);
+			auto m_pGamepad = m_pInput->get_gamepad(*m_ActiveGamepad);
 			{
-				if (const auto current_gamepad_iter = iter->second.gamepads.find(std::string(m_pGamepad->get_name())); current_gamepad_iter != iter->second.gamepads.end())
+				if (const auto current_gamepad_iter = iter->second.gamepads.find(std::string(m_pGamepad->get_name())); 
+					current_gamepad_iter != iter->second.gamepads.end())
 				{
 					for (const auto& button : current_gamepad_iter->second.buttons)
-					{
-						if (const auto value = static_cast<float>(m_pGamepad->get_button_down(button))) return value;
-					}
-
+						if (const auto value = static_cast<float>(m_pGamepad->get_button_down(button))) 
+							return value;
+					
 					for (const auto& hat : current_gamepad_iter->second.hats)
 					{
 						//TODO: ignore center case. center should be permissive state
@@ -487,6 +536,49 @@ namespace gdk
 	std::optional<size_t> controls_impl::is_gamepad_active()
 	{
 		return m_ActiveGamepad;
+	}
+
+	controls::bindings controls_impl::get_bindings(const std::string& aBindingName)
+	{
+		controls::bindings value;
+
+		value.keys = m_Inputs[aBindingName].keys;
+		
+		value.mouse_axes = m_Inputs[aBindingName].mouse.axes;
+		value.mouse_buttons = m_Inputs[aBindingName].mouse.buttons;
+
+		for (const auto& g : m_Inputs[aBindingName].gamepads)
+		{
+			decltype(value.gamepads)::value_type gamepad_binding;
+			
+			for (const auto& axis : g.second.axes)
+			{
+				gamepad_binding.axes[std::stoi(axis.first)] = axis.second;
+			}
+
+			gamepad_binding.buttons = g.second.buttons;
+
+			for (const auto& hat : g.second.hats)
+			{
+				gamepad_binding.hats[std::stoi(hat.first)] = hat.second;
+			}
+
+			value.gamepads.push_back(gamepad_binding);
+		}
+
+		return value;
+	}
+
+	std::map<std::string, controls::bindings> controls_impl::get_bindings()
+	{
+		std::map<std::string, controls::bindings> map;
+
+		for (const auto& bindings : m_Inputs)
+		{
+			map[bindings.first] = get_bindings(bindings.first);
+		}
+
+		return map;
 	}
 }
 

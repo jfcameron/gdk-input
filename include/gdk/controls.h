@@ -17,12 +17,54 @@
 
 namespace gdk
 {
-    /// \brief provides a way to map raw input from a gamepad, mouse, and keyboard behind a single logical input
+    /// \brief provides a way to bind input from a gamepad, mouse, keyboard to a single binding name
     /// e.g: create a "Jump" binding that is non-zero when spacebar or gamepad button zero is pressed
     /// e.g: a "Look up" binding that is non-zero when up arrow or mouse axis y or gamepad axis 0 is interacted with.
+	/// This also allows a game to easily support many types of gamepads.
 	class controls
     {
     public:
+		//! keys bound to a binding name
+		using key_collection_type = std::set<keyboard::Key>;
+
+		//! mouse buttons bound to a binding name
+		using mouse_button_collection_type = std::set<mouse::Button>;
+		//! mouse axes bound to a binding name
+		using mouse_axis_collection_type = std::set<std::pair<mouse::Axis, /*scale and direction*/double>>;
+
+		//! gamepad buttons bound to a binding name
+		using gamepad_button_collection_type = std::set</*index*/int>;
+		//! gamepad axes bound to a binding name
+		using gamepad_axis_collection_type = std::map</*index*/int, /*deadzone*/float>;
+		//! gamepad hats bound to a binding name
+		using gamepad_hat_collection_type = std::map</*index*/int, /*hat direction*/gamepad::hat_state_type>;
+
+		//! collection of all inputs bound to a name
+		struct bindings
+		{
+			//! bound keys
+			key_collection_type keys;
+
+			//! bound mouse buttons
+			mouse_button_collection_type mouse_buttons;
+			//! bound mouse axes
+			mouse_axis_collection_type mouse_axes;
+
+			//! collection of gamepad inputs
+			struct gamepad
+			{
+				//! bound gamepad buttons
+				gamepad_button_collection_type buttons;
+				//! bound gamepad axes
+				gamepad_axis_collection_type axes;
+				//! bound gamepad hats
+				gamepad_hat_collection_type hats;
+			};
+
+			//! bound gamepads
+			std::vector<gamepad> gamepads;
+		};
+
         //! construct an instance from a string containing a JSON serialized controls instance
         static std::unique_ptr<controls> make(gdk::input::context::context_shared_ptr_type aInput,
 			bool bKeyboardActive, 
@@ -106,6 +148,12 @@ namespace gdk
 		// virtual void unbind(std::string name) = 0; //unbind everything from bind
 		
 		// void unbind_all() = 0; //unbind everything
+
+		//! returns a group of collections, representing all the inputs bound to the given binding name
+		virtual bindings get_bindings(const std::string& aBindingName) = 0;
+
+		//! returns a group of collections, representing all the inputs bound to all binding names
+		virtual std::map<std::string, bindings> get_bindings() = 0;
 
 		//! controls will react to keyboard inputs
 		virtual void activate_keyboard() = 0;

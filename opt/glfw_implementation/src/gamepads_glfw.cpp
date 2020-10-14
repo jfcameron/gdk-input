@@ -8,8 +8,6 @@
 #include <vector>
 #include <iostream>
 
-#include <GLFW/glfw3.h>
-
 #include <gdk/gamepad_glfw.h>
 
 static constexpr char TAG[] = "gamepad_glfw";
@@ -76,7 +74,7 @@ namespace gdk
 		return {};
 	}
 
-	std::optional<std::pair<int, gamepad::hat_state_type>> gamepad_glfw::get_any_hat_down() const
+	std::optional<std::pair<gamepad::index_type, gamepad::hat_state_type>> gamepad_glfw::get_any_hat_down() const
 	{
 		for (decltype(m_Hats)::size_type i(0); i < m_Hats.size(); ++i)
 		{
@@ -87,7 +85,7 @@ namespace gdk
 		return {};
 	}
 
-	std::optional<std::pair<int, gamepad_glfw::axis_value_type>> gamepad_glfw::get_any_axis_down(axis_value_type threshold) const
+	std::optional<std::pair<gamepad::index_type, gamepad_glfw::axis_value_type>> gamepad_glfw::get_any_axis_down(axis_value_type threshold) const
 	{
 		for (decltype(m_Axes)::size_type i(0); i < m_Axes.size(); ++i)
 		{

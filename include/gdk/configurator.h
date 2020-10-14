@@ -32,6 +32,7 @@ namespace gdk
 			bind_new_input, //!< awaiting user input to bind
 			confirm_new_input, //!< add input if user confirms
 			clear_current_binding_of_inputs, //!< removes inputs from current binding
+			display_bindings, //!< displays bindings
 		};
 
 	private:
