@@ -1,4 +1,4 @@
-// © 2019 Joseph Cameron - All Rights Reserved
+// © 2019, 2020 Joseph Cameron - All Rights Reserved
 
 #include <type_traits>
 #include <iostream>
@@ -146,27 +146,17 @@ namespace gdk
     class controls_impl  : public controls
     {
     public:
-        //using key_collection_type = std::set<keyboard::Key>;
-
-        //using mouse_button_collection_type = std::set<mouse::Button>;
-        //using mouse_axis_collection_type = std::set<std::pair<mouse::Axis, /*scale and direction*/double>>;
-        
 		// Note: strings as indicies is wrong. This has to do with jsoncons not supporting int keys in maps.
 		// Check if the project has improved since I pulled it in (early 2019). 
 		// If not, consider finding a different solution to json serialization.
         // using gamepad_button_collection_type = std::set</*index*/int>;
 		// ideally just use controls::gamepad_axis_collection_type
         using gamepad_axis_collection_type_impl = std::map</*index*//*int*/std::string, /*deadzone*/float>;
-        //using gamepad_hat_collection_type_impl = std::map</*index*//*int*/std::string, /*hat direction*/gamepad::hat_state_type>;
-
-		//gamepad_hat_collection_type_impl hat_test;
-		gamepad_axis_collection_type_impl axes_test;
-
+        
         struct gamepad_bindings
         {
             gamepad_axis_collection_type_impl   axes;
             gamepad_button_collection_type buttons;
-			//gamepad_hat_collection_type_impl    hats;
         };
 
         struct bindings
@@ -302,10 +292,32 @@ namespace gdk
 					return static_cast<float>(value);
 		}
 
-		//TODO: gamepad buttons
-		//TODO: gamepad hats
-		//TODO: gamepad sticks
-		//if (m_ActiveGamepad)
+		if (m_ActiveGamepad)
+		{
+			auto m_pGamepad = m_pInput->get_gamepad(*m_ActiveGamepad);
+			{
+				if (const auto current_gamepad_iter = iter->second.gamepads.find(std::string(m_pGamepad->get_name()));
+					current_gamepad_iter != iter->second.gamepads.end())
+				{
+					for (const auto& button : current_gamepad_iter->second.buttons)
+						if (const auto value = static_cast<float>(m_pGamepad->get_button_just_released(button)))
+							return value;
+
+					for (const auto& axis : current_gamepad_iter->second.axes)
+					{
+						if (const auto value = static_cast<float>(m_pGamepad->get_axis_just_dropped_below_threshold(std::stoi(axis.first), axis.second)))
+						{
+							const float minimum(axis.second);
+
+							if (minimum >= 0 && value > minimum)
+								return value;
+							else if (minimum < 0 && value < minimum)
+								return static_cast<double>(value) * -1;
+						}
+					}
+				}
+			}
+		}
 
 		return false;
 	}
@@ -330,10 +342,32 @@ namespace gdk
 					return static_cast<float>(value);
 		}
 
-		//TODO: gamepad buttons
-		//TODO: gamepad hats
-		//TODO: gamepad sticks
-		//if (m_ActiveGamepad)
+		if (m_ActiveGamepad)
+		{
+			auto m_pGamepad = m_pInput->get_gamepad(*m_ActiveGamepad);
+			{
+				if (const auto current_gamepad_iter = iter->second.gamepads.find(std::string(m_pGamepad->get_name()));
+					current_gamepad_iter != iter->second.gamepads.end())
+				{
+					for (const auto& button : current_gamepad_iter->second.buttons)
+						if (const auto value = static_cast<float>(m_pGamepad->get_button_just_pressed(button)))
+							return value;
+
+					for (const auto& axis : current_gamepad_iter->second.axes)
+					{
+						if (const auto value = static_cast<float>(m_pGamepad->get_axis_just_exceeded_threshold(std::stoi(axis.first), axis.second)))
+						{
+							const float minimum(axis.second);
+
+							if (minimum >= 0 && value > minimum)
+								return value;
+							else if (minimum < 0 && value < minimum)
+								return static_cast<double>(value) * -1;
+						}
+					}
+				}
+			}
+		}
 
 		return false;
 	}
@@ -357,7 +391,7 @@ namespace gdk
 				if (const auto value = m_pInput->get_mouse_button_down(button))
 					return static_cast<float>(value);
 
-			//TODO: Consider whether or not to support mouse delta in controls.
+			/*//TODO: Consider whether or not to support mouse delta in controls.
 			// the values of mouse delta cannot be normalized. although it does agree that 0 is no input.
 			for (const auto& axis : iter->second.mouse.axes)
 			{
@@ -386,7 +420,7 @@ namespace gdk
 					default: throw std::invalid_argument("unhandled axis type");
 					}
 				}
-			}
+			}*/
 		}
         
 		if (m_ActiveGamepad)
@@ -399,12 +433,6 @@ namespace gdk
 					for (const auto& button : current_gamepad_iter->second.buttons)
 						if (const auto value = static_cast<float>(m_pGamepad->get_button_down(button))) 
 							return value;
-					
-					/*for (const auto& hat : current_gamepad_iter->second.hats)
-					{
-						//TODO: ignore center case. center should be permissive state
-						if (auto a = hat.second, b = m_pGamepad->get_hat(std::stoi(hat.first)); a.x == b.x && a.y == b.y) return 1;
-					}*/
 
 					for (const auto& axis : current_gamepad_iter->second.axes)
 					{
@@ -556,11 +584,6 @@ namespace gdk
 			}
 
 			gamepad_binding.buttons = g.second.buttons;
-
-			/*for (const auto& hat : g.second.hats)
-			{
-				gamepad_binding.hats[std::stoi(hat.first)] = hat.second;
-			}*/
 
 			value.gamepads.push_back(gamepad_binding);
 		}
