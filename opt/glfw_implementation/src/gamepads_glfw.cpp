@@ -59,21 +59,21 @@ namespace gdk
 
 	bool gamepad_glfw::get_button_down(const gamepad::index_type index) const
     {
-		if (index >= m_Buttons.size()) return 0;
+		if (index >= m_Buttons.size()) return false;
 
 		return m_Buttons[index] != button_state::UP;
     }
 
 	bool gamepad_glfw::get_button_just_pressed(const index_type index) const
 	{
-		if (index >= m_Buttons.size()) return 0;
+		if (index >= m_Buttons.size()) return false;
 
 		return m_Buttons[index] == button_state::JUST_PRESSED;
 	}
 
 	bool gamepad_glfw::get_button_just_released(const index_type index) const
 	{
-		if (index >= m_Buttons.size()) return 0;
+		if (index >= m_Buttons.size()) return false;
 
 		return m_Buttons[index] == button_state::JUST_RELEASED;
 	}

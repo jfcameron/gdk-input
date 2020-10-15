@@ -35,8 +35,24 @@ int main(int argc, char **argv)
 		"A",
 		"B",
 	});
+	
+	jfc::ring_buffer<int, 60> ring({});
+	
+	auto iter = ring.get();
+	
+	for (int i = 1; i < 61; i++)
+	{
+		*iter = i;
+		iter--;
+	}
 
-	jfc::ring_buffer<int, 10> ring;
+	auto citer = ring.cget();
+
+	for (int i = 1; i < 61; i++)
+	{
+		std::cout << *citer << "\n";
+		citer--;
+	}
 
 	for (bool bShouldExit(false);!bShouldExit;)
 	{
