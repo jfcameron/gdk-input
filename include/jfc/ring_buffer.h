@@ -7,11 +7,14 @@
 
 namespace jfc
 {
-	/// \brief fixed length, contiguous, linear collection with no begining or end
+	/// \brief fixed length, contiguous, linear collection with iterators
+	/// that wrap around its lower and upper limits rather than go out of bounds
 	///
-	/// to access the internal data, use get to construct a ring_buffer::iterator
-	/// to the data.
-	/// The iterator wraps around the internal array data instead of going out of bounds.
+	/// to access the internal data, use get to construct an iterator
+	/// to the data or cget to construct a const_iterator to the data
+	///
+	//TODO: this doesnt fully implement the expected methods on a stl container. think about this
+	// I think with just get and cget you can make full use of this container, but it is not standard in appearance.
 	template<class value_type_template, size_t size_template>
 	class ring_buffer final
 	{
@@ -84,6 +87,12 @@ namespace jfc
 				return m_iterator == other.m_iterator;
 			}
 
+			/// \brief iterator inequality
+			bool operator!=(const iterator& other) const
+			{
+				return m_iterator != other.m_iterator;
+			}
+
 			/// \brief defaulted dtor
 			~iterator() = default;
 
@@ -154,6 +163,12 @@ namespace jfc
 			bool operator==(const const_iterator& other) const
 			{
 				return m_iterator == other.m_iterator;
+			}
+
+			/// \brief iterator inequality
+			bool operator!=(const const_iterator& other) const
+			{
+				return m_iterator != other.m_iterator;
 			}
 
 			/// \brief defaulted dtor

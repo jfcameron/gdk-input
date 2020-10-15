@@ -60,8 +60,6 @@ namespace gdk::input
 		/// \brief returns a mouse button if one is down
 		[[nodiscard]] virtual std::optional<mouse::Button> get_any_mouse_button_down() const = 0;
 
-		[[nodiscard]] virtual std::optional<mouse::Axis> get_any_mouse_axis_down(float threshold) const = 0;
-
 		/// \brief get the cursor coordinates
 		/// 
 		/// cursor coordinates are normalized across the size of the window.
@@ -72,6 +70,9 @@ namespace gdk::input
 		/// this value is still reliable in cursor locked mode
 		/// the value is multiplied by a scalar set via set_mouse_delta_sensitivity
 		[[nodiscard]] virtual mouse::cursor_2d_type get_mouse_delta() const = 0;
+
+		/// \brief returns a mouse axis if one is nonzero.
+		[[nodiscard]] virtual std::optional<mouse::Axis> get_any_mouse_axis_down(float threshold) const = 0;
 
 		/// \brief gets the cursor mdoe
 		[[nodiscard]] virtual mouse::CursorMode get_mouse_cursor_mode() const = 0;

@@ -31,8 +31,11 @@ namespace gdk
         //! Buffer containing most recent button states
         std::vector<button_state> m_Buttons;
        
-        //! Buffer containing most recent axis states
+        //! Buffer containing most recent axes states
         std::vector<axis_value_type> m_Axes;
+
+		//! Buffer containing last frame's axes states
+		std::vector<axis_value_type> m_LastAxes;
 
     public:
         /// \brief updates the state of this gamepad
@@ -40,7 +43,13 @@ namespace gdk
         void update();
 
         virtual axis_value_type get_axis(index_type index, axis_value_type threshold) const override;
-        
+
+		virtual bool get_axis_just_exceeded_threshold(const index_type index, const axis_value_type threshold) const override;
+
+		virtual bool get_axis_just_dropped_below_threshold(const index_type index, const axis_value_type threshold) const override;
+
+		virtual std::optional<std::pair<index_type, axis_value_type>> get_any_axis_down(axis_value_type threshold) const override;
+
         virtual bool get_button_down(const index_type index) const override;
 
 		virtual bool get_button_just_pressed(const index_type index) const override;
@@ -50,8 +59,6 @@ namespace gdk
         virtual std::string_view get_name() const override;
 
 		virtual std::optional<button_collection_type::size_type> get_any_button_down() const override;
-
-		virtual std::optional<std::pair<index_type, axis_value_type>> get_any_axis_down(axis_value_type threshold) const override;
 
         gamepad_glfw(const int joystickID);
     };

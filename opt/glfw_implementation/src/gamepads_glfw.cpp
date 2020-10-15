@@ -18,7 +18,7 @@ namespace gdk
 {
     gamepad_glfw::gamepad_glfw(const int aJoystickIndex)
     : m_JoystickIndex(aJoystickIndex)
-    , m_Name([aJoystickIndex]()
+    , m_Name(/*[aJoystickIndex]()
     {
 		//NOTE: since glfw gamepads can shift in real time, no setup work should be done in the ctor.
 		//see update. should add a private method that shares commonalities of setup, call here and there.
@@ -31,7 +31,7 @@ namespace gdk
 		if (!name) name = "disconnected"; 
 
         return name; 
-    }())
+    }()*/)
     {}
 
     float gamepad_glfw::get_axis(gamepad::index_type index, axis_value_type threshold) const
@@ -42,8 +42,8 @@ namespace gdk
 
 		if (std::abs(value) < threshold) return 0;
 
-		// Gamepad triggers are -1 when untouched.
-		// This normalizes the value. instead of weird range of [-1 - +1], go to [0 - 1]
+		// glfw gamepad triggers are -1 when untouched.
+		// This moves the range from [-1 - +1], to [0 - 1]
 		// gdk always presents a value of 0 as unpressed
 		if (m_Name == SDL_GAMEPAD_NAME)
 		{
@@ -56,6 +56,36 @@ namespace gdk
 
         return value;
     }
+
+	bool gamepad_glfw::get_axis_just_exceeded_threshold(const index_type index, const axis_value_type threshold) const
+	{
+		if (index >= m_Axes.size()) return false;
+
+		const auto currentValue = m_Axes[index];
+
+		const auto lastValue = index < m_LastAxes.size()
+			? m_LastAxes[index]
+			: 0;
+
+		if (currentValue >= threshold && lastValue < threshold) return true;
+		
+		return false;
+	}
+
+	bool gamepad_glfw::get_axis_just_dropped_below_threshold(const index_type index, const axis_value_type threshold) const
+	{
+		if (index >= m_Axes.size()) return false;
+
+		const auto currentValue = m_Axes[index];
+
+		const auto lastValue = index < m_LastAxes.size()
+			? m_LastAxes[index]
+			: 0;
+
+		if (currentValue <= threshold && lastValue > threshold) return true;
+
+		return false;
+	}
 
 	bool gamepad_glfw::get_button_down(const gamepad::index_type index) const
     {
@@ -81,9 +111,7 @@ namespace gdk
 	std::optional<gamepad::button_collection_type::size_type> gamepad_glfw::get_any_button_down() const
 	{
 		for (decltype(m_Buttons)::size_type i(0); i < m_Buttons.size(); ++i)
-		{
 			if (m_Buttons[i] != button_state::UP) return i;
-		}
 
 		return {};
 	}
@@ -124,12 +152,14 @@ namespace gdk
         {
             m_Name = SDL_GAMEPAD_NAME;
             
+			// Axes
             GLFWgamepadstate state; 
             glfwGetGamepadState(m_JoystickIndex, &state);
 
-			//todo..
+			m_LastAxes = m_Axes;
             m_Axes = decltype(m_Axes)(state.axes, state.axes + (sizeof(state.axes) / sizeof(state.axes[0])));
 
+			// Buttons & hats
             // Hats are appended to the back of the button array. They are also in fixed positions
             // https://www.glfw.org/docs/latest/input_guide.html#gamepad "button indicies"
 			std::vector<decltype(GLFW_PRESS)> buttons(state.buttons, state.buttons + GLFW_GAMEPAD_BUTTON_LAST + 1);

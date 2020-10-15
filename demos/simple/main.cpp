@@ -35,24 +35,8 @@ int main(int argc, char **argv)
 		"A",
 		"B",
 	});
-	
-	jfc::ring_buffer<int, 60> ring({});
-	
-	auto iter = ring.get();
-	
-	for (int i = 1; i < 61; i++)
-	{
-		*iter = i;
-		iter--;
-	}
 
-	auto citer = ring.cget();
-
-	for (int i = 1; i < 61; i++)
-	{
-		std::cout << *citer << "\n";
-		citer--;
-	}
+	auto pGamepad = pInput->get_gamepad(0);
 
 	for (bool bShouldExit(false);!bShouldExit;)
 	{
@@ -60,7 +44,9 @@ int main(int argc, char **argv)
 
 		pInput->update();
 
-		c.update();
+		//c.update();
+
+		if (pGamepad->get_axis_just_dropped_below_threshold(0, 0.5f)) std::cout << "exceeded\n";
 
 		if (pInput->get_key_just_released(keyboard::Key::Escape)) bShouldExit = true;
 	}
