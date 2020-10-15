@@ -43,7 +43,7 @@ std::ostream& operator<<(std::ostream& s, const mouse::Axis a)
 }
 
 //Gamepad
-std::ostream& operator<<(std::ostream& s, const gamepad::hat_state_type::vertical_direction a)
+/*std::ostream& operator<<(std::ostream& s, const gamepad::hat_state_type::vertical_direction a)
 {
 	s << magic_enum::enum_name(a);
 
@@ -54,4 +54,4 @@ std::ostream& operator<<(std::ostream& s, const gamepad::hat_state_type::horizon
 	s << magic_enum::enum_name(a);
 
 	return s;
-}
+}*/

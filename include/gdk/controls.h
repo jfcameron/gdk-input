@@ -36,8 +36,6 @@ namespace gdk
 		using gamepad_button_collection_type = std::set</*index*/int>;
 		//! gamepad axes bound to a binding name
 		using gamepad_axis_collection_type = std::map</*index*/int, /*deadzone*/float>;
-		//! gamepad hats bound to a binding name
-		using gamepad_hat_collection_type = std::map</*index*/int, /*hat direction*/gamepad::hat_state_type>;
 
 		//! collection of all inputs bound to a name
 		struct bindings
@@ -57,8 +55,6 @@ namespace gdk
 				gamepad_button_collection_type buttons;
 				//! bound gamepad axes
 				gamepad_axis_collection_type axes;
-				//! bound gamepad hats
-				gamepad_hat_collection_type hats;
 			};
 
 			//! bound gamepads
@@ -108,12 +104,6 @@ namespace gdk
 			const int aAxisIndex, 
 			const float aMinimum) = 0;
        
-        //! adds a gamepad hat to a mapping for a specific gamepad type, creating a new mapping if it did not already exist.
-        virtual void bind(const std::string &aMappingName,
-			const std::string &aGamepadName, 
-			const int aHatIndex, 
-			const gamepad::hat_state_type aHatState) = 0;
-
 		//! unbind all inputs from a name
 		virtual void unbind(const std::string& aMappingName) = 0;
 

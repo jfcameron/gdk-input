@@ -157,16 +157,16 @@ namespace gdk
         // using gamepad_button_collection_type = std::set</*index*/int>;
 		// ideally just use controls::gamepad_axis_collection_type
         using gamepad_axis_collection_type_impl = std::map</*index*//*int*/std::string, /*deadzone*/float>;
-        using gamepad_hat_collection_type_impl = std::map</*index*//*int*/std::string, /*hat direction*/gamepad::hat_state_type>;
+        //using gamepad_hat_collection_type_impl = std::map</*index*//*int*/std::string, /*hat direction*/gamepad::hat_state_type>;
 
-		gamepad_hat_collection_type_impl hat_test;
+		//gamepad_hat_collection_type_impl hat_test;
 		gamepad_axis_collection_type_impl axes_test;
 
         struct gamepad_bindings
         {
             gamepad_axis_collection_type_impl   axes;
             gamepad_button_collection_type buttons;
-            gamepad_hat_collection_type_impl    hats;
+			//gamepad_hat_collection_type_impl    hats;
         };
 
         struct bindings
@@ -222,7 +222,7 @@ namespace gdk
         
         virtual void bind(const std::string &aMappingName, const std::string &aGamepadName, const int aAxisIndex, const float aMinimum) override;
        
-        virtual void bind(const std::string &aMappingName, const std::string &aGamepadName, const int aHatIndex, const gamepad::hat_state_type aHatState) override;
+        //virtual void bind(const std::string &aMappingName, const std::string &aGamepadName, const int aHatIndex, const gamepad::hat_state_type aHatState) override;
 
         virtual std::string serialize_to_json() override;
 
@@ -400,11 +400,11 @@ namespace gdk
 						if (const auto value = static_cast<float>(m_pGamepad->get_button_down(button))) 
 							return value;
 					
-					for (const auto& hat : current_gamepad_iter->second.hats)
+					/*for (const auto& hat : current_gamepad_iter->second.hats)
 					{
 						//TODO: ignore center case. center should be permissive state
 						if (auto a = hat.second, b = m_pGamepad->get_hat(std::stoi(hat.first)); a.x == b.x && a.y == b.y) return 1;
-					}
+					}*/
 
 					for (const auto& axis : current_gamepad_iter->second.axes)
 					{
@@ -441,7 +441,6 @@ namespace gdk
 		{
 			g.second.axes.clear();
 			g.second.buttons.clear();
-			g.second.hats.clear();
 		}
 	}
 
@@ -470,10 +469,10 @@ namespace gdk
         m_Inputs[aInputName].gamepads[aGamepadName].axes.insert({std::to_string(aAxisIndex), aMinimum});
     }
 
-    void controls_impl::bind(const std::string &aInputName, const std::string &aGamepadName, const int aHatIndex, const gamepad::hat_state_type aHatState)
+    /*void controls_impl::bind(const std::string &aInputName, const std::string &aGamepadName, const int aHatIndex, const gamepad::hat_state_type aHatState)
     {
         m_Inputs[aInputName].gamepads[aGamepadName].hats.insert({std::to_string(aHatIndex), aHatState});
-    }
+    }*/
 
     void controls_impl::bind(const std::string &aInputName, const std::string &aGamepadName, const int aButtonIndex)
     {
@@ -558,10 +557,10 @@ namespace gdk
 
 			gamepad_binding.buttons = g.second.buttons;
 
-			for (const auto& hat : g.second.hats)
+			/*for (const auto& hat : g.second.hats)
 			{
 				gamepad_binding.hats[std::stoi(hat.first)] = hat.second;
-			}
+			}*/
 
 			value.gamepads.push_back(gamepad_binding);
 		}
@@ -591,15 +590,7 @@ JSONCONS_UTIL_ENUM_TRAITS_DECL(gdk::mouse::Button);
 JSONCONS_UTIL_ENUM_TRAITS_DECL(gdk::mouse::Axis);
 JSONCONS_MEMBER_TRAITS_DECL(decltype(gdk::controls_impl::bindings::mouse), buttons, axes);
 
-// gamepad
-JSONCONS_UTIL_ENUM_TRAITS_DECL(gdk::gamepad::hat_state_type::vertical_direction);
-JSONCONS_UTIL_ENUM_TRAITS_DECL(gdk::gamepad::hat_state_type::horizontal_direction);
-JSONCONS_MEMBER_TRAITS_DECL   (gdk::gamepad::hat_state_type, x, y);
-
-JSONCONS_MEMBER_TRAITS_DECL(decltype(gdk::controls_impl::bindings::gamepads)::value_type::second_type, buttons, hats, axes);
+JSONCONS_MEMBER_TRAITS_DECL(decltype(gdk::controls_impl::bindings::gamepads)::value_type::second_type, buttons, /*hats,*/ axes);
 
 // all
 JSONCONS_MEMBER_TRAITS_DECL(gdk::controls_impl::bindings, keys, gamepads, mouse);
-
-// test
-JSONCONS_MEMBER_TRAITS_DECL(gdk::controls_impl, hat_test, axes_test);

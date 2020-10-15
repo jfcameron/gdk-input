@@ -1,4 +1,4 @@
-// © 2019 Joseph Cameron - All Rights Reserved
+// © 2019, 2020 Joseph Cameron - All Rights Reserved
 
 #include <cassert>
 #include <cstdio>
@@ -57,29 +57,32 @@ namespace gdk
         return value;
     }
 
-    gamepad::button_state_type gamepad_glfw::get_button_down(gamepad::index_type index) const
+	bool gamepad_glfw::get_button_down(const gamepad::index_type index) const
     {
 		if (index >= m_Buttons.size()) return 0;
 
-		return m_Buttons[index];
+		return m_Buttons[index] != button_state::UP;
     }
+
+	bool gamepad_glfw::get_button_just_pressed(const index_type index) const
+	{
+		if (index >= m_Buttons.size()) return 0;
+
+		return m_Buttons[index] == button_state::JUST_PRESSED;
+	}
+
+	bool gamepad_glfw::get_button_just_released(const index_type index) const
+	{
+		if (index >= m_Buttons.size()) return 0;
+
+		return m_Buttons[index] == button_state::JUST_RELEASED;
+	}
 
 	std::optional<gamepad::button_collection_type::size_type> gamepad_glfw::get_any_button_down() const
 	{
 		for (decltype(m_Buttons)::size_type i(0); i < m_Buttons.size(); ++i)
 		{
-			if (m_Buttons[i]) return i;
-		}
-
-		return {};
-	}
-
-	std::optional<std::pair<gamepad::index_type, gamepad::hat_state_type>> gamepad_glfw::get_any_hat_down() const
-	{
-		for (decltype(m_Hats)::size_type i(0); i < m_Hats.size(); ++i)
-		{
-			if (m_Hats[i]) return 
-			{{i, get_hat(i)}};
+			if (m_Buttons[i] != button_state::UP) return i;
 		}
 
 		return {};
@@ -100,26 +103,6 @@ namespace gdk
 
 		return {};
 	}
-
-    gamepad::hat_state_type gamepad_glfw::get_hat(gamepad::index_type index) const
-    {
-		gamepad::hat_state_type hat {
-			hat_state_type::horizontal_direction::Center,
-			hat_state_type::vertical_direction::Center
-		};
-
-		if (index >= m_Hats.size()) return hat;
-
-        const auto hat_state_glfw = m_Hats[index];
-
-		if      (hat_state_glfw & GLFW_HAT_LEFT) hat.x  = hat_state_type::horizontal_direction::Left;
-		if (hat_state_glfw & GLFW_HAT_RIGHT) hat.x = hat_state_type::horizontal_direction::Right;
-
-		if      (hat_state_glfw & GLFW_HAT_UP) hat.y   = hat_state_type::vertical_direction::Up;
-		if (hat_state_glfw & GLFW_HAT_DOWN) hat.y = hat_state_type::vertical_direction::Down;
-
-		return hat;
-    }
 
     std::string_view gamepad_glfw::get_name() const 
     {
@@ -144,36 +127,57 @@ namespace gdk
             GLFWgamepadstate state; 
             glfwGetGamepadState(m_JoystickIndex, &state);
 
+			//todo..
             m_Axes = decltype(m_Axes)(state.axes, state.axes + (sizeof(state.axes) / sizeof(state.axes[0])));
 
             // Hats are appended to the back of the button array. They are also in fixed positions
             // https://www.glfw.org/docs/latest/input_guide.html#gamepad "button indicies"
-            m_Buttons = decltype(m_Buttons)(state.buttons, state.buttons + GLFW_GAMEPAD_BUTTON_DPAD_UP - 1); //TODO test for off by one error.
-
-			auto a(GLFW_HAT_CENTERED);
-	
-			if (state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_RIGHT])
+			std::vector<decltype(GLFW_PRESS)> buttons(state.buttons, state.buttons + GLFW_GAMEPAD_BUTTON_LAST + 1);
+			
+			if (m_Buttons.size() == buttons.size())
 			{
-				a = GLFW_HAT_RIGHT;
+				for (size_t i(0); i < buttons.size(); ++i)
+				{
+					switch (m_Buttons[i])
+					{
+					case button_state::HELD_DOWN: 
+						m_Buttons[i] = buttons[i]
+							? button_state::HELD_DOWN
+							: button_state::JUST_RELEASED;
+					break;
 
-				if (state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_UP]) a = GLFW_HAT_RIGHT_UP;
-				if (state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_DOWN]) a = GLFW_HAT_RIGHT_DOWN;
+					case button_state::UP: 
+						m_Buttons[i] = buttons[i]
+							? button_state::JUST_PRESSED
+							: button_state::UP;
+					break;
+					
+					case button_state::JUST_PRESSED: 
+						m_Buttons[i] = buttons[i]
+							? button_state::HELD_DOWN
+							: button_state::JUST_RELEASED;
+					break;
+					
+					case button_state::JUST_RELEASED: 
+						m_Buttons[i] = buttons[i]
+							? button_state::JUST_PRESSED
+							: button_state::UP;
+					break;
+					}
+				}
 			}
-			else if (state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_LEFT])
+			else // This occurs if a joystick is swapped out & first update call
 			{
-				a = GLFW_HAT_LEFT;
+				m_Buttons.clear();
+				m_Buttons.reserve(buttons.size());
 
-				if (state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_UP]) a = GLFW_HAT_LEFT_UP;
-				if (state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_DOWN]) a = GLFW_HAT_LEFT_DOWN;
+				for (const auto& b : buttons)
+					m_Buttons.push_back(b
+						? button_state::JUST_PRESSED
+						: button_state::UP);
 			}
-			else if (state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_UP]) a = GLFW_HAT_UP;
-			else if (state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_DOWN]) a = GLFW_HAT_DOWN;
-
-			m_Hats = {
-				static_cast<decltype(m_Hats)::value_type>(a)
-			};
         }
-        else if (glfwJoystickPresent(m_JoystickIndex)) 
+        /*else if (glfwJoystickPresent(m_JoystickIndex)) 
         {
             m_Name = glfwGetJoystickName(m_JoystickIndex);
 
@@ -188,14 +192,14 @@ namespace gdk
             m_Axes = decltype(m_Axes)(axes, axes + count);
 
             const unsigned char *hats = glfwGetJoystickHats(m_JoystickIndex, &count);
+			//todo: convert hats to buttons. just a big switch.
 
             m_Hats = decltype(m_Hats)(hats, hats + count);
-        }
+        }*/
         else //Disconnected
         {
             m_Buttons.clear();
             m_Axes.clear();
-            m_Hats.clear();
         }
     }
 }

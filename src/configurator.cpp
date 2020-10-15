@@ -167,21 +167,6 @@ void configurator::update()
 				m_StateMachine.set(state::confirm_new_input);
 			}
 
-			// gamepad hats
-			if (auto hat = pGamepad->get_any_hat_down())
-			{
-				m_ConfirmFunctor = [=]()
-				{
-					m_pControl->bind(*(m_iCurrentBinding),
-						std::string(pGamepad->get_name()), hat->first, hat->second);
-				};
-
-				s << pGamepad->get_name() << " hat " << hat->first;
-				m_LastInputString = s.str();
-
-				m_StateMachine.set(state::confirm_new_input);
-			}
-
 			// gamepad axes
 			if (auto axis = pGamepad->get_any_axis_down(0.9f)) //parameterize 0.9
 			{

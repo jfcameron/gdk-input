@@ -9,6 +9,8 @@
 #include <gdk/gamepad_glfw.h>
 #include <gdk/configurator.h>
 
+#include <jfc/ring_buffer.h>
+
 #include <cstdlib>
 #include <vector>
 #include <iostream>
@@ -33,6 +35,8 @@ int main(int argc, char **argv)
 		"A",
 		"B",
 	});
+
+	jfc::ring_buffer<int, 10> ring;
 
 	for (bool bShouldExit(false);!bShouldExit;)
 	{

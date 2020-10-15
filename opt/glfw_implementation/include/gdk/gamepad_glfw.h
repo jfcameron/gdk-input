@@ -14,6 +14,14 @@ namespace gdk
     class gamepad_glfw final : public gamepad
     {
     private:
+		enum class button_state
+		{
+			UP = 0,
+			JUST_PRESSED,
+			JUST_RELEASED,
+			HELD_DOWN,
+		};
+
         //! glfw index for this joystick
 		index_type m_JoystickIndex;
 
@@ -21,13 +29,10 @@ namespace gdk
         std::string m_Name;
         
         //! Buffer containing most recent button states
-        std::vector<decltype(GLFW_GAMEPAD_BUTTON_A)> m_Buttons;
+        std::vector<button_state> m_Buttons;
        
         //! Buffer containing most recent axis states
         std::vector<axis_value_type> m_Axes;
-
-        //! Buffer containing the most recent hat states
-        std::vector<decltype(GLFW_HAT_CENTERED)> m_Hats;
 
     public:
         /// \brief updates the state of this gamepad
@@ -36,15 +41,15 @@ namespace gdk
 
         virtual axis_value_type get_axis(index_type index, axis_value_type threshold) const override;
         
-        virtual gamepad::button_state_type get_button_down(index_type index) const override;
+        virtual bool get_button_down(const index_type index) const override;
 
-        virtual gamepad::hat_state_type get_hat(index_type index) const override;
+		virtual bool get_button_just_pressed(const index_type index) const override;
+
+		virtual bool get_button_just_released(const index_type index) const override;
 
         virtual std::string_view get_name() const override;
 
 		virtual std::optional<button_collection_type::size_type> get_any_button_down() const override;
-
-		virtual std::optional<std::pair<index_type, hat_state_type>> get_any_hat_down() const override;
 
 		virtual std::optional<std::pair<index_type, axis_value_type>> get_any_axis_down(axis_value_type threshold) const override;
 
