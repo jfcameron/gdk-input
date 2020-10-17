@@ -44,10 +44,7 @@ int main(int argc, char **argv)
 
 		pInput->update();
 
-		//c.update();
-
-		if (pGamepad->get_axis_just_dropped_below_threshold(0, 0.5f)) std::cout << "dropped\n";
-		if (pGamepad->get_axis_just_exceeded_threshold(0, 0.5f)) std::cout << "exceeded\n";
+		c.update();
 
 		if (pInput->get_key_just_released(keyboard::Key::Escape)) bShouldExit = true;
 	}

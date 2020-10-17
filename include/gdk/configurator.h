@@ -66,6 +66,9 @@ namespace gdk
 		std::string m_LastInputString;
 
 	public:
+		//! gets a copy of the binding names.
+		//decltype(m_Bindings) get_binding_names() const;
+		
 		//! must be called in an update loop
 		void update();
 

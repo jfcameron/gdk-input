@@ -19,6 +19,7 @@ configurator::configurator(decltype(m_pInput) aInput,
 	{
 	case state::select_current_binding:
 	{
+		//TODO: functor, list of binding names + current binding
 		std::cout << "select a binding to perform an action to\n";
 
 		std::cout << *m_iCurrentBinding << "\n";
@@ -26,6 +27,7 @@ configurator::configurator(decltype(m_pInput) aInput,
 
 	case state::choose_current_binding_action:
 	{
+		//TODO: functor, list actions + current action
 		std::cout << "choose action to perform on " << (*m_iCurrentBinding) << "\n";
 
 		std::cout << m_iCurrentAction->first << "\n";
@@ -66,6 +68,11 @@ configurator::configurator(decltype(m_pInput) aInput,
 
 	m_StateMachine.set(state::select_current_binding);
 }
+
+/*decltype(configurator::m_Bindings) configurator::get_binding_names() const
+{
+	return m_Bindings;
+}*/
 
 void configurator::update()
 {

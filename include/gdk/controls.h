@@ -1,4 +1,4 @@
-// © 2019 Joseph Cameron - All Rights Reserved
+// © 2019, 2020 Joseph Cameron - All Rights Reserved
 
 #ifndef GDK_CONTROLS_H
 #define GDK_CONTROLS_H
