@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="icon.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">gdk-input
-   &#160;<span id="projectnumber">1cf7fc251d0b7a12e58a7a8c8f59c84eec3f00c8</span>
+   &#160;<span id="projectnumber">20e12c3ea972d5bced72382957b23f60876766cb</span>
    </div>
   </td>
  </tr>
@@ -90,6 +90,14 @@ using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cla
 using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdk_1_1input_1_1context.html#ad7b7c65ba36b1b49dafd67241dc077c1">context_shared_ptr_type</a> = std::shared_ptr&lt; <a class="el" href="classgdk_1_1input_1_1context.html">gdk::input::context</a> &gt;</td></tr>
 <tr class="memdesc:ad7b7c65ba36b1b49dafd67241dc077c1"><td class="mdescLeft">&#160;</td><td class="mdescRight">shared ptr to a context <br /></td></tr>
 <tr class="separator:ad7b7c65ba36b1b49dafd67241dc077c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7c999d458a0f6364fd7637b5eb5a321d"><td class="memItemLeft" align="right" valign="top"><a id="a7c999d458a0f6364fd7637b5eb5a321d"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdk_1_1input_1_1context.html#a7c999d458a0f6364fd7637b5eb5a321d">gamepad_ptr</a> = std::shared_ptr&lt; <a class="el" href="classgdk_1_1gamepad.html">gamepad</a> &gt;</td></tr>
+<tr class="memdesc:a7c999d458a0f6364fd7637b5eb5a321d"><td class="mdescLeft">&#160;</td><td class="mdescRight">shared ptr to a gamepad <br /></td></tr>
+<tr class="separator:a7c999d458a0f6364fd7637b5eb5a321d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae76b34be359d035bd4a0ff6fe162ee33"><td class="memItemLeft" align="right" valign="top"><a id="ae76b34be359d035bd4a0ff6fe162ee33"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdk_1_1input_1_1context.html#ae76b34be359d035bd4a0ff6fe162ee33">gamepad_collection_type</a> = std::vector&lt; <a class="el" href="classgdk_1_1input_1_1context.html#a7c999d458a0f6364fd7637b5eb5a321d">gamepad_ptr</a> &gt;</td></tr>
+<tr class="memdesc:ae76b34be359d035bd4a0ff6fe162ee33"><td class="mdescLeft">&#160;</td><td class="mdescRight">collection of gamepads <br /></td></tr>
+<tr class="separator:ae76b34be359d035bd4a0ff6fe162ee33"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -102,11 +110,61 @@ virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 <tr class="memdesc:ad290b41c501e6fc97d25a3abeb851329"><td class="mdescLeft">&#160;</td><td class="mdescRight">check if a key was just pressed <br /></td></tr>
 <tr class="separator:ad290b41c501e6fc97d25a3abeb851329"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac79de3fa133389a91de97ac35e221eee"><td class="memItemLeft" align="right" valign="top"><a id="ac79de3fa133389a91de97ac35e221eee"></a>
-virtual bool&#160;</td><td class="memItemRight" valign="bottom"><b>get_key_just_released</b> (const <a class="el" href="classgdk_1_1keyboard.html#aafc81cd9039ebb5d7ca1e65373d2eb0a">keyboard::Key</a> &amp;aKeyCode) const =0</td></tr>
+virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdk_1_1input_1_1context.html#ac79de3fa133389a91de97ac35e221eee">get_key_just_released</a> (const <a class="el" href="classgdk_1_1keyboard.html#aafc81cd9039ebb5d7ca1e65373d2eb0a">keyboard::Key</a> &amp;aKeyCode) const =0</td></tr>
+<tr class="memdesc:ac79de3fa133389a91de97ac35e221eee"><td class="mdescLeft">&#160;</td><td class="mdescRight">check if the key was just released <br /></td></tr>
 <tr class="separator:ac79de3fa133389a91de97ac35e221eee"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a23a5443e3470d3dd4399a661644e1e47"><td class="memItemLeft" align="right" valign="top"><a id="a23a5443e3470d3dd4399a661644e1e47"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdk_1_1input_1_1context.html#a23a5443e3470d3dd4399a661644e1e47">update</a> ()=0</td></tr>
-<tr class="memdesc:a23a5443e3470d3dd4399a661644e1e47"><td class="mdescLeft">&#160;</td><td class="mdescRight">must be called in your loop <br /></td></tr>
+<tr class="memitem:a569b8f089c52730fca2f592bf46bc7ed"><td class="memItemLeft" align="right" valign="top"><a id="a569b8f089c52730fca2f592bf46bc7ed"></a>
+virtual std::optional&lt; <a class="el" href="classgdk_1_1keyboard.html#aafc81cd9039ebb5d7ca1e65373d2eb0a">keyboard::Key</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdk_1_1input_1_1context.html#a569b8f089c52730fca2f592bf46bc7ed">get_any_key_down</a> () const =0</td></tr>
+<tr class="memdesc:a569b8f089c52730fca2f592bf46bc7ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns a key if one is down <br /></td></tr>
+<tr class="separator:a569b8f089c52730fca2f592bf46bc7ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a64a51a43e75131913409516c8b220aba"><td class="memItemLeft" align="right" valign="top"><a id="a64a51a43e75131913409516c8b220aba"></a>
+virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdk_1_1input_1_1context.html#a64a51a43e75131913409516c8b220aba">get_mouse_button_down</a> (const <a class="el" href="classgdk_1_1mouse.html#aeb2869e36d6e8050b557efd1a2c24b3f">mouse::Button</a> &amp;aButton) const =0</td></tr>
+<tr class="memdesc:a64a51a43e75131913409516c8b220aba"><td class="mdescLeft">&#160;</td><td class="mdescRight">check if a mouse button is down (held or just pressed) <br /></td></tr>
+<tr class="separator:a64a51a43e75131913409516c8b220aba"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a97c61d7be94d84da6a9ed6572931b37e"><td class="memItemLeft" align="right" valign="top"><a id="a97c61d7be94d84da6a9ed6572931b37e"></a>
+virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdk_1_1input_1_1context.html#a97c61d7be94d84da6a9ed6572931b37e">get_mouse_button_just_pressed</a> (const <a class="el" href="classgdk_1_1mouse.html#aeb2869e36d6e8050b557efd1a2c24b3f">mouse::Button</a> &amp;aButton) const =0</td></tr>
+<tr class="memdesc:a97c61d7be94d84da6a9ed6572931b37e"><td class="mdescLeft">&#160;</td><td class="mdescRight">check if a mouse button was just pressed <br /></td></tr>
+<tr class="separator:a97c61d7be94d84da6a9ed6572931b37e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a39de0507f5257a959791d25cb1ae698c"><td class="memItemLeft" align="right" valign="top"><a id="a39de0507f5257a959791d25cb1ae698c"></a>
+virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdk_1_1input_1_1context.html#a39de0507f5257a959791d25cb1ae698c">get_mouse_button_just_released</a> (const <a class="el" href="classgdk_1_1mouse.html#aeb2869e36d6e8050b557efd1a2c24b3f">mouse::Button</a> &amp;aButton) const =0</td></tr>
+<tr class="memdesc:a39de0507f5257a959791d25cb1ae698c"><td class="mdescLeft">&#160;</td><td class="mdescRight">check if a mouse button was just released <br /></td></tr>
+<tr class="separator:a39de0507f5257a959791d25cb1ae698c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a38bcb8148efed33b4530fc7964ff138b"><td class="memItemLeft" align="right" valign="top"><a id="a38bcb8148efed33b4530fc7964ff138b"></a>
+virtual std::optional&lt; <a class="el" href="classgdk_1_1mouse.html#aeb2869e36d6e8050b557efd1a2c24b3f">mouse::Button</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdk_1_1input_1_1context.html#a38bcb8148efed33b4530fc7964ff138b">get_any_mouse_button_down</a> () const =0</td></tr>
+<tr class="memdesc:a38bcb8148efed33b4530fc7964ff138b"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns a mouse button if one is down <br /></td></tr>
+<tr class="separator:a38bcb8148efed33b4530fc7964ff138b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a60f9c743a75bd8bbcb764e7aa483c952"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="structgdk_1_1mouse_1_1cursor__2d__type.html">mouse::cursor_2d_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdk_1_1input_1_1context.html#a60f9c743a75bd8bbcb764e7aa483c952">get_mouse_cursor_position</a> () const =0</td></tr>
+<tr class="memdesc:a60f9c743a75bd8bbcb764e7aa483c952"><td class="mdescLeft">&#160;</td><td class="mdescRight">get the cursor coordinates  <a href="#a60f9c743a75bd8bbcb764e7aa483c952">More...</a><br /></td></tr>
+<tr class="separator:a60f9c743a75bd8bbcb764e7aa483c952"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab5055b98d8fc11bf38f0916fa7621db0"><td class="memItemLeft" align="right" valign="top"><a id="ab5055b98d8fc11bf38f0916fa7621db0"></a>
+virtual <a class="el" href="structgdk_1_1mouse_1_1cursor__2d__type.html">mouse::cursor_2d_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdk_1_1input_1_1context.html#ab5055b98d8fc11bf38f0916fa7621db0">get_mouse_delta</a> () const =0</td></tr>
+<tr class="memdesc:ab5055b98d8fc11bf38f0916fa7621db0"><td class="mdescLeft">&#160;</td><td class="mdescRight">get the distance the cursor has moved since last delta in unnormalized screen coordinates this value is still reliable in cursor locked mode the value is multiplied by a scalar set via set_mouse_delta_sensitivity <br /></td></tr>
+<tr class="separator:ab5055b98d8fc11bf38f0916fa7621db0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa572a43ece7b5bf0af7a06457ab924e5"><td class="memItemLeft" align="right" valign="top"><a id="aa572a43ece7b5bf0af7a06457ab924e5"></a>
+virtual std::optional&lt; <a class="el" href="classgdk_1_1mouse.html#a1020e84be3a50feaf2275d72223cc3f5">mouse::Axis</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdk_1_1input_1_1context.html#aa572a43ece7b5bf0af7a06457ab924e5">get_any_mouse_axis_down</a> (float threshold) const =0</td></tr>
+<tr class="memdesc:aa572a43ece7b5bf0af7a06457ab924e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns a mouse axis if one is nonzero. <br /></td></tr>
+<tr class="separator:aa572a43ece7b5bf0af7a06457ab924e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a920b8210a87a838c4c7f687dde86d380"><td class="memItemLeft" align="right" valign="top"><a id="a920b8210a87a838c4c7f687dde86d380"></a>
+virtual <a class="el" href="classgdk_1_1mouse.html#a80626bf3a8774d64fef0f8e99a65e6ff">mouse::CursorMode</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdk_1_1input_1_1context.html#a920b8210a87a838c4c7f687dde86d380">get_mouse_cursor_mode</a> () const =0</td></tr>
+<tr class="memdesc:a920b8210a87a838c4c7f687dde86d380"><td class="mdescLeft">&#160;</td><td class="mdescRight">gets the cursor mdoe <br /></td></tr>
+<tr class="separator:a920b8210a87a838c4c7f687dde86d380"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa29f728d33667476b6f1a6f778df8817"><td class="memItemLeft" align="right" valign="top"><a id="aa29f728d33667476b6f1a6f778df8817"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdk_1_1input_1_1context.html#aa29f728d33667476b6f1a6f778df8817">set_mouse_cursor_mode</a> (<a class="el" href="classgdk_1_1mouse.html#a80626bf3a8774d64fef0f8e99a65e6ff">mouse::CursorMode</a> mode)=0</td></tr>
+<tr class="memdesc:aa29f728d33667476b6f1a6f778df8817"><td class="mdescLeft">&#160;</td><td class="mdescRight">affects cursor behaviour <br /></td></tr>
+<tr class="separator:aa29f728d33667476b6f1a6f778df8817"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1bf258096b616d4fbb79df4b257fc5d7"><td class="memItemLeft" align="right" valign="top"><a id="a1bf258096b616d4fbb79df4b257fc5d7"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdk_1_1input_1_1context.html#a1bf258096b616d4fbb79df4b257fc5d7">set_mouse_delta_sensitivity</a> (const double sens)=0</td></tr>
+<tr class="memdesc:a1bf258096b616d4fbb79df4b257fc5d7"><td class="mdescLeft">&#160;</td><td class="mdescRight">affects the values returned by <a class="el" href="classgdk_1_1input_1_1context.html#ab5055b98d8fc11bf38f0916fa7621db0" title="get the distance the cursor has moved since last delta in unnormalized screen coordinates this value ...">get_mouse_delta()</a> <br /></td></tr>
+<tr class="separator:a1bf258096b616d4fbb79df4b257fc5d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad0a5a3541a9a093299eb132ea09743da"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classgdk_1_1input_1_1context.html#a7c999d458a0f6364fd7637b5eb5a321d">gamepad_ptr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdk_1_1input_1_1context.html#ad0a5a3541a9a093299eb132ea09743da">get_gamepad</a> (const size_t index)=0</td></tr>
+<tr class="memdesc:ad0a5a3541a9a093299eb132ea09743da"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns a ptr to a gamepad  <a href="#ad0a5a3541a9a093299eb132ea09743da">More...</a><br /></td></tr>
+<tr class="separator:ad0a5a3541a9a093299eb132ea09743da"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a358a643146da788d57c202a469806538"><td class="memItemLeft" align="right" valign="top"><a id="a358a643146da788d57c202a469806538"></a>
+virtual <a class="el" href="classgdk_1_1input_1_1context.html#ae76b34be359d035bd4a0ff6fe162ee33">gamepad_collection_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdk_1_1input_1_1context.html#a358a643146da788d57c202a469806538">get_gamepads</a> ()=0</td></tr>
+<tr class="memdesc:a358a643146da788d57c202a469806538"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns array of all gamepads <br /></td></tr>
+<tr class="separator:a358a643146da788d57c202a469806538"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a23a5443e3470d3dd4399a661644e1e47"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdk_1_1input_1_1context.html#a23a5443e3470d3dd4399a661644e1e47">update</a> ()=0</td></tr>
+<tr class="memdesc:a23a5443e3470d3dd4399a661644e1e47"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns maximum number of connected gamepads this library can handle  <a href="#a23a5443e3470d3dd4399a661644e1e47">More...</a><br /></td></tr>
 <tr class="separator:a23a5443e3470d3dd4399a661644e1e47"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a073c4930cfbf1e182b0f967e24295cda"><td class="memItemLeft" align="right" valign="top"><a id="a073c4930cfbf1e182b0f967e24295cda"></a>
 virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdk_1_1input_1_1context.html#a073c4930cfbf1e182b0f967e24295cda">~context</a> ()=default</td></tr>
@@ -115,7 +173,9 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a4a2a38eaf59fce1354b490426be6bbbe"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classgdk_1_1input_1_1context.html#aee4ccc39b7e24a35ae6ed4a12a59b870">context_ptr_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdk_1_1input_1_1context.html#a4a2a38eaf59fce1354b490426be6bbbe">make</a> (GLFWwindow *const apGLFWWindow)</td></tr>
+<tr class="memitem:a4a2a38eaf59fce1354b490426be6bbbe"><td class="memItemLeft" align="right" valign="top"><a id="a4a2a38eaf59fce1354b490426be6bbbe"></a>
+static <a class="el" href="classgdk_1_1input_1_1context.html#aee4ccc39b7e24a35ae6ed4a12a59b870">context_ptr_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdk_1_1input_1_1context.html#a4a2a38eaf59fce1354b490426be6bbbe">make</a> (GLFWwindow *const apGLFWWindow)</td></tr>
+<tr class="memdesc:a4a2a38eaf59fce1354b490426be6bbbe"><td class="mdescLeft">&#160;</td><td class="mdescRight">create a context from a glfw window  the implementation does not have any ownership over the pointer. It is up to the user to guarantee the glfw window's lifetime exceeds the context <br /></td></tr>
 <tr class="separator:a4a2a38eaf59fce1354b490426be6bbbe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
@@ -128,8 +188,8 @@ Protected Member Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>intermediary between the user and the underlying implementation. provides common interface and manages state </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="a4a2a38eaf59fce1354b490426be6bbbe"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4a2a38eaf59fce1354b490426be6bbbe">&#9670;&nbsp;</a></span>make()</h2>
+<a id="ad0a5a3541a9a093299eb132ea09743da"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad0a5a3541a9a093299eb132ea09743da">&#9670;&nbsp;</a></span>get_gamepad()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -138,20 +198,78 @@ Protected Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static <a class="el" href="classgdk_1_1input_1_1context.html#aee4ccc39b7e24a35ae6ed4a12a59b870">context_ptr_type</a> gdk::input::context::make </td>
+          <td class="memname">virtual <a class="el" href="classgdk_1_1input_1_1context.html#a7c999d458a0f6364fd7637b5eb5a321d">gamepad_ptr</a> gdk::input::context::get_gamepad </td>
           <td>(</td>
-          <td class="paramtype">GLFWwindow *const&#160;</td>
-          <td class="paramname"><em>apGLFWWindow</em></td><td>)</td>
+          <td class="paramtype">const size_t&#160;</td>
+          <td class="paramname"><em>index</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>create a context from a glfw window  the implementation does not have any ownership over the pointer. It is up to the user to guarantee the glfw window's lifetime exceeds the context </p>
+
+<p>returns a ptr to a gamepad </p>
+<p>the order of gamepads is the order in which they were connected to the device the index refers to a poisition in that order. the gamepad ptr is guaranteed not to be null, even if there are less than N gamepads connected, such a gamepad will simply return 0 for all input polling. </p>
+
+</div>
+</div>
+<a id="a60f9c743a75bd8bbcb764e7aa483c952"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a60f9c743a75bd8bbcb764e7aa483c952">&#9670;&nbsp;</a></span>get_mouse_cursor_position()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="structgdk_1_1mouse_1_1cursor__2d__type.html">mouse::cursor_2d_type</a> gdk::input::context::get_mouse_cursor_position </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>get the cursor coordinates </p>
+<p>cursor coordinates are normalized across the size of the window. 0,0 is bottom left, 1,1 is top right </p>
+
+</div>
+</div>
+<a id="a23a5443e3470d3dd4399a661644e1e47"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a23a5443e3470d3dd4399a661644e1e47">&#9670;&nbsp;</a></span>update()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void gdk::input::context::update </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>returns maximum number of connected gamepads this library can handle </p>
+<p>returns the number of gamepads currently connected to the devicemust be called in your loop </p>
 
 </div>
 </div>

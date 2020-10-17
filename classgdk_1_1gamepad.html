@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="icon.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">gdk-input
-   &#160;<span id="projectnumber">1cf7fc251d0b7a12e58a7a8c8f59c84eec3f00c8</span>
+   &#160;<span id="projectnumber">20e12c3ea972d5bced72382957b23f60876766cb</span>
    </div>
   </td>
  </tr>
@@ -65,7 +65,6 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="classgdk_1_1gamepad-members.html">List of all members</a>  </div>
@@ -79,54 +78,119 @@ $(function() {
 
 <p><code>#include &lt;<a class="el" href="gamepad_8h_source.html">gamepad.h</a>&gt;</code></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
-Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgdk_1_1gamepad_1_1hat__state__type.html">hat_state_type</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:ab3bbc034e6e4d356e8c7860cc94f4f4c"><td class="memItemLeft" align="right" valign="top"><a id="ab3bbc034e6e4d356e8c7860cc94f4f4c"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>size_type</b> = size_t</td></tr>
-<tr class="separator:ab3bbc034e6e4d356e8c7860cc94f4f4c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4855e66a8dd52e8d4071da16e8685a49"><td class="memItemLeft" align="right" valign="top"><a id="a4855e66a8dd52e8d4071da16e8685a49"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>button_state_type</b> = bool</td></tr>
-<tr class="separator:a4855e66a8dd52e8d4071da16e8685a49"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae2c016e513c24c4b907a4a97308ac5f4"><td class="memItemLeft" align="right" valign="top"><a id="ae2c016e513c24c4b907a4a97308ac5f4"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdk_1_1gamepad.html#ae2c016e513c24c4b907a4a97308ac5f4">index_type</a> = short unsigned int</td></tr>
+<tr class="memdesc:ae2c016e513c24c4b907a4a97308ac5f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">type used to index buttons, axes <br /></td></tr>
+<tr class="separator:ae2c016e513c24c4b907a4a97308ac5f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a58c3c9a62b2d1d515bafaf78e5f09d29"><td class="memItemLeft" align="right" valign="top"><a id="a58c3c9a62b2d1d515bafaf78e5f09d29"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdk_1_1gamepad.html#a58c3c9a62b2d1d515bafaf78e5f09d29">button_collection_type</a> = std::vector&lt; bool &gt;</td></tr>
+<tr class="memdesc:a58c3c9a62b2d1d515bafaf78e5f09d29"><td class="mdescLeft">&#160;</td><td class="mdescRight">type used to store a collection of buttons <br /></td></tr>
+<tr class="separator:a58c3c9a62b2d1d515bafaf78e5f09d29"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae32201163fb41c6d2a09856971c0778b"><td class="memItemLeft" align="right" valign="top"><a id="ae32201163fb41c6d2a09856971c0778b"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdk_1_1gamepad.html#ae32201163fb41c6d2a09856971c0778b">axis_value_type</a> = float</td></tr>
+<tr class="memdesc:ae32201163fb41c6d2a09856971c0778b"><td class="mdescLeft">&#160;</td><td class="mdescRight">precision type used to store value of an axis <br /></td></tr>
+<tr class="separator:ae32201163fb41c6d2a09856971c0778b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a89e5d1f2745e90857ed97eb1c37c6ced"><td class="memItemLeft" align="right" valign="top"><a id="a89e5d1f2745e90857ed97eb1c37c6ced"></a>
-virtual std::string_view&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdk_1_1gamepad.html#a89e5d1f2745e90857ed97eb1c37c6ced">getName</a> () const =0</td></tr>
-<tr class="memdesc:a89e5d1f2745e90857ed97eb1c37c6ced"><td class="mdescLeft">&#160;</td><td class="mdescRight">human readable device name <br /></td></tr>
-<tr class="separator:a89e5d1f2745e90857ed97eb1c37c6ced"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a97461ad8a5cfeda40a17fb0d2dddc8e0"><td class="memItemLeft" align="right" valign="top"><a id="a97461ad8a5cfeda40a17fb0d2dddc8e0"></a>
-virtual float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdk_1_1gamepad.html#a97461ad8a5cfeda40a17fb0d2dddc8e0">getAxis</a> (int index) const =0</td></tr>
-<tr class="memdesc:a97461ad8a5cfeda40a17fb0d2dddc8e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">normalized magnitude of axis. 0 = no input, 1 = full input <br /></td></tr>
-<tr class="separator:a97461ad8a5cfeda40a17fb0d2dddc8e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ace4a9c8af6ecbff6791588591a84a621"><td class="memItemLeft" align="right" valign="top"><a id="ace4a9c8af6ecbff6791588591a84a621"></a>
-virtual size_type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdk_1_1gamepad.html#ace4a9c8af6ecbff6791588591a84a621">getAxisCount</a> () const =0</td></tr>
-<tr class="memdesc:ace4a9c8af6ecbff6791588591a84a621"><td class="mdescLeft">&#160;</td><td class="mdescRight">number of axes <br /></td></tr>
-<tr class="separator:ace4a9c8af6ecbff6791588591a84a621"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af6a3deec3853cbd22d4d1b32c7b9eed3"><td class="memItemLeft" align="right" valign="top"><a id="af6a3deec3853cbd22d4d1b32c7b9eed3"></a>
-virtual button_state_type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdk_1_1gamepad.html#af6a3deec3853cbd22d4d1b32c7b9eed3">getButtonDown</a> (int index) const =0</td></tr>
-<tr class="memdesc:af6a3deec3853cbd22d4d1b32c7b9eed3"><td class="mdescLeft">&#160;</td><td class="mdescRight">whether or not the button is being held down by the user <br /></td></tr>
-<tr class="separator:af6a3deec3853cbd22d4d1b32c7b9eed3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ade80afcb4179820568be3237d838e174"><td class="memItemLeft" align="right" valign="top"><a id="ade80afcb4179820568be3237d838e174"></a>
-virtual size_type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdk_1_1gamepad.html#ade80afcb4179820568be3237d838e174">getButtonCount</a> () const =0</td></tr>
-<tr class="memdesc:ade80afcb4179820568be3237d838e174"><td class="mdescLeft">&#160;</td><td class="mdescRight">number of buttons <br /></td></tr>
-<tr class="separator:ade80afcb4179820568be3237d838e174"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae5dec5c0c99e9d81ca6a2255fbd10141"><td class="memItemLeft" align="right" valign="top"><a id="ae5dec5c0c99e9d81ca6a2255fbd10141"></a>
-virtual <a class="el" href="structgdk_1_1gamepad_1_1hat__state__type.html">hat_state_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdk_1_1gamepad.html#ae5dec5c0c99e9d81ca6a2255fbd10141">getHat</a> (int index) const =0</td></tr>
-<tr class="memdesc:ae5dec5c0c99e9d81ca6a2255fbd10141"><td class="mdescLeft">&#160;</td><td class="mdescRight">value of a hat direction by index <br /></td></tr>
-<tr class="separator:ae5dec5c0c99e9d81ca6a2255fbd10141"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1a91bb226632f96105da81ba3e093550"><td class="memItemLeft" align="right" valign="top"><a id="a1a91bb226632f96105da81ba3e093550"></a>
-virtual size_type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdk_1_1gamepad.html#a1a91bb226632f96105da81ba3e093550">getHatCount</a> () const =0</td></tr>
-<tr class="memdesc:a1a91bb226632f96105da81ba3e093550"><td class="mdescLeft">&#160;</td><td class="mdescRight">number of hats <br /></td></tr>
-<tr class="separator:a1a91bb226632f96105da81ba3e093550"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a76a5aab6ae54a3a3b07c7bbba5872f86"><td class="memItemLeft" align="right" valign="top"><a id="a76a5aab6ae54a3a3b07c7bbba5872f86"></a>
+virtual std::string_view&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdk_1_1gamepad.html#a76a5aab6ae54a3a3b07c7bbba5872f86">get_name</a> () const =0</td></tr>
+<tr class="memdesc:a76a5aab6ae54a3a3b07c7bbba5872f86"><td class="mdescLeft">&#160;</td><td class="mdescRight">human readable device name <br /></td></tr>
+<tr class="separator:a76a5aab6ae54a3a3b07c7bbba5872f86"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abb4d1315054542f802bbc1ae073b3e3e"><td class="memItemLeft" align="right" valign="top"><a id="abb4d1315054542f802bbc1ae073b3e3e"></a>
+virtual <a class="el" href="classgdk_1_1gamepad.html#ae32201163fb41c6d2a09856971c0778b">axis_value_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdk_1_1gamepad.html#abb4d1315054542f802bbc1ae073b3e3e">get_axis</a> (const <a class="el" href="classgdk_1_1gamepad.html#ae2c016e513c24c4b907a4a97308ac5f4">index_type</a> index, const <a class="el" href="classgdk_1_1gamepad.html#ae32201163fb41c6d2a09856971c0778b">axis_value_type</a> threshold=0.1f) const =0</td></tr>
+<tr class="memdesc:abb4d1315054542f802bbc1ae073b3e3e"><td class="mdescLeft">&#160;</td><td class="mdescRight">normalized magnitude of axis. 0 = no input, 1 = full input <br /></td></tr>
+<tr class="separator:abb4d1315054542f802bbc1ae073b3e3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a35b89f3949db981929c24d089e81ecda"><td class="memItemLeft" align="right" valign="top"><a id="a35b89f3949db981929c24d089e81ecda"></a>
+virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdk_1_1gamepad.html#a35b89f3949db981929c24d089e81ecda">get_axis_just_exceeded_threshold</a> (const <a class="el" href="classgdk_1_1gamepad.html#ae2c016e513c24c4b907a4a97308ac5f4">index_type</a> index, const <a class="el" href="classgdk_1_1gamepad.html#ae32201163fb41c6d2a09856971c0778b">axis_value_type</a> threshold=0.1f) const =0</td></tr>
+<tr class="memdesc:a35b89f3949db981929c24d089e81ecda"><td class="mdescLeft">&#160;</td><td class="mdescRight">true if just exceeded threshold <br /></td></tr>
+<tr class="separator:a35b89f3949db981929c24d089e81ecda"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a383f8ef22d515a9660396626159acfc0"><td class="memItemLeft" align="right" valign="top"><a id="a383f8ef22d515a9660396626159acfc0"></a>
+virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdk_1_1gamepad.html#a383f8ef22d515a9660396626159acfc0">get_axis_just_dropped_below_threshold</a> (const <a class="el" href="classgdk_1_1gamepad.html#ae2c016e513c24c4b907a4a97308ac5f4">index_type</a> index, const <a class="el" href="classgdk_1_1gamepad.html#ae32201163fb41c6d2a09856971c0778b">axis_value_type</a> threshold=0.1f) const =0</td></tr>
+<tr class="memdesc:a383f8ef22d515a9660396626159acfc0"><td class="mdescLeft">&#160;</td><td class="mdescRight">true if just dropped below threshold <br /></td></tr>
+<tr class="separator:a383f8ef22d515a9660396626159acfc0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7150c748f5898aba94a3d0d5e5b82e7d"><td class="memItemLeft" align="right" valign="top">virtual std::optional&lt; std::pair&lt; <a class="el" href="classgdk_1_1gamepad.html#ae2c016e513c24c4b907a4a97308ac5f4">index_type</a>, <a class="el" href="classgdk_1_1gamepad.html#ae32201163fb41c6d2a09856971c0778b">axis_value_type</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdk_1_1gamepad.html#a7150c748f5898aba94a3d0d5e5b82e7d">get_any_axis_down</a> (<a class="el" href="classgdk_1_1gamepad.html#ae32201163fb41c6d2a09856971c0778b">axis_value_type</a> threshold=0.1f) const =0</td></tr>
+<tr class="memdesc:a7150c748f5898aba94a3d0d5e5b82e7d"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns an axis if one is down, otherwise the optional will be null  <a href="#a7150c748f5898aba94a3d0d5e5b82e7d">More...</a><br /></td></tr>
+<tr class="separator:a7150c748f5898aba94a3d0d5e5b82e7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a50ce07f09627e238ef96e2d5d14d5180"><td class="memItemLeft" align="right" valign="top"><a id="a50ce07f09627e238ef96e2d5d14d5180"></a>
+virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdk_1_1gamepad.html#a50ce07f09627e238ef96e2d5d14d5180">get_button_down</a> (const <a class="el" href="classgdk_1_1gamepad.html#ae2c016e513c24c4b907a4a97308ac5f4">index_type</a> index) const =0</td></tr>
+<tr class="memdesc:a50ce07f09627e238ef96e2d5d14d5180"><td class="mdescLeft">&#160;</td><td class="mdescRight">whether or not the button is being held down by the user <br /></td></tr>
+<tr class="separator:a50ce07f09627e238ef96e2d5d14d5180"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ade00ae83aa35031f94edc3ed5a3d8579"><td class="memItemLeft" align="right" valign="top"><a id="ade00ae83aa35031f94edc3ed5a3d8579"></a>
+virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdk_1_1gamepad.html#ade00ae83aa35031f94edc3ed5a3d8579">get_button_just_pressed</a> (const <a class="el" href="classgdk_1_1gamepad.html#ae2c016e513c24c4b907a4a97308ac5f4">index_type</a> index) const =0</td></tr>
+<tr class="memdesc:ade00ae83aa35031f94edc3ed5a3d8579"><td class="mdescLeft">&#160;</td><td class="mdescRight">whether or not the button was just pressed this frame <br /></td></tr>
+<tr class="separator:ade00ae83aa35031f94edc3ed5a3d8579"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9dac384b19c2645d7a1d851a07691fa2"><td class="memItemLeft" align="right" valign="top"><a id="a9dac384b19c2645d7a1d851a07691fa2"></a>
+virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdk_1_1gamepad.html#a9dac384b19c2645d7a1d851a07691fa2">get_button_just_released</a> (const <a class="el" href="classgdk_1_1gamepad.html#ae2c016e513c24c4b907a4a97308ac5f4">index_type</a> index) const =0</td></tr>
+<tr class="memdesc:a9dac384b19c2645d7a1d851a07691fa2"><td class="mdescLeft">&#160;</td><td class="mdescRight">whether or not the button was just released this frame <br /></td></tr>
+<tr class="separator:a9dac384b19c2645d7a1d851a07691fa2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae9051f4cae1f01d9fb260f79dfe89c7d"><td class="memItemLeft" align="right" valign="top">virtual std::optional&lt; button_collection_type::size_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgdk_1_1gamepad.html#ae9051f4cae1f01d9fb260f79dfe89c7d">get_any_button_down</a> () const =0</td></tr>
+<tr class="memdesc:ae9051f4cae1f01d9fb260f79dfe89c7d"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns a button if any button is down, otherwise the optional will be null  <a href="#ae9051f4cae1f01d9fb260f79dfe89c7d">More...</a><br /></td></tr>
+<tr class="separator:ae9051f4cae1f01d9fb260f79dfe89c7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>gamepad interface </p>
-</div><hr/>The documentation for this class was generated from the following file:<ul>
+</div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="a7150c748f5898aba94a3d0d5e5b82e7d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7150c748f5898aba94a3d0d5e5b82e7d">&#9670;&nbsp;</a></span>get_any_axis_down()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual std::optional&lt;std::pair&lt;<a class="el" href="classgdk_1_1gamepad.html#ae2c016e513c24c4b907a4a97308ac5f4">index_type</a>, <a class="el" href="classgdk_1_1gamepad.html#ae32201163fb41c6d2a09856971c0778b">axis_value_type</a>&gt; &gt; gdk::gamepad::get_any_axis_down </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classgdk_1_1gamepad.html#ae32201163fb41c6d2a09856971c0778b">axis_value_type</a>&#160;</td>
+          <td class="paramname"><em>threshold</em> = <code>0.1f</code></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>returns an axis if one is down, otherwise the optional will be null </p>
+<dl class="section warning"><dt>Warning</dt><dd>If multiple axes are down, the first found is returned. Order should be considered arbitrary </dd></dl>
+
+</div>
+</div>
+<a id="ae9051f4cae1f01d9fb260f79dfe89c7d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae9051f4cae1f01d9fb260f79dfe89c7d">&#9670;&nbsp;</a></span>get_any_button_down()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual std::optional&lt;button_collection_type::size_type&gt; gdk::gamepad::get_any_button_down </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>returns a button if any button is down, otherwise the optional will be null </p>
+<dl class="section warning"><dt>Warning</dt><dd>If multiple buttons are down, the first found is returned. Order should be considered arbitrary </dd></dl>
+
+</div>
+</div>
+<hr/>The documentation for this class was generated from the following file:<ul>
 <li>/home/travis/build/jfcameron/gdk-input/include/gdk/<a class="el" href="gamepad_8h_source.html">gamepad.h</a></li>
 </ul>
 </div><!-- contents -->
