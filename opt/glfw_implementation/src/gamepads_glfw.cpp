@@ -1,12 +1,13 @@
 // © 2019, 2020 Joseph Cameron - All Rights Reserved
 
 #include <cassert>
+#include <cmath>
 #include <cstdio>
 #include <cstring>
 #include <iostream>
+#include <iostream>
 #include <map>
 #include <vector>
-#include <iostream>
 
 #include <gdk/gamepad_glfw.h>
 
