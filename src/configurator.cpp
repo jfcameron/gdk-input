@@ -2,6 +2,7 @@
 
 #include <gdk/configurator.h>
 
+#include <cmath>
 #include <iostream>
 #include <sstream>
 
