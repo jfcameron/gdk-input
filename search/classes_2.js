@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['hat_5fstate_5ftype',['hat_state_type',['../structgdk_1_1gamepad_1_1hat__state__type.html',1,'gdk::gamepad']]]
+  ['keyboard_5fglfw_0',['keyboard_glfw',['../classgdk_1_1keyboard__glfw.html',1,'gdk']]]
 ];

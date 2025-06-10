@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['keyboard',['keyboard',['../classgdk_1_1keyboard.html',1,'gdk']]]
+  ['mouse_5fglfw_0',['mouse_glfw',['../classgdk_1_1mouse__glfw.html',1,'gdk']]]
 ];

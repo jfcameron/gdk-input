@@ -1,10 +1,11 @@
 var searchData=
 [
-  ['addgamepadaxistomapping',['addGamepadAxisToMapping',['../classgdk_1_1controls.html#a34d9cb2f646ae1f080b66a379f937669',1,'gdk::controls']]],
-  ['addgamepadbuttontomapping',['addGamepadButtonToMapping',['../classgdk_1_1controls.html#a46287aad78aff320958322d5a94fc82d',1,'gdk::controls']]],
-  ['addgamepadhattomapping',['addGamepadHatToMapping',['../classgdk_1_1controls.html#af3c72e5a88058c11aa2f51a24ab15b62',1,'gdk::controls']]],
-  ['addkeytomapping',['addKeyToMapping',['../classgdk_1_1controls.html#a8c32dd0bc32c6dda0b8a5e07c29f2020',1,'gdk::controls']]],
-  ['addmouseaxistomapping',['addMouseAxisToMapping',['../classgdk_1_1controls.html#a60a87c8ebbb29f7f1275ea358e366eb2',1,'gdk::controls']]],
-  ['addmousebuttontomapping',['addMouseButtonToMapping',['../classgdk_1_1controls.html#a6b3123439fb5b2a251a17289394b3bdd',1,'gdk::controls']]],
-  ['axis',['Axis',['../classgdk_1_1mouse.html#a1020e84be3a50feaf2275d72223cc3f5',1,'gdk::mouse']]]
+  ['any_5faxis_5fdown_0',['any_axis_down',['../classgdk_1_1gamepad.html#ab74a9c1655aad0372378eaa4267bad0b',1,'gdk::gamepad::any_axis_down()'],['../classgdk_1_1gamepad__glfw.html#a26b808bf84d511b60647196a09e66ebe',1,'gdk::gamepad_glfw::any_axis_down()']]],
+  ['any_5fbutton_5fdown_1',['any_button_down',['../classgdk_1_1gamepad.html#a0c9b839345ca2d413f0bcb415910acec',1,'gdk::gamepad::any_button_down()'],['../classgdk_1_1gamepad__glfw.html#afc44c5aa8872aff8bcd6224c85cf7bd6',1,'gdk::gamepad_glfw::any_button_down()']]],
+  ['any_5fkey_5fdown_2',['any_key_down',['../classgdk_1_1input_1_1context.html#a2492381616eede68cb925402e69c2cf6',1,'gdk::input::context::any_key_down()'],['../classgdk_1_1input_1_1glfw__context.html#ac8c4cc5a9cd37afe69cde559b0b10c1e',1,'gdk::input::glfw_context::any_key_down()']]],
+  ['any_5fmouse_5faxis_5fdown_3',['any_mouse_axis_down',['../classgdk_1_1input_1_1context.html#add9623c738f29e2077844ae0242263d6',1,'gdk::input::context::any_mouse_axis_down()'],['../classgdk_1_1input_1_1glfw__context.html#a44e554c37195252491cd690aba40fcce',1,'gdk::input::glfw_context::any_mouse_axis_down()']]],
+  ['any_5fmouse_5fbutton_5fdown_4',['any_mouse_button_down',['../classgdk_1_1input_1_1context.html#a8b62e507d29d53bde5467d9c69b5b27f',1,'gdk::input::context::any_mouse_button_down()'],['../classgdk_1_1input_1_1glfw__context.html#ab22f6a30586987ec2fb61ecd3297403e',1,'gdk::input::glfw_context::any_mouse_button_down()']]],
+  ['axis_5',['axis',['../classgdk_1_1gamepad.html#ae25fd0baa6d04ca2e0724b1eb7337fa5',1,'gdk::gamepad::axis()'],['../classgdk_1_1gamepad__glfw.html#a4af7198802c75ea998c209923e6f08bf',1,'gdk::gamepad_glfw::axis()']]],
+  ['axis_5fjust_5fdropped_5fbelow_5fthreshold_6',['axis_just_dropped_below_threshold',['../classgdk_1_1gamepad.html#a18c6b3476856893477cd84eddf345042',1,'gdk::gamepad::axis_just_dropped_below_threshold()'],['../classgdk_1_1gamepad__glfw.html#a36c3ecf3d5c12a41fe65603dbf9d053c',1,'gdk::gamepad_glfw::axis_just_dropped_below_threshold()']]],
+  ['axis_5fjust_5fexceeded_5fthreshold_7',['axis_just_exceeded_threshold',['../classgdk_1_1gamepad.html#a9b13c7243ea1152e77ea024f4cfb7229',1,'gdk::gamepad::axis_just_exceeded_threshold()'],['../classgdk_1_1gamepad__glfw.html#a21e4c252fc8e72f922e30940894e5659',1,'gdk::gamepad_glfw::axis_just_exceeded_threshold()']]]
 ];

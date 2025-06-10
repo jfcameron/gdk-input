@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['controls',['controls',['../classgdk_1_1controls.html',1,'gdk']]],
-  ['cursor_5f2d_5ftype',['cursor_2d_type',['../structgdk_1_1mouse_1_1cursor__2d__type.html',1,'gdk::mouse']]],
-  ['cursormode',['CursorMode',['../classgdk_1_1mouse.html#a80626bf3a8774d64fef0f8e99a65e6ff',1,'gdk::mouse']]]
+  ['connected_0',['connected',['../classgdk_1_1gamepad.html#aef2bc20e1a78ed222b0b03d9a5489a32',1,'gdk::gamepad::connected()'],['../classgdk_1_1gamepad__glfw.html#aff3e74939e61f9d1da8eca7239ed8a29',1,'gdk::gamepad_glfw::connected()']]],
+  ['context_1',['context',['../classgdk_1_1input_1_1context.html',1,'gdk::input::context'],['../classgdk_1_1input_1_1context.html#a93324d1253cfdb11ab4cdc0c3e3465a8',1,'gdk::input::context::context()']]],
+  ['cursor_5f2d_5ftype_2',['cursor_2d_type',['../structgdk_1_1mouse_1_1cursor__2d__type.html',1,'gdk::mouse']]]
 ];

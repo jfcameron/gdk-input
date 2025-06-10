@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['make',['make',['../classgdk_1_1controls.html#a4dce7b58a83670bd903a41318f1e9304',1,'gdk::controls']]],
-  ['make_5ffrom_5fjson',['make_from_json',['../classgdk_1_1controls.html#aa06b14f94a48a6a2d4b6d6df340bc03f',1,'gdk::controls']]]
+  ['connected_0',['connected',['../classgdk_1_1gamepad.html#aef2bc20e1a78ed222b0b03d9a5489a32',1,'gdk::gamepad::connected()'],['../classgdk_1_1gamepad__glfw.html#aff3e74939e61f9d1da8eca7239ed8a29',1,'gdk::gamepad_glfw::connected()']]],
+  ['context_1',['context',['../classgdk_1_1input_1_1context.html#a93324d1253cfdb11ab4cdc0c3e3465a8',1,'gdk::input::context']]]
 ];
