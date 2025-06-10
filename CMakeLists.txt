@@ -2,7 +2,7 @@
 
 cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
 
-include("${CMAKE_CURRENT_SOURCE_DIR}/jfc-cmake/jfclib.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/jfc-cmake/jfclib.cmake")
 
 project(null)
 
@@ -29,7 +29,7 @@ endif()
 
 jfc_project(library
     NAME "gdkinput"
-    VERSION 0.0
+    VERSION 0.9
     DESCRIPTION "game development kit human input device library"
     C++_STANDARD 17
     C_STANDARD 90
