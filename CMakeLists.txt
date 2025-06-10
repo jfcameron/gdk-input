@@ -16,15 +16,14 @@ add_subdirectory(thirdparty)
 
 if (GDK_INPUT_IMPLEMENTATION_GLFW) 
     set(implementation_source_list "${implementation_source_list}"
-        ${CMAKE_CURRENT_SOURCE_DIR}/impl/src/glfw_context.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/impl/src/glfw_gamepad.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/impl/src/glfw_keyboard.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/impl/src/glfw_mouse.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/enum_ostreams.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/impl/glfw/src/glfw_context.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/impl/glfw/src/glfw_gamepad.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/impl/glfw/src/glfw_keyboard.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/impl/glfw/src/glfw_mouse.cpp
     )
 
     set(implementation_header_paths "${implementation_header_paths}"
-        ${CMAKE_CURRENT_SOURCE_DIR}/impl/include)
+        ${CMAKE_CURRENT_SOURCE_DIR}/impl/glfw/include)
 endif()
 
 jfc_project(library
