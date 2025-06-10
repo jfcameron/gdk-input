@@ -1,5 +1,5 @@
 [submodule "thirdparty/glfw"]
-	path = thirdparty/glfw
+	path = extern/glfw
 	url = https://github.com/glfw/glfw.git
 [submodule "cmake/jfc-cmake"]
 	path = cmake/jfc-cmake

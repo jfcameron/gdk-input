@@ -12,7 +12,7 @@ option(JFC_BUILD_TESTS "Build unit tests" OFF)
 
 set(GDK_INPUT_IMPLEMENTATION_GLFW ON)
 
-add_subdirectory(thirdparty)
+add_subdirectory(extern)
 
 if (GDK_INPUT_IMPLEMENTATION_GLFW) 
     set(implementation_source_list "${implementation_source_list}"
