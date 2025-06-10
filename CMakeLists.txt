@@ -1,4 +1,4 @@
-# © 2019 Joseph Cameron - All Rights Reserved
+# © Joseph Cameron - All Rights Reserved
 
 cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
 
@@ -8,7 +8,7 @@ project(null)
 
 option(JFC_BUILD_DEMO "Build demos" ON)
 option(JFC_BUILD_DOCS  "Build documentation" ON)
-option(JFC_BUILD_TESTS "Build unit tests" ON)
+option(JFC_BUILD_TESTS "Build unit tests" OFF)
 
 set(GDK_INPUT_IMPLEMENTATION_GLFW ON)
 
@@ -16,16 +16,15 @@ add_subdirectory(thirdparty)
 
 if (GDK_INPUT_IMPLEMENTATION_GLFW) 
     set(implementation_source_list "${implementation_source_list}"
-        ${CMAKE_CURRENT_SOURCE_DIR}/opt/glfw_implementation/src/gamepads_glfw.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/opt/glfw_implementation/src/glfw_context.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/opt/glfw_implementation/src/keyboard_glfw.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/opt/glfw_implementation/src/mouse_glfw.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/configurator.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/impl/src/glfw_context.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/impl/src/glfw_gamepad.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/impl/src/glfw_keyboard.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/impl/src/glfw_mouse.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/enum_ostreams.cpp
     )
 
     set(implementation_header_paths "${implementation_header_paths}"
-        ${CMAKE_CURRENT_SOURCE_DIR}/opt/glfw_implementation/include)
+        ${CMAKE_CURRENT_SOURCE_DIR}/impl/include)
 endif()
 
 jfc_project(library
@@ -55,8 +54,6 @@ jfc_project(library
 
     SOURCE_LIST 
 		${CMAKE_CURRENT_SOURCE_DIR}/src/enum_ostreams.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/controls.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/input_context.cpp
         ${implementation_source_list}
 )
 

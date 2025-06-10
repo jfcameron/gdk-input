@@ -1,7 +1,6 @@
-// © 2020 Joseph Cameron - All Rights Reserved
+// © Joseph Cameron - All Rights Reserved
 
-#include <gdk/keyboard.h>
-#include <gdk/mouse.h>
+#include <gdk/input_context.h>
 #include <gdk/gamepad.h>
 
 #include <iostream>
@@ -9,50 +8,10 @@
 
 using namespace gdk;
 
-//Keyboard
-std::ostream& operator<<(std::ostream& s, const keyboard::Key a)
-{
-	s << magic_enum::enum_name(a);
+std::ostream& operator<<(std::ostream& s, const gdk::keyboard::key a) { s << magic_enum::enum_name(a); return s; }
+std::ostream& operator<<(std::ostream& s, const gdk::keyboard::key_state a) { s << magic_enum::enum_name(a); return s; }
+std::ostream& operator<<(std::ostream& s, const gdk::mouse::button a) { s << magic_enum::enum_name(a); return s; }
+std::ostream& operator<<(std::ostream& s, const mouse::axis a) { s << magic_enum::enum_name(a); return s; }
+std::ostream& operator<<(std::ostream& s, const mouse::button_state a) { s << magic_enum::enum_name(a); return s; }
+std::ostream& operator<<(std::ostream& s, const mouse::cursor_mode a) { s << magic_enum::enum_name(a); return s; }
 
-	return s;
-}
-
-//Mouse
-std::ostream& operator<<(std::ostream& s, const mouse::Button a)
-{
-	s << magic_enum::enum_name(a);
-
-	return s;
-}
-std::ostream& operator<<(std::ostream& s, const mouse::ButtonState a)
-{
-	s << magic_enum::enum_name(a);
-
-	return s;
-}
-std::ostream& operator<<(std::ostream& s, const mouse::CursorMode a)
-{
-	s << magic_enum::enum_name(a);
-
-	return s;
-}
-std::ostream& operator<<(std::ostream& s, const mouse::Axis a)
-{
-	s << magic_enum::enum_name(a);
-
-	return s;
-}
-
-//Gamepad
-/*std::ostream& operator<<(std::ostream& s, const gamepad::hat_state_type::vertical_direction a)
-{
-	s << magic_enum::enum_name(a);
-
-	return s;
-}
-std::ostream& operator<<(std::ostream& s, const gamepad::hat_state_type::horizontal_direction a)
-{
-	s << magic_enum::enum_name(a);
-
-	return s;
-}*/
