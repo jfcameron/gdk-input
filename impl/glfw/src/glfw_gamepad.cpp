@@ -106,15 +106,24 @@ void gamepad_glfw::update() {
         return;
     }
 
-    m_Name = glfwGetJoystickName(m_JoystickIndex);
-    
-    m_LastAxes = m_Axes;
-    int count;
-    const float* axes = glfwGetJoystickAxes(m_JoystickIndex, &count);
-    m_Axes = decltype(m_Axes)(axes, axes + (sizeof(axes) / sizeof(axes[0])));
+    if (const auto *pName = glfwGetJoystickName(m_JoystickIndex)) m_Name = pName;
 
-    const unsigned char* raw_buttons = glfwGetJoystickButtons(m_JoystickIndex, &count);
-    std::vector<decltype(GLFW_PRESS)> buttons(raw_buttons, raw_buttons + GLFW_GAMEPAD_BUTTON_LAST + 1);
+    m_LastAxes = m_Axes;
+
+    int axisCount = 0;
+    const float *pAxes = glfwGetJoystickAxes(m_JoystickIndex, &axisCount);
+    m_Axes = pAxes
+        ? decltype(m_Axes)(pAxes, pAxes + axisCount)
+        : decltype(m_Axes)();
+
+    int buttonCount = 0;
+    const unsigned char *pButtons = glfwGetJoystickButtons(m_JoystickIndex, &buttonCount);
+    if (!pButtons) {
+        m_Buttons.clear();
+        return;
+    }
+
+    std::vector<decltype(GLFW_PRESS)> buttons(pButtons, pButtons + buttonCount);
     if (m_Buttons.size() == buttons.size()) {
         for (size_t i(0); i < buttons.size(); ++i) {
             switch (m_Buttons[i])
@@ -146,7 +155,7 @@ void gamepad_glfw::update() {
         }
     }
     else {
-        m_Buttons = std::vector<button_state>(GLFW_GAMEPAD_BUTTON_LAST + 1);
+        m_Buttons = std::vector<button_state>(buttons.size());
     }
 }
 
