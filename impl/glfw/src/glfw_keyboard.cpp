@@ -1,9 +1,8 @@
 // © Joseph Cameron - All Rights Reserved
 
-#include <gdk/glfw_keyboard.h>
+#include <gdk/input/impl_glfw_keyboard.h>
 
 #include <GLFW/glfw3.h>
-#include <magic_enum/magic_enum.hpp>
 
 #include <functional>
 #include <iostream>
@@ -12,11 +11,10 @@
 #include <string>
 #include <type_traits>
 
-using namespace gdk;
+using namespace gdk::input;
 
 static constexpr char TAG[] = "keyboard_glfw";
 
-static const auto GDK_INPUT_KEY_SET = magic_enum::enum_values<keyboard::key>();
 
 static const std::set<decltype(GLFW_KEY_A)> KEY_SET{
 	GLFW_KEY_ESCAPE,
@@ -124,7 +122,6 @@ static const std::set<decltype(GLFW_KEY_A)> KEY_SET{
 
 static inline decltype(GLFW_KEY_ESCAPE) glfwKeyCodeFromKey(const keyboard::key a) {
     switch(a) {
-        //Top Row
         case keyboard::key::escape:       return GLFW_KEY_ESCAPE;
         case keyboard::key::f1:           return GLFW_KEY_F1;
         case keyboard::key::f2:           return GLFW_KEY_F2;
@@ -142,7 +139,6 @@ static inline decltype(GLFW_KEY_ESCAPE) glfwKeyCodeFromKey(const keyboard::key a
         case keyboard::key::scrolllock:   return GLFW_KEY_SCROLL_LOCK;
         case keyboard::key::pausebreak:   return GLFW_KEY_PAUSE;
         
-        //Alphabetical characters
         case keyboard::key::q:            return GLFW_KEY_Q;
         case keyboard::key::w:            return GLFW_KEY_W;
         case keyboard::key::e:            return GLFW_KEY_E;
@@ -170,7 +166,6 @@ static inline decltype(GLFW_KEY_ESCAPE) glfwKeyCodeFromKey(const keyboard::key a
         case keyboard::key::n:            return GLFW_KEY_N;
         case keyboard::key::m:            return GLFW_KEY_M;
         
-        //Number row
         case keyboard::key::one:          return GLFW_KEY_1;
         case keyboard::key::two:          return GLFW_KEY_2;
         case keyboard::key::three:        return GLFW_KEY_3;
@@ -188,7 +183,6 @@ static inline decltype(GLFW_KEY_ESCAPE) glfwKeyCodeFromKey(const keyboard::key a
         case keyboard::key::home:         return GLFW_KEY_HOME;
         case keyboard::key::end:          return GLFW_KEY_END;
         
-        //Q row
         case keyboard::key::tab:          return GLFW_KEY_TAB;
         case keyboard::key::openbracket:  return GLFW_KEY_LEFT_BRACKET;
         case keyboard::key::closebracket: return GLFW_KEY_RIGHT_BRACKET;
@@ -196,7 +190,6 @@ static inline decltype(GLFW_KEY_ESCAPE) glfwKeyCodeFromKey(const keyboard::key a
         case keyboard::key::insert:       return GLFW_KEY_INSERT;
         case keyboard::key::pageup:       return GLFW_KEY_PAGE_UP;
         
-        //A row
         case keyboard::key::capslock:     return GLFW_KEY_CAPS_LOCK;
         case keyboard::key::semicolon:    return GLFW_KEY_SEMICOLON;
         case keyboard::key::quote:        return GLFW_KEY_APOSTROPHE;
@@ -204,27 +197,23 @@ static inline decltype(GLFW_KEY_ESCAPE) glfwKeyCodeFromKey(const keyboard::key a
         case keyboard::key::deletekey:    return GLFW_KEY_DELETE;
         case keyboard::key::pagedown:     return GLFW_KEY_PAGE_DOWN;
             
-        //Z row
         case keyboard::key::leftshift:    return GLFW_KEY_LEFT_SHIFT;
         case keyboard::key::comma:        return GLFW_KEY_COMMA;
         case keyboard::key::period:       return GLFW_KEY_PERIOD;
         case keyboard::key::forwardslash: return GLFW_KEY_SLASH;
         case keyboard::key::rightshift:   return GLFW_KEY_RIGHT_SHIFT;
         
-        //Bottom row
         case keyboard::key::leftcontrol:  return GLFW_KEY_LEFT_CONTROL;
         case keyboard::key::leftalt:      return GLFW_KEY_LEFT_ALT;
         case keyboard::key::space:        return GLFW_KEY_SPACE;
         case keyboard::key::rightalt:     return GLFW_KEY_RIGHT_ALT;
         case keyboard::key::rightcontrol: return GLFW_KEY_RIGHT_CONTROL;
         
-        //Arrow keys
         case keyboard::key::leftarrow:    return GLFW_KEY_LEFT;
         case keyboard::key::rightarrow:   return GLFW_KEY_RIGHT;
         case keyboard::key::uparrow:      return GLFW_KEY_UP;
         case keyboard::key::downarrow:    return GLFW_KEY_DOWN;
         
-        //Numpad
         case keyboard::key::numlock:      return GLFW_KEY_NUM_LOCK;
         case keyboard::key::numslash:     return GLFW_KEY_SLASH;
         case keyboard::key::numasterisk:  return GLFW_KEY_KP_MULTIPLY;
@@ -253,19 +242,12 @@ keyboard_glfw::keyboard_glfw(decltype(m_pWindow) pWindow)
 : m_pWindow(pWindow)
 {}
 
-std::optional<keyboard::key> keyboard_glfw::any_key_down() const {
-	for (const auto key : GDK_INPUT_KEY_SET)
-		if (key_down(key)) return key;
-
-	return {};
-}
-
 bool keyboard_glfw::key_down(const keyboard::key &aKeyCode) const {
 	bool value(false);
 
 	if (auto search = m_CurrentState.find(glfwKeyCodeFromKey(aKeyCode)); search != m_CurrentState.end())
-		value = search->second == gdk::keyboard::key_state::held_down || 
-				search->second == gdk::keyboard::key_state::just_pressed;
+		value = search->second == gdk::input::keyboard::key_state::held_down || 
+				search->second == gdk::input::keyboard::key_state::just_pressed;
 
 	return value;
 }
@@ -274,7 +256,7 @@ bool keyboard_glfw::key_just_down(const keyboard::key &aKeyCode) const {
 	bool value(false);
 
 	if (auto search = m_CurrentState.find(glfwKeyCodeFromKey(aKeyCode)); search != m_CurrentState.end())
-		value = search->second == gdk::keyboard::key_state::just_pressed;
+		value = search->second == gdk::input::keyboard::key_state::just_pressed;
 
 	return value;
 }
@@ -283,7 +265,7 @@ bool keyboard_glfw::key_just_released(const keyboard::key &aKeyCode) const {
 	bool value(false);
 
 	if (auto search = m_CurrentState.find(glfwKeyCodeFromKey(aKeyCode)); search != m_CurrentState.end())
-		value = search->second == gdk::keyboard::key_state::just_released;
+		value = search->second == gdk::input::keyboard::key_state::just_released;
 
 	return value;
 }
@@ -301,8 +283,8 @@ void keyboard_glfw::update() {
 		
 		else if (currentKeyState != GLFW_RELEASE)
 			newState = lastKeyState == GLFW_RELEASE
-				? newState = keyboard::key_state::just_pressed
-				: newState = keyboard::key_state::held_down;
+				? keyboard::key_state::just_pressed
+				: keyboard::key_state::held_down;
 		
 		m_CurrentState[glfwKey] = newState;
 

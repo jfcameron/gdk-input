@@ -1,6 +1,9 @@
-[submodule "thirdparty/glfw"]
+[submodule "extern/glfw"]
 	path = extern/glfw
 	url = https://github.com/glfw/glfw.git
 [submodule "cmake/jfc-cmake"]
 	path = cmake/jfc-cmake
 	url = https://github.com/jfcameron/jfc-cmake.git
+[submodule "extern/jfc-lua"]
+	path = extern/jfc-lua
+	url = https://github.com/jfcameron/jfc-lua.git

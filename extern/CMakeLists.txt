@@ -1,8 +1,7 @@
-# © 2019 Joseph Cameron - All Rights Reserved
+# © Joseph Cameron - All Rights Reserved
 
 set(dependencies
     "glfw"
-    "jsoncons"
     "magic_enum"
 )
 

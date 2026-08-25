@@ -1,4 +1,4 @@
-set(DEMO_COMMON_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/common_headers)
+# © Joseph Cameron - All Rights Reserved
 
-#add_subdirectory(simple)
-
+add_subdirectory(simple)
+add_subdirectory(rebinding)

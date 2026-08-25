@@ -3,8 +3,8 @@
 jfc_project(executable
     NAME "gdkinput-simple-demo"
     VERSION 1.0
-    DESCRIPTION "demo gdk-graphics app"
-    C++_STANDARD 17
+    DESCRIPTION "demo gdk-input app"
+    C++_STANDARD 20
     C_STANDARD 90
 
     SOURCE_LIST
@@ -12,7 +12,7 @@ jfc_project(executable
     
     PRIVATE_INCLUDE_DIRECTORIES
         "${gdkinput_INCLUDE_DIRECTORIES}"
-        "${DEMO_COMMON_HEADERS}"
+        "${glfw_INCLUDE_DIR}"
 
     LIBRARIES
         "${gdkinput_LIBRARIES}"

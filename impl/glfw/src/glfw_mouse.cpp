@@ -1,6 +1,6 @@
 // © Joseph Cameron - All Rights Reserved
 
-#include <gdk/glfw_mouse.h>
+#include <gdk/input/impl_glfw_mouse.h>
 
 #include <GLFW/glfw3.h>
 
@@ -9,21 +9,22 @@
 #include <stdexcept>
 #include <string>
 #include <set>
+#include <unordered_map>
 
 static constexpr char TAG[] = "mouse";
 
-using namespace gdk;
+using namespace gdk::input;
 
-static inline decltype(GLFW_MOUSE_BUTTON_1) glfwmouseButtonFromButton(const gdk::mouse::button a) {
+static inline decltype(GLFW_MOUSE_BUTTON_1) glfwmouseButtonFromButton(const gdk::input::mouse::button a) {
     switch(a) {
-        case gdk::mouse::button::left: return GLFW_MOUSE_BUTTON_LEFT;
-        case gdk::mouse::button::right: return GLFW_MOUSE_BUTTON_RIGHT;
-        case gdk::mouse::button::middle: return GLFW_MOUSE_BUTTON_MIDDLE;
-        case gdk::mouse::button::four: return GLFW_MOUSE_BUTTON_4;
-        case gdk::mouse::button::five: return GLFW_MOUSE_BUTTON_5;
-        case gdk::mouse::button::six: return GLFW_MOUSE_BUTTON_6;
-        case gdk::mouse::button::seven: return GLFW_MOUSE_BUTTON_7;
-        case gdk::mouse::button::eight: return GLFW_MOUSE_BUTTON_8;
+        case gdk::input::mouse::button::left: return GLFW_MOUSE_BUTTON_LEFT;
+        case gdk::input::mouse::button::right: return GLFW_MOUSE_BUTTON_RIGHT;
+        case gdk::input::mouse::button::middle: return GLFW_MOUSE_BUTTON_MIDDLE;
+        case gdk::input::mouse::button::four: return GLFW_MOUSE_BUTTON_4;
+        case gdk::input::mouse::button::five: return GLFW_MOUSE_BUTTON_5;
+        case gdk::input::mouse::button::six: return GLFW_MOUSE_BUTTON_6;
+        case gdk::input::mouse::button::seven: return GLFW_MOUSE_BUTTON_7;
+        case gdk::input::mouse::button::eight: return GLFW_MOUSE_BUTTON_8;
 
 		default: throw std::invalid_argument(std::string("Unable to convert mouse button \"")
 			.append(std::to_string(static_cast<std::underlying_type< decltype(a)>::type>(a)))
@@ -31,10 +32,26 @@ static inline decltype(GLFW_MOUSE_BUTTON_1) glfwmouseButtonFromButton(const gdk:
     }
 }
 
+static std::unordered_map<GLFWwindow *, mouse::scroll_2d_type> &scrollAccumulators() {
+    static std::unordered_map<GLFWwindow *, mouse::scroll_2d_type> instance;
+
+    return instance;
+}
+
 mouse_glfw::mouse_glfw(decltype(m_pWindow) pWindow)
 : m_pWindow(pWindow)
 , m_LastDeltaCallCursorPosition(cursor_position())
-{}
+{
+    scrollAccumulators()[m_pWindow.get()] = {0, 0};
+
+    glfwSetScrollCallback(m_pWindow.get(),
+        [](GLFWwindow *const pCurrentWindow, const double aX, const double aY) {
+            auto &accumulator = scrollAccumulators()[pCurrentWindow];
+
+            accumulator.x += aX;
+            accumulator.y += aY;
+        });
+}
 
 void mouse_glfw::set_cursor_mode(const mouse::cursor_mode acursor_mode) {
     decltype(GLFW_CURSOR_NORMAL) cursorModeBuffer;
@@ -74,12 +91,16 @@ mouse::cursor_2d_type mouse_glfw::delta() const {
     return m_Delta;
 }
 
+mouse::scroll_2d_type mouse_glfw::scroll_delta() const {
+    return m_ScrollDelta;
+}
+
 bool mouse_glfw::button_down(const mouse::button aButton) const {
     bool value(false);
 
     if (auto search = m_CurrentState.find(glfwmouseButtonFromButton(aButton)); search != m_CurrentState.end())
-        value = search->second == gdk::mouse::button_state::held_down ||
-        search->second == gdk::mouse::button_state::just_pressed;
+        value = search->second == gdk::input::mouse::button_state::held_down ||
+        search->second == gdk::input::mouse::button_state::just_pressed;
 	
     return value;
 }
@@ -88,7 +109,7 @@ bool mouse_glfw::button_just_down(const mouse::button aKeyCode) const {
     bool value(false);
 
     if (auto search = m_CurrentState.find(glfwmouseButtonFromButton(aKeyCode)); search != m_CurrentState.end())
-        value = search->second == gdk::mouse::button_state::just_pressed;
+        value = search->second == gdk::input::mouse::button_state::just_pressed;
 
     return value;
 }
@@ -97,7 +118,7 @@ bool mouse_glfw::button_just_released(const mouse::button aKeyCode) const {
     bool value(false);
 
     if (auto search = m_CurrentState.find(glfwmouseButtonFromButton(aKeyCode)); search != m_CurrentState.end())
-        value = search->second == gdk::mouse::button_state::just_released;
+        value = search->second == gdk::input::mouse::button_state::just_released;
 
     return value;
 }
@@ -123,8 +144,8 @@ void mouse_glfw::update() {
             newState = mouse::button_state::just_released;
         else if (currentButtonState != GLFW_RELEASE)
             newState = lastButtonState == GLFW_RELEASE
-            ? newState = mouse::button_state::just_pressed
-            : newState = mouse::button_state::held_down;
+                ? mouse::button_state::just_pressed
+                : mouse::button_state::held_down;
 
         m_CurrentState[glfwButton] = newState;
         m_MouseButtonLastState[glfwButton] = currentButtonState;
@@ -134,5 +155,10 @@ void mouse_glfw::update() {
     m_Delta.x = currentCursorPosition.x - m_LastDeltaCallCursorPosition.x;
     m_Delta.y = currentCursorPosition.y - m_LastDeltaCallCursorPosition.y;
     m_LastDeltaCallCursorPosition = currentCursorPosition;
+
+    auto &accumulator = scrollAccumulators()[m_pWindow.get()];
+
+    m_ScrollDelta = accumulator;
+    accumulator = {0, 0};
 }
 
