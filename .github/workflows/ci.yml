@@ -36,15 +36,10 @@ jobs:
             runner: windows-latest
             tests: true
 
-          # Builds the demo and nothing else, so that an interface change which breaks the one
-          # worked example is caught without every other leg paying for it.
           - preset: linux-gcc-demo
             runner: ubuntu-latest
             tests: false
 
-          # The ext/ lua codec is off by default, so without this leg its tests are compiled and run
-          # nowhere. One leg rather than every leg: turning the option on costs a LuaJIT build, and
-          # what it exercises is portable c++ over jfc-lua, not anything platform specific.
           - preset: linux-gcc-ext-lua
             runner: ubuntu-latest
             tests: true
@@ -54,9 +49,6 @@ jobs:
         with:
           submodules: recursive
 
-      # GLFW needs these to compile its X11 and Wayland backends. The suite itself runs on GLFW's
-      # null platform and opens no display, so this is not what makes the tests pass -- it is what
-      # stops the Linux legs building a library with no real windowing backend in it.
       - name: install windowing headers
         if: runner.os == 'Linux'
         run: |
@@ -69,8 +61,24 @@ jobs:
       - name: build
         run: cmake --build --preset ${{ matrix.preset }}
 
-      # The tests select GLFW_PLATFORM_NULL themselves, so no display or X server is needed here.
-      # Skipped on legs that build no test target, which have no test preset to run.
       - name: test
         if: matrix.tests
         run: ctest --preset ${{ matrix.preset }}
+
+  docs:
+    name: docs (doxygen)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y doxygen \
+            xorg-dev libwayland-dev libxkbcommon-dev wayland-protocols
+
+      - name: generate documentation
+        run: cmake --preset linux-docs

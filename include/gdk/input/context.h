@@ -69,6 +69,8 @@ namespace gdk::input {
 		[[nodiscard]] virtual mouse::scroll_2d_type mouse_scroll_delta() const = 0;
 
 		/// \brief returns a mouse axis if it moved further than aThreshold since the last update
+		///
+		/// Cursor motion is reported ahead of the wheel, and x ahead of y within each.
 		[[nodiscard]] virtual std::optional<mouse::axis> any_mouse_axis_down(float threshold) const = 0;
 
 		/// \brief gets the cursor mode

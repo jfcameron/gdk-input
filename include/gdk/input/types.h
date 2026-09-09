@@ -17,10 +17,7 @@ namespace gdk::input {
     using controls_ptr_type = std::shared_ptr<controls>;
     using capture_ptr_type = std::shared_ptr<capture>;
 
-    /// \brief a gamepad belonging to a player
     using gamepad_ptr_type = std::shared_ptr<gamepad>;
-
-    /// \brief how far an input is applied: 0 to 1 for a button, -1 to 1 for a stick
     using value_type = float;
 }
 
@@ -50,7 +47,8 @@ namespace gdk::input::mouse {
     };
 
     enum class axis {
-        x, y
+        x, y,
+        scroll_x, scroll_y
     };
     
     struct cursor_2d_type {

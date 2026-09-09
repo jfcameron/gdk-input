@@ -35,6 +35,11 @@ void controls::bind(const std::string &aAction, const mouse::button aButton) {
     bind(aAction, binding::of(aButton));
 }
 
+void controls::bind(const std::string &aAction, const mouse::axis aAxis,
+    const value_type aScale) {
+    bind(aAction, binding::of(aAxis, aScale));
+}
+
 void controls::bind(const std::string &aAction, const gamepad::button aButton) {
     bind(aAction, binding::of(aButton));
 }
@@ -124,6 +129,31 @@ controls::value_type controls::get(const std::string &aAction) const {
         if (std::abs(aValue) > std::abs(strongest)) strongest = aValue;
     };
 
+    const auto pointer_value = [this](const binding &aBinding) {
+        const auto delta = mpContext->mouse_delta();
+        const auto scroll = mpContext->mouse_scroll_delta();
+
+        const auto raw = [&]() -> double {
+            switch (aBinding.pointerAxis) {
+                case mouse::axis::x: return delta.x;
+                case mouse::axis::y: return delta.y;
+                case mouse::axis::scroll_x: return scroll.x;
+                case mouse::axis::scroll_y: return scroll.y;
+            }
+
+            return 0;
+        }();
+
+        const auto scaled = static_cast<value_type>(raw) * aBinding.scale;
+
+        const auto isWheel = aBinding.pointerAxis == mouse::axis::scroll_x
+            || aBinding.pointerAxis == mouse::axis::scroll_y;
+
+        if (isWheel) return scaled;
+
+        return std::max(value_type{-1}, std::min(value_type{1}, scaled));
+    };
+
     for (const auto &s : *pSources) {
         switch (s.which) {
             case binding::kind::key:
@@ -132,6 +162,10 @@ controls::value_type controls::get(const std::string &aAction) const {
 
             case binding::kind::mouse_button:
                 if (mpContext->mouse_button_down(s.mouseButton)) consider(1);
+            break;
+
+            case binding::kind::pointer_axis:
+                consider(pointer_value(s));
             break;
 
             case binding::kind::gamepad_button:
@@ -181,6 +215,9 @@ bool controls::just_pressed(const std::string &aAction) const {
                 if (mpContext->mouse_button_just_pressed(s.mouseButton)) return true;
             break;
 
+            case binding::kind::pointer_axis:
+            break;
+
             case binding::kind::gamepad_button:
                 if (pGamepad && pGamepad->button_just_pressed(s.gamepadButton)) return true;
             break;
@@ -226,6 +263,9 @@ bool controls::just_released(const std::string &aAction) const {
 
             case binding::kind::mouse_button:
                 if (mpContext->mouse_button_just_released(s.mouseButton)) return true;
+            break;
+
+            case binding::kind::pointer_axis:
             break;
 
             case binding::kind::gamepad_button:

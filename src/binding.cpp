@@ -22,6 +22,15 @@ binding binding::of(const mouse::button aButton) {
     return b;
 }
 
+binding binding::of(const mouse::axis aAxis, const value_type aScale) {
+    binding b;
+    b.which = kind::pointer_axis;
+    b.pointerAxis = aAxis;
+    b.scale = aScale;
+
+    return b;
+}
+
 binding binding::of(const gamepad::button aButton) {
     binding b;
     b.which = kind::gamepad_button;
@@ -60,11 +69,12 @@ binding binding::of_device_axis(const std::string &aGuid, const gamepad::index_t
 }
 
 bool binding::is_gamepad() const {
-    return which != kind::key && which != kind::mouse_button;
+    return which != kind::key && which != kind::mouse_button && which != kind::pointer_axis;
 }
 
 bool binding::is_axis() const {
-    return which == kind::gamepad_axis || which == kind::device_axis;
+    return which == kind::gamepad_axis || which == kind::device_axis
+        || which == kind::pointer_axis;
 }
 
 bool binding::operator==(const binding &aOther) const {
@@ -73,6 +83,7 @@ bool binding::operator==(const binding &aOther) const {
     switch (which) {
         case kind::key: return key == aOther.key;
         case kind::mouse_button: return mouseButton == aOther.mouseButton;
+        case kind::pointer_axis: return pointerAxis == aOther.pointerAxis && scale == aOther.scale;
         case kind::gamepad_button: return gamepadButton == aOther.gamepadButton;
         case kind::gamepad_axis: return gamepadAxis == aOther.gamepadAxis && scale == aOther.scale;
         case kind::device_button: return guid == aOther.guid && index == aOther.index;
@@ -94,6 +105,11 @@ std::ostream &operator<<(std::ostream &aStream, const gdk::input::binding &aBind
     switch (aBinding.which) {
         case kind::key: aStream << "key " << aBinding.key; break;
         case kind::mouse_button: aStream << "mouse " << aBinding.mouseButton; break;
+
+        case kind::pointer_axis:
+            aStream << "pointer " << direction(aBinding.scale) << aBinding.pointerAxis;
+        break;
+
         case kind::gamepad_button: aStream << "gamepad " << aBinding.gamepadButton; break;
 
         case kind::gamepad_axis:

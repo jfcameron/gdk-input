@@ -17,9 +17,10 @@ namespace gdk::input {
         enum class kind {
             key,
             mouse_button,
+            pointer_axis,   //!< cursor motion or the wheel, \see mouse::axis
             gamepad_button, //!< standard layout
             gamepad_axis,   //!< standard layout
-            device_button,  //!< a raw index on the device named by \ref guid
+            device_button,  //!< a raw index on the device named by `guid`
             device_axis     //!< a raw index
         };
 
@@ -27,6 +28,7 @@ namespace gdk::input {
 
         keyboard::key key{};
         mouse::button mouseButton{};
+        mouse::axis pointerAxis{};
         gamepad::button gamepadButton{};
         gamepad::axis gamepadAxis{};
 
@@ -40,6 +42,9 @@ namespace gdk::input {
         [[nodiscard]] static binding of(const mouse::button aButton);
         [[nodiscard]] static binding of(const gamepad::button aButton);
         [[nodiscard]] static binding of(const gamepad::axis aAxis, const value_type aScale = 1);
+
+        /// \brief bind cursor motion or the wheel
+        [[nodiscard]] static binding of(const mouse::axis aAxis, const value_type aScale = 1);
 
         [[nodiscard]] static binding of_device_button(const std::string &aGuid,
             const gamepad::index_type aIndex);

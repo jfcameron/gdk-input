@@ -13,7 +13,7 @@ namespace gdk::input {
     class glfw_context final : public gdk::input::context {
     public:
 		/// \brief create a context from a glfw window
-		/// \warn the implementation does not have any ownership over the pointer. It is up to the user to guarantee
+		/// \warning the implementation does not have any ownership over the pointer. It is up to the user to guarantee
 		/// the glfw window's lifetime exceeds the context
 		[[nodiscard]] static context_ptr_type make(std::shared_ptr<GLFWwindow> apGLFWWindow);
 		/// \attention must be called in your update loop

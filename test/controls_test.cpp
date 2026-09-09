@@ -399,3 +399,143 @@ TEST_CASE("a binding can be removed on its own", "[controls]")
     REQUIRE(f.pControls->unbind("jump", binding::of(keyboard::key::space)));
     REQUIRE(f.pControls->actions().empty());
 }
+
+TEST_CASE("a pointer axis is a bindable source", "[controls][pointer_axis]")
+{
+    fixture f;
+
+    SECTION("cursor motion drives an action, scaled")
+    {
+        f.pControls->bind("look_x", mouse::axis::x, 0.1f);
+
+        f.pNull->set_mouse_delta({5, 0});
+        REQUIRE(f.pControls->get("look_x") == Approx(0.5f));
+
+        f.pNull->set_mouse_delta({0, 9});
+        REQUIRE(f.pControls->get("look_x") == 0);
+    }
+
+    SECTION("a still pointer contributes nothing")
+    {
+        f.pControls->bind("look_y", mouse::axis::y, 0.1f);
+
+        f.pNull->set_mouse_delta({0, 0});
+        REQUIRE(f.pControls->get("look_y") == 0);
+        REQUIRE_FALSE(f.pControls->down("look_y"));
+    }
+
+    SECTION("a negative scale binds the opposite direction")
+    {
+        f.pControls->bind("look_left", mouse::axis::x, -0.1f);
+
+        f.pNull->set_mouse_delta({5, 0});
+        REQUIRE(f.pControls->get("look_left") == Approx(-0.5f));
+    }
+
+    SECTION("**the scaled delta is clamped into the range a stick reports**")
+    {
+        f.pControls->bind("look_x", mouse::axis::x, 0.1f);
+
+        f.pNull->set_mouse_delta({400, 0});
+        REQUIRE(f.pControls->get("look_x") == Approx(1.0f));
+
+        f.pNull->set_mouse_delta({-400, 0});
+        REQUIRE(f.pControls->get("look_x") == Approx(-1.0f));
+    }
+
+    SECTION("the wheel is a pointer axis like any other")
+    {
+        f.pControls->bind("zoom", mouse::axis::scroll_y, 0.5f);
+
+        f.pNull->set_scroll_delta({0, 1});
+        REQUIRE(f.pControls->get("zoom") == Approx(0.5f));
+
+        f.pNull->set_scroll_delta({1, 0});
+        REQUIRE(f.pControls->get("zoom") == 0);
+    }
+
+    SECTION("the other wheel axis is separately bindable")
+    {
+        f.pControls->bind("pan", mouse::axis::scroll_x, 1.0f);
+
+        f.pNull->set_scroll_delta({3, 0});
+        REQUIRE(f.pControls->get("pan") == Approx(3.0f));
+
+        f.pNull->set_scroll_delta({0, 3});
+        REQUIRE(f.pControls->get("pan") == 0);
+    }
+
+    SECTION("**the wheel is not clamped, so a fast spin still counts every notch**")
+    {
+        f.pControls->bind("zoom", mouse::axis::scroll_y, 0.75f);
+
+        f.pNull->set_scroll_delta({0, 1});
+        REQUIRE(f.pControls->get("zoom") == Approx(0.75f));
+
+        f.pNull->set_scroll_delta({0, 2});
+        REQUIRE(f.pControls->get("zoom") == Approx(1.5f));
+
+        f.pNull->set_scroll_delta({0, -4});
+        REQUIRE(f.pControls->get("zoom") == Approx(-3.0f));
+    }
+
+    SECTION("cursor motion is still clamped, and the wheel does not change that")
+    {
+        f.pControls->bind("look_x", mouse::axis::x, 4.0f);
+        f.pControls->bind("zoom", mouse::axis::scroll_y, 4.0f);
+
+        f.pNull->set_mouse_delta({0.5, 0});
+        f.pNull->set_scroll_delta({0, 0.5});
+
+        REQUIRE(f.pControls->get("look_x") == Approx(1.0f));
+        REQUIRE(f.pControls->get("zoom") == Approx(2.0f));
+    }
+
+    SECTION("a mouse and a stick can drive one action, and the one being used wins")
+    {
+        const auto player = f.attach();
+
+        f.pControls->bind("look_x", mouse::axis::x, 0.1f);
+        f.pControls->bind("look_x", gamepad::axis::left_x, 1.0f);
+
+        f.pNull->set_mouse_delta({2, 0});
+        REQUIRE(f.pControls->get("look_x") == Approx(0.2f));
+
+        f.pNull->gamepad_at(player)->set_axis(
+            static_cast<gamepad::index_type>(gamepad::axis::left_x), 0.8f);
+        f.pNull->update();
+        REQUIRE(f.pControls->get("look_x") == Approx(0.8f));
+
+        f.pNull->set_mouse_delta({9000, 0});
+        REQUIRE(f.pControls->get("look_x") == Approx(1.0f));
+    }
+
+    SECTION("a pointer axis reports no edges")
+    {
+        f.pControls->bind("look_x", mouse::axis::x, 0.1f);
+
+        f.pNull->set_mouse_delta({5, 0});
+        REQUIRE(f.pControls->down("look_x"));
+        REQUIRE_FALSE(f.pControls->just_pressed("look_x"));
+        REQUIRE_FALSE(f.pControls->just_released("look_x"));
+    }
+
+    SECTION("it round trips as a binding value")
+    {
+        f.pControls->bind("look_x", mouse::axis::x, 0.1f);
+
+        const auto sources = f.pControls->sources("look_x");
+
+        REQUIRE(sources.size() == 1);
+        REQUIRE(sources.at(0).which == binding::kind::pointer_axis);
+        REQUIRE(sources.at(0).pointerAxis == mouse::axis::x);
+        REQUIRE(sources.at(0).is_axis());
+        REQUIRE_FALSE(sources.at(0).is_gamepad());
+        REQUIRE(sources.at(0) == binding::of(mouse::axis::x, 0.1f));
+        REQUIRE_FALSE(sources.at(0) == binding::of(mouse::axis::y, 0.1f));
+        REQUIRE_FALSE(sources.at(0) == binding::of(mouse::axis::x, 0.2f));
+
+        REQUIRE(f.pControls->unbind("look_x", binding::of(mouse::axis::x, 0.1f)));
+        REQUIRE(f.pControls->source_count("look_x") == 0);
+    }
+}

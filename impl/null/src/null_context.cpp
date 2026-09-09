@@ -52,6 +52,9 @@ std::optional<mouse::axis> null_context::any_mouse_axis_down(float threshold) co
     if (std::abs(mMouseDelta.x) > threshold) return mouse::axis::x;
     if (std::abs(mMouseDelta.y) > threshold) return mouse::axis::y;
 
+    if (std::abs(mScrollDelta.x) > threshold) return mouse::axis::scroll_x;
+    if (std::abs(mScrollDelta.y) > threshold) return mouse::axis::scroll_y;
+
     return {};
 }
 

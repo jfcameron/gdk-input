@@ -29,10 +29,18 @@ namespace gdk::input {
         void bind(const std::string &aAction, const keyboard::key aKey);
         void bind(const std::string &aAction, const mouse::button aButton);
 
+        /// \brief bind cursor motion or the wheel, so aiming can be rebound like anything else
+        ///
+        /// The scale is the sensitivity; \see binding::of(mouse::axis, value_type) for why a
+        /// pointer axis needs one and a stick does not.
+        void bind(const std::string &aAction, const mouse::axis aAxis, const value_type aScale = 1);
+
         //! applies to any gamepad with a standard mapping, whatever the hardware
         void bind(const std::string &aAction, const gamepad::button aButton);
 
-        /// \param aScale multiplies the axis. Negative binds the opposite direction, which is how an
+        /// \brief bind a gamepad axis
+        ///
+        /// The scale multiplies the axis. Negative binds the opposite direction, which is how an
         /// action that means "left" is built out of an axis that reads negative when pushed left.
         void bind(const std::string &aAction, const gamepad::axis aAxis, const value_type aScale = 1);
 
@@ -62,19 +70,15 @@ namespace gdk::input {
         [[nodiscard]] std::vector<binding> sources(const std::string &aAction) const;
 
         /// \brief the strongest contribution from any source bound to this action
-        ///
-        /// A button contributes 1 while it is down. An axis contributes its value times its scale.
-        /// The result is the contribution with the largest magnitude, so a keyboard key and a stick
-        /// can drive one action and the one being used wins.
         [[nodiscard]] value_type get(const std::string &aAction) const;
 
         /// \brief whether the action is being driven, which is \ref get past \ref threshold
         [[nodiscard]] bool down(const std::string &aAction) const;
 
-        //! whether any bound source began this frame
+        /// \brief whether any bound source began this frame
         [[nodiscard]] bool just_pressed(const std::string &aAction) const;
 
-        //! whether any bound source ended this frame
+        //! whether any bound source ended this frame. A pointer axis never reports this
         [[nodiscard]] bool just_released(const std::string &aAction) const;
 
         //! how far an axis must move before it counts as down

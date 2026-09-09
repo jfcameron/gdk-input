@@ -4,7 +4,9 @@ cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/jfc-cmake/jfclib.cmake")
 
-project(null)
+project(gdkinput
+    VERSION 0.9
+    DESCRIPTION "game development kit human input device library")
 
 option(JFC_BUILD_DEMO "Build demos" ON)
 option(JFC_BUILD_DOCS  "Build documentation" ON)
@@ -79,38 +81,39 @@ else()
     endforeach()
 endif()
 
-jfc_project(library
-    NAME "gdkinput"
-    VERSION 0.9
-    DESCRIPTION "game development kit human input device library"
-    C++_STANDARD 20
-    C_STANDARD 90
-    TYPE STATIC
+add_library(gdkinput STATIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/binding.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/capture.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/context.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/controls.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/enum_ostreams.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/exception.cpp
+    ${implementation_source_list})
 
-    DEPENDENCIES
-        "glfw"
+add_library(gdk::input ALIAS gdkinput)
 
-    LIBRARIES
-        ${glfw_LIBRARIES}
+set_target_properties(gdkinput PROPERTIES EXPORT_NAME input)
 
-    PUBLIC_INCLUDE_DIRECTORIES
-        ${CMAKE_CURRENT_SOURCE_DIR}/include
+set_target_properties(gdkinput PROPERTIES PREFIX "lib")
+
+jfc_generate_cmake_header()
+
+target_include_directories(gdkinput
+    PUBLIC
+        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
         ${implementation_header_paths}
-
-    PRIVATE_INCLUDE_DIRECTORIES
+        "$<INSTALL_INTERFACE:include>"
+    PRIVATE
+        "${PROJECT_BINARY_DIR}/generated_include/"
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include
-        ${glfw_INCLUDE_DIR}
-        ${magic_enum_INCLUDE_DIR}
+    )
 
-    SOURCE_LIST 
-		${CMAKE_CURRENT_SOURCE_DIR}/src/binding.cpp
-		${CMAKE_CURRENT_SOURCE_DIR}/src/capture.cpp
-		${CMAKE_CURRENT_SOURCE_DIR}/src/context.cpp
-		${CMAKE_CURRENT_SOURCE_DIR}/src/controls.cpp
-		${CMAKE_CURRENT_SOURCE_DIR}/src/enum_ostreams.cpp
-		${CMAKE_CURRENT_SOURCE_DIR}/src/exception.cpp
-        ${implementation_source_list}
-)
+target_compile_features(gdkinput PUBLIC cxx_std_20)
+
+target_link_libraries(gdkinput PUBLIC
+    glfw)
+
+target_link_libraries(gdkinput PRIVATE magic_enum)
 
 if (GDK_INPUT_EXT_LUA)
     if (NOT TARGET jfclua)
@@ -151,18 +154,14 @@ if (GDK_INPUT_EXT_LUA)
 
     target_include_directories(gdkinput_ext_lua
         PUBLIC
-            "${CMAKE_CURRENT_SOURCE_DIR}/include"
-            ${jfclua_INCLUDE_DIRECTORIES}
-        PRIVATE
-            ${magic_enum_INCLUDE_DIR})
+            "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
-    set(_gdk_input_jfclua_link ${jfclua_LIBRARIES})
-    list(FILTER _gdk_input_jfclua_link EXCLUDE REGEX "(libjfclua\\.a|jfclua\\.lib)$")
+    target_link_libraries(gdkinput_ext_lua PRIVATE magic_enum)
 
-    target_link_libraries(gdkinput_ext_lua PUBLIC gdkinput jfclua ${_gdk_input_jfclua_link})
+    target_link_libraries(gdkinput_ext_lua PUBLIC gdkinput jfclua)
 
     set(gdkinput_ext_lua_INCLUDE_DIRECTORIES
-        "${CMAKE_CURRENT_SOURCE_DIR}/include" ${jfclua_INCLUDE_DIRECTORIES})
+        "${CMAKE_CURRENT_SOURCE_DIR}/include")
     set(gdkinput_ext_lua_LIBRARIES gdkinput_ext_lua)
 endif()
 

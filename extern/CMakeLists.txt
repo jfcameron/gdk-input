@@ -1,8 +1,4 @@
 # © Joseph Cameron - All Rights Reserved
 
-set(dependencies
-    "glfw"
-    "magic_enum"
-)
-
-jfc_add_dependencies(${dependencies})
+include("${CMAKE_CURRENT_LIST_DIR}/glfw.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/magic_enum.cmake")

@@ -65,6 +65,11 @@ std::optional<mouse::axis> glfw_context::any_mouse_axis_down(float threshold) co
 	if (std::abs(delta.x) > threshold) return mouse::axis::x;
 	if (std::abs(delta.y) > threshold) return mouse::axis::y;
 
+	const auto scroll = mouse_scroll_delta();
+
+	if (std::abs(scroll.x) > threshold) return mouse::axis::scroll_x;
+	if (std::abs(scroll.y) > threshold) return mouse::axis::scroll_y;
+
 	return {};
 }
 

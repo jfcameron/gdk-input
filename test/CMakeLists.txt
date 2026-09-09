@@ -22,13 +22,11 @@ jfc_add_tests(
 
     INCLUDE_DIRECTORIES
         "${CMAKE_CURRENT_LIST_DIR}"
-        "${gdkinput_INCLUDE_DIRECTORIES}"
-        "${magic_enum_INCLUDE_DIR}"
         ${ext_test_includes}
 
     LIBRARIES
-        "${gdkinput_LIBRARIES}"
-        "${glfw_LIBRARIES}"
+        gdkinput
+        magic_enum
         ${ext_test_libraries})
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_EXTENSIONS OFF)

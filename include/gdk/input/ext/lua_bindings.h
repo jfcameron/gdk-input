@@ -10,16 +10,9 @@
 #include <cstddef>
 #include <string>
 
-/// \file serialization for lua tables
-///
-/// This table codec is written against the library's interface, so
-/// it serves as living documentation for how to write additional ones
-/// (eg for json), and as a convenience for users who are using lua
+/// \file
+/// \brief serialization for lua tables
 namespace gdk::input::ext {
-    /// \brief the format version this writes
-    ///
-    /// Written into every table so a file outliving a change to the layout can be recognised rather
-    /// than misread.
     inline constexpr double LUA_BINDINGS_VERSION{1};
 
     /// \brief every binding a controls holds as a table

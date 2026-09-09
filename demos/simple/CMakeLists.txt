@@ -1,23 +1,14 @@
 # © Joseph Cameron - All Rights Reserved
 
-jfc_project(executable
-    NAME "gdkinput-simple-demo"
-    VERSION 1.0
-    DESCRIPTION "demo gdk-input app"
-    C++_STANDARD 20
-    C_STANDARD 90
+project(gdkinput-simple-demo)
 
-    SOURCE_LIST
-        ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
-    
-    PRIVATE_INCLUDE_DIRECTORIES
-        "${gdkinput_INCLUDE_DIRECTORIES}"
-        "${glfw_INCLUDE_DIR}"
+add_executable(gdkinput-simple-demo
+    ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp)
 
-    LIBRARIES
-        "${gdkinput_LIBRARIES}"
+target_include_directories(gdkinput-simple-demo PRIVATE
+    "${glfw_INCLUDE_DIR}")
 
-    DEPENDENCIES
-        "gdkinput"
-)
+target_link_libraries(gdkinput-simple-demo PRIVATE gdkinput)
+
+target_compile_features(gdkinput-simple-demo PRIVATE cxx_std_20)
 
