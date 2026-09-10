@@ -96,7 +96,7 @@ set_target_properties(gdkinput PROPERTIES EXPORT_NAME input)
 
 set_target_properties(gdkinput PROPERTIES PREFIX "lib")
 
-jfc_generate_cmake_header()
+jfc_generate_build_info()
 
 target_include_directories(gdkinput
     PUBLIC

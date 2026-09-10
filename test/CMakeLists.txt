@@ -8,7 +8,6 @@ endif()
 
 jfc_add_tests(
     C++_STANDARD 20
-    C_STANDARD 90
 
     TEST_SOURCE_FILES
         "${CMAKE_CURRENT_LIST_DIR}/null_backend_test.cpp"
@@ -29,4 +28,4 @@ jfc_add_tests(
         magic_enum
         ${ext_test_libraries})
 
-set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_EXTENSIONS OFF)
+set_property(TARGET ${JFC_TEST_TARGET} PROPERTY CXX_EXTENSIONS OFF)
