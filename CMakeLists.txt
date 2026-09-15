@@ -27,6 +27,7 @@ if (GDK_INPUT_IMPLEMENTATION_GLFW)
         ${CMAKE_CURRENT_SOURCE_DIR}/impl/glfw/src/glfw_gamepad.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/impl/glfw/src/glfw_keyboard.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/impl/glfw/src/glfw_mouse.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/impl/glfw/src/glfw_text_input.cpp
     )
 
     set(implementation_header_paths "${implementation_header_paths}"
@@ -88,6 +89,7 @@ add_library(gdkinput STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/controls.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/enum_ostreams.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/exception.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/text_input.cpp
     ${implementation_source_list})
 
 add_library(gdk::input ALIAS gdkinput)

@@ -17,10 +17,12 @@ jfc_add_tests(
         "${CMAKE_CURRENT_LIST_DIR}/gamepad_test.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/keyboard_test.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/mouse_test.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/text_input_test.cpp"
         ${ext_test_sources}
 
     INCLUDE_DIRECTORIES
         "${CMAKE_CURRENT_LIST_DIR}"
+        "${CMAKE_CURRENT_LIST_DIR}/../src/include"
         ${ext_test_includes}
 
     LIBRARIES

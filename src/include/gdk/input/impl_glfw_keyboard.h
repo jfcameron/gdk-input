@@ -4,10 +4,12 @@
 #define GDK_INPUT_KEYBOARD_GLFW_H
 
 #include <gdk/input/context.h>
+#include <gdk/input/impl_text_input.h>
 
 #include <GLFW/glfw3.h>
 
 #include <memory>
+#include <set>
 #include <unordered_map>
 
 struct GLFWwindow;
@@ -17,7 +19,9 @@ namespace gdk::input {
     /// \attention glfwPollEvents() must be called periodically in order to update the keyboard state
     class keyboard_glfw final {
     public:
-		void update();
+		/// \param aTextFocus whether a text field has the keyboard
+		/// \param aPressed the glfw keys pressed since the last update
+		void update(const bool aTextFocus, const std::set<int> &aPressed = {});
 
         bool key_down(const keyboard::key &aKeyCode) const;
 		bool key_just_down(const keyboard::key &aKeyCode) const;
@@ -27,7 +31,7 @@ namespace gdk::input {
 
     private:
         std::shared_ptr<GLFWwindow> m_pWindow;
-		std::unordered_map<decltype(GLFW_KEY_Q), decltype(GLFW_PRESS)> m_KeyboardLastState;
+		std::unordered_map<decltype(GLFW_KEY_Q), withheld_key> m_Keys;
 		std::unordered_map<decltype(GLFW_KEY_Q), keyboard::key_state> m_CurrentState;
     };
 }

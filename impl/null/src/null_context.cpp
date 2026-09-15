@@ -5,6 +5,7 @@
 #include <gdk/input/impl_gamepad_mappings.h>
 
 #include <gdk/input/impl_slot_assignment.h>
+#include <gdk/input/impl_text_input.h>
 
 #include <cmath>
 
@@ -19,7 +20,7 @@ std::shared_ptr<null_context> null_context::make() {
 }
 
 bool null_context::key_down(const keyboard::key &aKey) const {
-    return mKeys.held.count(aKey) != 0;
+    return mKeys.held.count(aKey) != 0 && mWithheldKeys.count(aKey) == 0;
 }
 
 bool null_context::key_just_pressed(const keyboard::key &aKey) const {
@@ -138,12 +139,50 @@ std::optional<std::size_t> null_context::port_of(const std::size_t aPlayer) cons
 }
 
 void null_context::press_key(const keyboard::key aKey) {
-    if (mKeys.held.insert(aKey).second) mKeys.pressedThisFrame.insert(aKey);
+    if (!mKeys.held.insert(aKey).second) return;
+
+    if (mTextFocus) mWithheldKeys.insert(aKey);
+    else mKeys.pressedThisFrame.insert(aKey);
 }
 
 void null_context::release_key(const keyboard::key aKey) {
-    if (mKeys.held.erase(aKey)) mKeys.releasedThisFrame.insert(aKey);
+    if (!mKeys.held.erase(aKey)) return;
+
+    if (!mWithheldKeys.erase(aKey)) mKeys.releasedThisFrame.insert(aKey);
 }
+
+const std::vector<text::event> &null_context::text_events() const { return mTextEvents; }
+
+text::composition null_context::text_composition() const { return mComposition; }
+
+bool null_context::text_input_focus() const { return mTextFocus; }
+
+void null_context::set_text_input_focus(const bool aFocus) {
+    if (aFocus == mTextFocus) return;
+
+    mTextFocus = aFocus;
+
+    if (aFocus) {
+        for (const auto key : mKeys.held) {
+            if (!mWithheldKeys.insert(key).second) continue;
+
+            if (!mKeys.pressedThisFrame.erase(key)) mKeys.releasedThisFrame.insert(key);
+        }
+    }
+    else mComposition = {};
+}
+
+void null_context::set_text_input_caret(const text::caret &aCaret) { mCaret = aCaret; }
+
+void null_context::type_text(const std::string &aText) { append_text(mTextEvents, aText); }
+
+void null_context::press_edit(const text::edit &aEdit) { mTextEvents.emplace_back(aEdit); }
+
+void null_context::set_composition(const text::composition &aComposition) {
+    mComposition = aComposition;
+}
+
+text::caret null_context::text_input_caret() const { return mCaret; }
 
 void null_context::press_mouse_button(const mouse::button aButton) {
     if (mMouseButtons.held.insert(aButton).second) mMouseButtons.pressedThisFrame.insert(aButton);
@@ -188,6 +227,8 @@ void null_context::update() {
 
     mKeys.advance();
     mMouseButtons.advance();
+
+    mTextEvents.clear();
 
     for (auto &pGamepad : mGamepads) pGamepad->update();
 }

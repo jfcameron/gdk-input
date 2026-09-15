@@ -33,6 +33,12 @@ namespace gdk::input {
 		[[nodiscard]] virtual mouse::cursor_mode mouse_cursor_mode() const override;
 		virtual void set_mouse_cursor_mode(mouse::cursor_mode mode) override;
 
+		[[nodiscard]] virtual const std::vector<text::event> &text_events() const override;
+		[[nodiscard]] virtual text::composition text_composition() const override;
+		[[nodiscard]] virtual bool text_input_focus() const override;
+		virtual void set_text_input_focus(const bool aFocus) override;
+		virtual void set_text_input_caret(const text::caret &aCaret) override;
+
 		[[nodiscard]] virtual gamepad_ptr get_gamepad(const size_t index) override;
 		[[nodiscard]] virtual gamepad_collection_type gamepads() override;
 		virtual void swap_players(const std::size_t aLeft, const std::size_t aRight) override;

@@ -4,6 +4,7 @@
 #include <gdk/input/impl_glfw_gamepad.h>
 #include <gdk/input/impl_glfw_keyboard.h>
 #include <gdk/input/impl_glfw_mouse.h>
+#include <gdk/input/impl_glfw_text_input.h>
 
 #include <gdk/input/impl_gamepad_mappings.h>
 #include <gdk/input/impl_slot_assignment.h>
@@ -24,12 +25,14 @@ struct glfw_context::impl final {
 
 	keyboard_glfw keyboard;
 	mouse_glfw mouse;
+	text_input_glfw text;
 
 	std::array<glfw_gamepad_ptr, GLFW_JOYSTICK_LAST + 1> gamepads;
 
 	explicit impl(std::shared_ptr<GLFWwindow> apWindow)
 	: keyboard(apWindow)
-	, mouse(apWindow) {
+	, mouse(apWindow)
+	, text(apWindow) {
 		for (auto &pGamepad : gamepads) pGamepad = glfw_gamepad_ptr(new gamepad_glfw());
 	}
 
@@ -99,6 +102,26 @@ mouse::cursor_2d_type glfw_context::mouse_delta() const {
 
 mouse::scroll_2d_type glfw_context::mouse_scroll_delta() const {
 	return m_pImpl->mouse.scroll_delta();
+}
+
+const std::vector<text::event> &glfw_context::text_events() const {
+	return m_pImpl->text.events();
+}
+
+text::composition glfw_context::text_composition() const {
+	return m_pImpl->text.composition();
+}
+
+bool glfw_context::text_input_focus() const {
+	return m_pImpl->text.focus();
+}
+
+void glfw_context::set_text_input_focus(const bool aFocus) {
+	m_pImpl->text.set_focus(aFocus);
+}
+
+void glfw_context::set_text_input_caret(const text::caret &aCaret) {
+	m_pImpl->text.set_caret(aCaret);
 }
 
 context::gamepad_ptr glfw_context::get_gamepad(const size_t index) {
@@ -179,7 +202,8 @@ context::gamepad_collection_type glfw_context::gamepads() {
 }
 
 void glfw_context::update() {
-	m_pImpl->keyboard.update();
+	m_pImpl->text.update();
+	m_pImpl->keyboard.update(m_pImpl->text.focus(), m_pImpl->text.presses());
 	m_pImpl->mouse.update();
 
 	m_pImpl->reconcile_devices();

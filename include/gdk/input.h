@@ -9,6 +9,7 @@
 #include <gdk/input/controls.h>
 #include <gdk/input/exception.h>
 #include <gdk/input/gamepad.h>
+#include <gdk/input/text.h>
 #include <gdk/input/types.h>
 
 #endif

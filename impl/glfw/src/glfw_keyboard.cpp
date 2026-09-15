@@ -270,25 +270,8 @@ bool keyboard_glfw::key_just_released(const keyboard::key &aKeyCode) const {
 	return value;
 }
 
-void keyboard_glfw::update() {
-	for (const auto &glfwKey : KEY_SET) {
-		auto lastKeyState = m_KeyboardLastState[glfwKey];
-
-		auto currentKeyState = glfwGetKey(m_pWindow.get(), glfwKey);
-
-		auto newState = keyboard::key_state::up;
-
-		if (currentKeyState == GLFW_RELEASE && lastKeyState != GLFW_RELEASE)
-			newState = keyboard::key_state::just_released;
-		
-		else if (currentKeyState != GLFW_RELEASE)
-			newState = lastKeyState == GLFW_RELEASE
-				? keyboard::key_state::just_pressed
-				: keyboard::key_state::held_down;
-		
-		m_CurrentState[glfwKey] = newState;
-
-		m_KeyboardLastState[glfwKey] = currentKeyState;
-	}
+void keyboard_glfw::update(const bool aTextFocus, const std::set<int> &aPressed) {
+	for (const auto &glfwKey : KEY_SET)
+		m_CurrentState[glfwKey] = m_Keys[glfwKey].advance(
+			glfwGetKey(m_pWindow.get(), glfwKey) != GLFW_RELEASE || aPressed.count(glfwKey) != 0, aTextFocus);
 }
-

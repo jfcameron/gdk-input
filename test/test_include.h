@@ -12,6 +12,15 @@
 #include <stdexcept>
 #include <string>
 
+/// glfw's own entry for a key event from the platform, which sets what glfwGetKey reads and calls the
+/// window's key callback.
+extern "C" void _glfwInputKey(struct _GLFWwindow *window, int key, int scancode, int action, int mods);
+
+//! press or release a key, as the platform would. \see _glfwInputKey
+inline void input_glfw_key(GLFWwindow *const pWindow, const int aKey, const int aAction) {
+    _glfwInputKey(reinterpret_cast<struct _GLFWwindow *>(pWindow), aKey, 0, aAction, 0);
+}
+
 [[nodiscard]] inline std::shared_ptr<GLFWwindow> initGLFW() {
     static std::string lastError;
 

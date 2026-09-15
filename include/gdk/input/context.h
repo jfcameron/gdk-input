@@ -4,6 +4,7 @@
 #define GDK_INPUT_CONTEXT_H
 
 #include <gdk/input/gamepad.h>
+#include <gdk/input/text.h>
 #include <gdk/input/types.h>
 
 #include <memory>
@@ -78,6 +79,33 @@ namespace gdk::input {
 
 		/// \brief affects cursor behaviour
 		virtual void set_mouse_cursor_mode(mouse::cursor_mode mode) = 0;
+    ///@}
+
+    /// \name text input
+    /// Typing into a text field: what was typed, what an input method is composing, and the field
+    /// telling the context it has the keyboard. \see text.h
+    ///@{
+    //
+		/// \brief what was typed between the last two updates: text committed and editing keys, in order
+		///
+		/// Collected whether or not a field has focus; a field reads them while it does.
+		[[nodiscard]] virtual const std::vector<text::event> &text_events() const = 0;
+
+		/// \brief what an input method is composing now: empty when it is composing nothing
+		[[nodiscard]] virtual text::composition text_composition() const = 0;
+
+		/// \brief whether a text field has the keyboard
+		[[nodiscard]] virtual bool text_input_focus() const = 0;
+
+		/// \brief give the keyboard to a text field or hand it back
+		///
+		/// **While a field has it, every key reads as up** to everything but \ref text_events 
+		///
+		/// Handing the keyboard back abandons any composition in progress.
+		virtual void set_text_input_focus(const bool aFocus) = 0;
+
+		/// \brief tell the input method where the field's caret is, so its windows open beside it
+		virtual void set_text_input_caret(const text::caret &aCaret) = 0;
     ///@}
 
     /// \name gamepad methods

@@ -5,6 +5,7 @@
 
 #include <gdk/input/context.h>
 #include <gdk/input/null_gamepad.h>
+#include <gdk/input/text.h>
 
 #include <array>
 #include <memory>
@@ -34,6 +35,12 @@ namespace gdk::input {
         [[nodiscard]] virtual mouse::cursor_mode mouse_cursor_mode() const override;
         virtual void set_mouse_cursor_mode(mouse::cursor_mode aMode) override;
 
+        [[nodiscard]] virtual const std::vector<text::event> &text_events() const override;
+        [[nodiscard]] virtual text::composition text_composition() const override;
+        [[nodiscard]] virtual bool text_input_focus() const override;
+        virtual void set_text_input_focus(const bool aFocus) override;
+        virtual void set_text_input_caret(const text::caret &aCaret) override;
+
         [[nodiscard]] virtual gamepad_ptr get_gamepad(const size_t index) override;
         [[nodiscard]] virtual gamepad_collection_type gamepads() override;
         virtual void swap_players(const std::size_t aLeft, const std::size_t aRight) override;
@@ -59,6 +66,18 @@ namespace gdk::input {
         void set_mouse_delta(const mouse::cursor_2d_type aDelta);
         void set_scroll_delta(const mouse::scroll_2d_type aDelta);
 
+        //! text committed, as UTF-8, as a keyboard or an input method would. Until the next update
+        void type_text(const std::string &aText);
+
+        //! an editing key pressed, or repeating. Until the next update
+        void press_edit(const text::edit &aEdit);
+
+        //! what an input method is composing, until it is changed
+        void set_composition(const text::composition &aComposition);
+
+        //! where the field with focus last said its caret was
+        [[nodiscard]] text::caret text_input_caret() const;
+
         void update();
 
         virtual ~null_context() override = default;
@@ -78,6 +97,14 @@ namespace gdk::input {
         };
 
         edge_set<keyboard::key> mKeys;
+
+        //! keys held that read as up, for a text field has, or had, the keyboard
+        std::set<keyboard::key> mWithheldKeys;
+
+        std::vector<text::event> mTextEvents;
+        text::composition mComposition;
+        text::caret mCaret;
+        bool mTextFocus{false};
         edge_set<mouse::button> mMouseButtons;
 
         mouse::cursor_2d_type mCursorPosition{0, 0};
