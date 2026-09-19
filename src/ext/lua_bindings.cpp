@@ -54,6 +54,11 @@ namespace {
                 out.set(BUTTON_KEY, name_of(aBinding.mouseButton));
             break;
 
+            case binding::kind::pointer_axis:
+                out.set(AXIS_KEY, name_of(aBinding.pointerAxis));
+                out.set(SCALE_KEY, static_cast<double>(aBinding.scale));
+            break;
+
             case binding::kind::gamepad_button:
                 out.set(BUTTON_KEY, name_of(aBinding.gamepadButton));
             break;
@@ -101,6 +106,14 @@ namespace {
                 if (!button) return {};
 
                 return binding::of(*button);
+            }
+
+            case binding::kind::pointer_axis: {
+                const auto axis = value_of<mouse::axis>(aEntry.get_string(AXIS_KEY));
+
+                if (!axis) return {};
+
+                return binding::of(*axis, scale);
             }
 
             case binding::kind::gamepad_button: {

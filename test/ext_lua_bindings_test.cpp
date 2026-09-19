@@ -25,6 +25,8 @@ namespace {
             pControls->bind("jump", keyboard::key::space);
             pControls->bind("jump", gamepad::button::a);
             pControls->bind("fire", mouse::button::left);
+            pControls->bind("zoom", mouse::axis::scroll_y);
+            pControls->bind("look", mouse::axis::x, -1.f);
             pControls->bind("move_left", gamepad::axis::left_x, -1.f);
             pControls->bind("move_right", gamepad::axis::left_x, 1.f);
             pControls->bind_device_button("brake", "guid-stick", 7);
