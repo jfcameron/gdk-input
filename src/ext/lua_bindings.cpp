@@ -181,7 +181,8 @@ data_table gdk::input::ext::to_data_table(const controls &aControls) {
     return out;
 }
 
-std::size_t gdk::input::ext::from_data_table(controls &aControls, const data_table &aTable) {
+std::size_t gdk::input::ext::from_data_table(controls &aControls, const data_table &aTable,
+    const binding_order aOrder) {
     const auto version = aTable.get_number(VERSION_KEY);
 
     if (!version)
@@ -196,7 +197,8 @@ std::size_t gdk::input::ext::from_data_table(controls &aControls, const data_tab
 
     if (!pActions) throw exception("bindings table has no actions table");
 
-    for (const auto &action : aControls.actions()) aControls.unbind(action);
+    if (aOrder == binding_order::replace)
+        for (const auto &action : aControls.actions()) aControls.unbind(action);
 
     if (const auto threshold = aTable.get_number(THRESHOLD_KEY))
         aControls.set_threshold(static_cast<controls::value_type>(*threshold));
@@ -227,6 +229,7 @@ std::string gdk::input::ext::to_string(const controls &aControls) {
     return to_data_table(aControls).to_string();
 }
 
-std::size_t gdk::input::ext::from_string(controls &aControls, const std::string &aText) {
-    return from_data_table(aControls, data_table::from_string(aText));
+std::size_t gdk::input::ext::from_string(controls &aControls, const std::string &aText,
+    const binding_order aOrder) {
+    return from_data_table(aControls, data_table::from_string(aText), aOrder);
 }

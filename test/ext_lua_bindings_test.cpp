@@ -217,3 +217,41 @@ TEST_CASE("the player index is recorded but not applied", "[ext][lua]")
     REQUIRE(pFirst->player() == 0);
     REQUIRE(ext::to_data_table(*pSecond).get_number("player") == 1);
 }
+
+TEST_CASE("bindings may be added to what is already bound", "[ext][lua]")
+{
+    fixture f;
+
+    auto pControls = f.make_controls();
+
+    constexpr auto FIRST = R"({["version"]=1,["actions"]={["walk"]={[1]={["kind"]="key",["key"]="w"}}}})";
+    constexpr auto SECOND = R"({["version"]=1,["actions"]={["fish"]={[1]={["kind"]="key",["key"]="f"}}}})";
+
+    REQUIRE(ext::from_string(*pControls, FIRST) == 0);
+    REQUIRE(pControls->sources("walk").size() == 1);
+
+    SECTION("**replacing is what it has always done**, and what a player's own bindings want")
+    {
+        REQUIRE(ext::from_string(*pControls, SECOND) == 0);
+
+        REQUIRE(pControls->sources("fish").size() == 1);
+        REQUIRE(pControls->sources("walk").empty());
+    }
+
+    SECTION("**adding keeps what was there**, which is what several sources of defaults want")
+    {
+        REQUIRE(ext::from_string(*pControls, SECOND, ext::binding_order::add) == 0);
+
+        REQUIRE(pControls->sources("fish").size() == 1);
+        REQUIRE(pControls->sources("walk").size() == 1);
+    }
+
+    SECTION("**and an action bound by both has what each gave it**")
+    {
+        constexpr auto ALSO = R"({["version"]=1,["actions"]={["walk"]={[1]={["kind"]="key",["key"]="up"}}}})";
+
+        REQUIRE(ext::from_string(*pControls, ALSO, ext::binding_order::add) == 0);
+
+        REQUIRE(pControls->sources("walk").size() == 2);
+    }
+}

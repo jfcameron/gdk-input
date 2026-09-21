@@ -33,14 +33,25 @@ namespace gdk::input::ext {
     /// ~~~
     [[nodiscard]] jfc::lua::data_table to_data_table(const controls &aControls);
 
-    /// \brief replace a controls' bindings with the ones in a table
-    std::size_t from_data_table(controls &aControls, const jfc::lua::data_table &aTable);
+    /// \brief what a table's bindings do to the ones already there
+    enum class binding_order {
+        replace, //<! what was bound is unbound first
+        add      //<! what is in the table is bound beside what was already there
+    };
+
+    /// \brief put the bindings in a table onto a controls
+    ///
+    /// \param aOrder whether what is already bound is cleared first. **Replacing is the default**,
+    ///        which is what this has always done.
+    std::size_t from_data_table(controls &aControls, const jfc::lua::data_table &aTable,
+        binding_order aOrder = binding_order::replace);
 
     /// \brief serialize a controls to a lua table
     [[nodiscard]] std::string to_string(const controls &aControls);
 
     /// \brief parsed from_data_table
-    std::size_t from_string(controls &aControls, const std::string &aText);
+    std::size_t from_string(controls &aControls, const std::string &aText,
+        binding_order aOrder = binding_order::replace);
 }
 
 #endif
