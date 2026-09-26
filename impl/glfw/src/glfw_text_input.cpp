@@ -38,6 +38,20 @@ namespace {
         }
     }
 
+    //! **a shortcut, with Control held**: select all, copy, paste, cut, undo, redo. \see text::SHORTCUT_KEYS
+    [[nodiscard]] std::optional<keyboard::key> shortcut_key(const int aKey) {
+        switch (aKey) {
+            case GLFW_KEY_A: return keyboard::key::a;
+            case GLFW_KEY_C: return keyboard::key::c;
+            case GLFW_KEY_V: return keyboard::key::v;
+            case GLFW_KEY_X: return keyboard::key::x;
+            case GLFW_KEY_Z: return keyboard::key::z;
+            case GLFW_KEY_Y: return keyboard::key::y;
+
+            default: return {};
+        }
+    }
+
     [[nodiscard]] text_input_glfw *receiver(GLFWwindow *const pWindow) {
         const auto found = receivers().find(pWindow);
 
@@ -103,6 +117,16 @@ void text_input_glfw::set_focus(const bool aFocus) {
     }
 }
 
+std::string text_input_glfw::clipboard() const {
+    const char *const pText = glfwGetClipboardString(m_pWindow.get());
+
+    return pText ? std::string(pText) : std::string();
+}
+
+void text_input_glfw::set_clipboard(const std::string &aText) {
+    glfwSetClipboardString(m_pWindow.get(), aText.c_str());
+}
+
 void text_input_glfw::set_caret(const text::caret &aCaret) {
 #if GDK_INPUT_GLFW_IME
     int width, height;
@@ -142,7 +166,9 @@ void text_input_glfw::on_key(GLFWwindow *const pWindow, const int aKey, const in
 
     if (aAction == GLFW_PRESS) pInput->m_PendingPresses.insert(aKey);
 
-    if (const auto key = editing_key(aKey); key && aAction != GLFW_RELEASE) {
+    const auto key = editing_key(aKey) ? editing_key(aKey) : (aMods & GLFW_MOD_CONTROL ? shortcut_key(aKey) : std::nullopt);
+
+    if (key && aAction != GLFW_RELEASE) {
         text::edit edit;
 
         edit.key = *key;

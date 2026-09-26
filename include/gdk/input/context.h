@@ -106,6 +106,12 @@ namespace gdk::input {
 
 		/// \brief tell the input method where the field's caret is, so its windows open beside it
 		virtual void set_text_input_caret(const text::caret &aCaret) = 0;
+
+		/// \brief get the content of the system clipboard
+		[[nodiscard]] virtual std::string clipboard() const { return {}; }
+
+		/// \brief set system clipboard content
+		virtual void set_clipboard(const std::string &aText) { static_cast<void>(aText); }
     ///@}
 
     /// \name gamepad methods

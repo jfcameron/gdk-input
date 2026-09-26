@@ -38,8 +38,18 @@ namespace gdk::input::text {
         return false;
     }
 
+    inline constexpr std::array<keyboard::key, 6> SHORTCUT_KEYS {
+        keyboard::key::a, keyboard::key::c, keyboard::key::v, keyboard::key::x, keyboard::key::z, keyboard::key::y
+    };
+
+    [[nodiscard]] constexpr bool is_shortcut_key(const keyboard::key aKey) {
+        for (const auto key : SHORTCUT_KEYS) if (key == aKey) return true;
+
+        return false;
+    }
+
     struct edit final {
-        keyboard::key key = keyboard::key::backspace; //!< one of \ref EDITING_KEYS
+        keyboard::key key = keyboard::key::backspace; //!< one of \ref EDITING_KEYS, or \ref SHORTCUT_KEYS with Control held
 
         modifiers held;
 

@@ -10,6 +10,7 @@
 #include <array>
 #include <memory>
 #include <set>
+#include <string>
 #include <vector>
 
 namespace gdk::input {
@@ -40,6 +41,9 @@ namespace gdk::input {
         [[nodiscard]] virtual bool text_input_focus() const override;
         virtual void set_text_input_focus(const bool aFocus) override;
         virtual void set_text_input_caret(const text::caret &aCaret) override;
+
+        [[nodiscard]] virtual std::string clipboard() const override { return mClipboard; }
+        virtual void set_clipboard(const std::string &aText) override { mClipboard = aText; }
 
         [[nodiscard]] virtual gamepad_ptr get_gamepad(const size_t index) override;
         [[nodiscard]] virtual gamepad_collection_type gamepads() override;
@@ -103,6 +107,7 @@ namespace gdk::input {
 
         std::vector<text::event> mTextEvents;
         text::composition mComposition;
+        std::string mClipboard;
         text::caret mCaret;
         bool mTextFocus{false};
         edge_set<mouse::button> mMouseButtons;

@@ -39,6 +39,9 @@ namespace gdk::input {
 		virtual void set_text_input_focus(const bool aFocus) override;
 		virtual void set_text_input_caret(const text::caret &aCaret) override;
 
+		[[nodiscard]] virtual std::string clipboard() const override;
+		virtual void set_clipboard(const std::string &aText) override;
+
 		[[nodiscard]] virtual gamepad_ptr get_gamepad(const size_t index) override;
 		[[nodiscard]] virtual gamepad_collection_type gamepads() override;
 		virtual void swap_players(const std::size_t aLeft, const std::size_t aRight) override;

@@ -10,6 +10,7 @@
 
 #include <memory>
 #include <set>
+#include <string>
 #include <vector>
 
 /// whether this glfw can talk to an input method: the IME branch's, and not under emscripten, which
@@ -38,6 +39,10 @@ namespace gdk::input {
         void set_focus(const bool aFocus);
 
         void set_caret(const text::caret &aCaret);
+
+        //! the system clipboard's text
+        [[nodiscard]] std::string clipboard() const;
+        void set_clipboard(const std::string &aText);
 
         explicit text_input_glfw(std::shared_ptr<GLFWwindow> pWindow);
 

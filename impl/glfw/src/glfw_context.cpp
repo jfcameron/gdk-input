@@ -124,6 +124,14 @@ void glfw_context::set_text_input_caret(const text::caret &aCaret) {
 	m_pImpl->text.set_caret(aCaret);
 }
 
+std::string glfw_context::clipboard() const {
+	return m_pImpl->text.clipboard();
+}
+
+void glfw_context::set_clipboard(const std::string &aText) {
+	m_pImpl->text.set_clipboard(aText);
+}
+
 context::gamepad_ptr glfw_context::get_gamepad(const size_t index) {
 	if (index >= m_pImpl->gamepads.size()) {
 		static const auto pAbsent = std::make_shared<gamepad_glfw>();
