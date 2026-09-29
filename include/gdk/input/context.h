@@ -97,6 +97,9 @@ namespace gdk::input {
 		/// \brief whether a text field has the keyboard
 		[[nodiscard]] virtual bool text_input_focus() const = 0;
 
+		/// \brief the modifier keys held down, whether or not a text field has the keyboard
+		[[nodiscard]] virtual text::modifiers modifiers_held() const = 0;
+
 		/// \brief give the keyboard to a text field or hand it back
 		///
 		/// **While a field has it, every key reads as up** to everything but \ref text_events 

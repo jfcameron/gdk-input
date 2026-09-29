@@ -157,6 +157,16 @@ text::composition null_context::text_composition() const { return mComposition; 
 
 bool null_context::text_input_focus() const { return mTextFocus; }
 
+text::modifiers null_context::modifiers_held() const {
+    const auto held = [this](const keyboard::key aLeft, const keyboard::key aRight) {
+        return mKeys.held.count(aLeft) != 0 || mKeys.held.count(aRight) != 0;
+    };
+
+    return {held(keyboard::key::leftshift, keyboard::key::rightshift),
+        held(keyboard::key::leftcontrol, keyboard::key::rightcontrol),
+        held(keyboard::key::leftalt, keyboard::key::rightalt), false};
+}
+
 void null_context::set_text_input_focus(const bool aFocus) {
     if (aFocus == mTextFocus) return;
 

@@ -27,6 +27,8 @@ namespace gdk::input {
 		bool key_just_down(const keyboard::key &aKeyCode) const;
 		bool key_just_released(const keyboard::key &aKeyCode) const;
 
+		text::modifiers modifiers() const;
+
 		keyboard_glfw(std::shared_ptr<GLFWwindow> pWindow);
 
     private:

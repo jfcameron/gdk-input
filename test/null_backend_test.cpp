@@ -307,6 +307,37 @@ TEST_CASE("keyboard and mouse are drivable too", "[null][input]")
     }
 }
 
+TEST_CASE("modifiers are held as the keyboard is, whether or not a field has it", "[null][input][modifiers]")
+{
+    auto pContext = null_context::make();
+
+    REQUIRE(pContext->modifiers_held() == text::modifiers{});
+
+    pContext->press_key(keyboard::key::leftshift);
+    pContext->press_key(keyboard::key::rightcontrol);
+
+    REQUIRE(pContext->modifiers_held() == text::modifiers{true, true, false, false});
+
+    SECTION("a field taking the keyboard hides them from key_down, and not from modifiers_held")
+    {
+        pContext->set_text_input_focus(true);
+        pContext->update();
+
+        REQUIRE_FALSE(pContext->key_down(keyboard::key::leftshift));
+        REQUIRE(pContext->modifiers_held().shift);
+        REQUIRE(pContext->modifiers_held().control);
+    }
+
+    SECTION("let go, they are not held")
+    {
+        pContext->release_key(keyboard::key::leftshift);
+        pContext->release_key(keyboard::key::rightcontrol);
+        pContext->press_key(keyboard::key::leftalt);
+
+        REQUIRE(pContext->modifiers_held() == text::modifiers{false, false, true, false});
+    }
+}
+
 TEST_CASE("a mapped device presents the standard layout", "[null][input][mapping]")
 {
     auto pContext = null_context::make();

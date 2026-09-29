@@ -270,6 +270,15 @@ bool keyboard_glfw::key_just_released(const keyboard::key &aKeyCode) const {
 	return value;
 }
 
+text::modifiers keyboard_glfw::modifiers() const {
+	const auto held = [this](const int aLeft, const int aRight) {
+		return glfwGetKey(m_pWindow.get(), aLeft) != GLFW_RELEASE || glfwGetKey(m_pWindow.get(), aRight) != GLFW_RELEASE;
+	};
+
+	return {held(GLFW_KEY_LEFT_SHIFT, GLFW_KEY_RIGHT_SHIFT), held(GLFW_KEY_LEFT_CONTROL, GLFW_KEY_RIGHT_CONTROL),
+		held(GLFW_KEY_LEFT_ALT, GLFW_KEY_RIGHT_ALT), held(GLFW_KEY_LEFT_SUPER, GLFW_KEY_RIGHT_SUPER)};
+}
+
 void keyboard_glfw::update(const bool aTextFocus, const std::set<int> &aPressed) {
 	for (const auto &glfwKey : KEY_SET)
 		m_CurrentState[glfwKey] = m_Keys[glfwKey].advance(

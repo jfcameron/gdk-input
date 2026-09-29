@@ -112,6 +112,10 @@ text::composition glfw_context::text_composition() const {
 	return m_pImpl->text.composition();
 }
 
+text::modifiers glfw_context::modifiers_held() const {
+	return m_pImpl->keyboard.modifiers();
+}
+
 bool glfw_context::text_input_focus() const {
 	return m_pImpl->text.focus();
 }

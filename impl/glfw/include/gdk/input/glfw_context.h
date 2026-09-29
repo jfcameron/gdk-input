@@ -36,6 +36,8 @@ namespace gdk::input {
 		[[nodiscard]] virtual const std::vector<text::event> &text_events() const override;
 		[[nodiscard]] virtual text::composition text_composition() const override;
 		[[nodiscard]] virtual bool text_input_focus() const override;
+
+		[[nodiscard]] virtual text::modifiers modifiers_held() const override;
 		virtual void set_text_input_focus(const bool aFocus) override;
 		virtual void set_text_input_caret(const text::caret &aCaret) override;
 
