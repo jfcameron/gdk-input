@@ -4,6 +4,10 @@
 
 #include <GLFW/glfw3.h>
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten/em_asm.h>
+#endif
+
 #include <array>
 #include <iostream>
 #include <stdexcept>
@@ -64,6 +68,16 @@ void mouse_glfw::set_cursor_mode(const mouse::cursor_mode acursor_mode) {
         default: throw std::invalid_argument(std::string("Unhandled cursor_mode: ")
             .append(std::to_string(static_cast<std::underlying_type<decltype(acursor_mode)>::type>(acursor_mode))));
     }
+
+#ifdef __EMSCRIPTEN__
+    EM_ASM({
+        const canvas = Module['canvas'];
+
+        if (canvas) canvas.style.cursor = $0 ? 'none' : '';
+    }, acursor_mode == mouse::cursor_mode::hidden);
+
+    if (cursorModeBuffer == GLFW_CURSOR_HIDDEN) cursorModeBuffer = GLFW_CURSOR_NORMAL;
+#endif
 
     glfwSetInputMode(m_pWindow.get(), GLFW_CURSOR, cursorModeBuffer);
 

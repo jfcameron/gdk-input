@@ -179,10 +179,15 @@ void null_context::set_text_input_focus(const bool aFocus) {
             if (!mKeys.pressedThisFrame.erase(key)) mKeys.releasedThisFrame.insert(key);
         }
     }
-    else mComposition = {};
+    else {
+        mComposition = {};
+        mPurpose = text::purpose::plain;
+    }
 }
 
 void null_context::set_text_input_caret(const text::caret &aCaret) { mCaret = aCaret; }
+
+void null_context::set_text_input_purpose(const text::purpose aPurpose) { mPurpose = aPurpose; }
 
 void null_context::type_text(const std::string &aText) { append_text(mTextEvents, aText); }
 
@@ -193,6 +198,8 @@ void null_context::set_composition(const text::composition &aComposition) {
 }
 
 text::caret null_context::text_input_caret() const { return mCaret; }
+
+text::purpose null_context::text_input_purpose() const { return mPurpose; }
 
 void null_context::press_mouse_button(const mouse::button aButton) {
     if (mMouseButtons.held.insert(aButton).second) mMouseButtons.pressedThisFrame.insert(aButton);

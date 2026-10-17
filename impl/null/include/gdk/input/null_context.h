@@ -43,6 +43,7 @@ namespace gdk::input {
         [[nodiscard]] virtual text::modifiers modifiers_held() const override;
         virtual void set_text_input_focus(const bool aFocus) override;
         virtual void set_text_input_caret(const text::caret &aCaret) override;
+        virtual void set_text_input_purpose(const text::purpose aPurpose) override;
 
         [[nodiscard]] virtual std::string clipboard() const override { return mClipboard; }
         virtual void set_clipboard(const std::string &aText) override { mClipboard = aText; }
@@ -72,17 +73,15 @@ namespace gdk::input {
         void set_mouse_delta(const mouse::cursor_2d_type aDelta);
         void set_scroll_delta(const mouse::scroll_2d_type aDelta);
 
-        //! text committed, as UTF-8, as a keyboard or an input method would. Until the next update
         void type_text(const std::string &aText);
 
-        //! an editing key pressed, or repeating. Until the next update
         void press_edit(const text::edit &aEdit);
 
-        //! what an input method is composing, until it is changed
         void set_composition(const text::composition &aComposition);
 
-        //! where the field with focus last said its caret was
         [[nodiscard]] text::caret text_input_caret() const;
+
+        [[nodiscard]] text::purpose text_input_purpose() const;
 
         void update();
 
@@ -104,13 +103,13 @@ namespace gdk::input {
 
         edge_set<keyboard::key> mKeys;
 
-        //! keys held that read as up, for a text field has, or had, the keyboard
         std::set<keyboard::key> mWithheldKeys;
 
         std::vector<text::event> mTextEvents;
         text::composition mComposition;
         std::string mClipboard;
         text::caret mCaret;
+        text::purpose mPurpose{text::purpose::plain};
         bool mTextFocus{false};
         edge_set<mouse::button> mMouseButtons;
 

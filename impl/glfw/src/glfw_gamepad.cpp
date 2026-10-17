@@ -1,6 +1,7 @@
 // © Joseph Cameron - All Rights Reserved
 
 #include <gdk/input/impl_gamepad_mappings.h>
+#include <gdk/input/impl_joysticks.h>
 
 #include <gdk/input/impl_glfw_gamepad.h>
 
@@ -129,7 +130,7 @@ std::string_view gamepad_glfw::name() const {
 }
 
 bool gamepad_glfw::connected() const {
-    return m_JoystickIndex && glfwJoystickPresent(*m_JoystickIndex);
+    return m_JoystickIndex && joystick_present(*m_JoystickIndex);
 }
 
 bool gamepad_glfw::has_standard_mapping() const { return m_HasStandardMapping; }
@@ -165,7 +166,9 @@ void gamepad_glfw::update() {
 
     if (wasJustDisconnected) m_JustDisconnected = false;
 
-    if (!m_JoystickIndex || !glfwJoystickPresent(*m_JoystickIndex)) {
+    const auto reading = m_JoystickIndex ? read_joystick(*m_JoystickIndex) : joystick_reading{};
+
+    if (!reading.present) {
         m_Buttons.clear();
         m_Axes.clear();
         m_LastAxes.clear();
@@ -176,53 +179,23 @@ void gamepad_glfw::update() {
 
     if (wasJustConnected) m_JustConnected = false;
 
-    const int joystick = *m_JoystickIndex;
-
     m_LastAxes = m_Axes;
 
-    m_HasStandardMapping = glfwJoystickIsGamepad(joystick);
+    m_HasStandardMapping = reading.standard;
 
-    std::vector<decltype(GLFW_PRESS)> buttons;
+    if (!reading.name.empty()) m_Name = reading.name;
 
-    if (m_HasStandardMapping) {
-        GLFWgamepadstate state{};
+    m_Axes = reading.axes;
 
-        if (glfwGetGamepadState(joystick, &state)) {
-            if (const auto *pName = glfwGetGamepadName(joystick)) m_Name = pName;
+    if (m_HasStandardMapping)
+        for (std::size_t i = 0; i < m_Axes.size(); ++i)
+            if (is_standard_trigger(i)) m_Axes[i] = standard_trigger_value(m_Axes[i]);
 
-            m_Axes.assign(std::begin(state.axes), std::end(state.axes));
+    m_Hats.clear();
 
-            for (std::size_t i = 0; i < m_Axes.size(); ++i)
-                if (is_standard_trigger(i)) m_Axes[i] = standard_trigger_value(m_Axes[i]);
+    for (const auto hat : reading.hats) m_Hats.push_back(to_hat_state(hat));
 
-            buttons.assign(std::begin(state.buttons), std::end(state.buttons));
-
-            m_Hats.clear();
-        }
-    }
-    else {
-        if (const auto *pName = glfwGetJoystickName(joystick)) m_Name = pName;
-
-        int axisCount = 0;
-        const float *pAxes = glfwGetJoystickAxes(joystick, &axisCount);
-        m_Axes = pAxes
-            ? decltype(m_Axes)(pAxes, pAxes + axisCount)
-            : decltype(m_Axes)();
-
-        int hatCount = 0;
-        const unsigned char *pHats = glfwGetJoystickHats(joystick, &hatCount);
-        m_Hats.clear();
-        if (pHats) for (int i = 0; i < hatCount; ++i) m_Hats.push_back(to_hat_state(pHats[i]));
-
-        int buttonCount = 0;
-        const unsigned char *pButtons = glfwGetJoystickButtons(joystick, &buttonCount);
-        if (!pButtons) {
-            m_Buttons.clear();
-            return;
-        }
-
-        buttons.assign(pButtons, pButtons + buttonCount);
-    }
+    std::vector<decltype(GLFW_PRESS)> buttons(reading.buttons.begin(), reading.buttons.end());
 
     if (m_Buttons.size() == buttons.size()) {
         for (size_t i(0); i < buttons.size(); ++i) {

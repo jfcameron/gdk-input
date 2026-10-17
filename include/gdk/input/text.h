@@ -87,6 +87,14 @@ namespace gdk::input::text {
 
         [[nodiscard]] bool operator==(const caret &) const = default;
     };
+
+    /// \brief what the field with focus is for, so a screen's keyboard offers the keys for it
+    enum class purpose {
+        plain,    //!< anything at all
+        search,   //!< something to search for: the keyboard's enter key searches
+        url,      //!< a web address
+        password  //!< a secret, which the keyboard neither suggests nor learns
+    };
 }
 
 #endif

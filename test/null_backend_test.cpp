@@ -338,6 +338,45 @@ TEST_CASE("modifiers are held as the keyboard is, whether or not a field has it"
     }
 }
 
+TEST_CASE("a field says what it is for, until it hands the keyboard back", "[null][input][purpose]")
+{
+    auto pContext = null_context::make();
+
+    REQUIRE(pContext->text_input_purpose() == text::purpose::plain);
+
+    pContext->set_text_input_focus(true);
+    pContext->set_text_input_purpose(text::purpose::password);
+
+    REQUIRE(pContext->text_input_purpose() == text::purpose::password);
+
+    SECTION("handed back, it is plain again, so the next field is not taken for a password")
+    {
+        pContext->set_text_input_focus(false);
+
+        REQUIRE(pContext->text_input_purpose() == text::purpose::plain);
+
+        pContext->set_text_input_focus(true);
+
+        REQUIRE(pContext->text_input_purpose() == text::purpose::plain);
+    }
+
+    SECTION("said again with the keyboard kept, the new purpose is the one")
+    {
+        pContext->set_text_input_purpose(text::purpose::url);
+
+        REQUIRE(pContext->text_input_purpose() == text::purpose::url);
+    }
+
+    SECTION("said before the field takes the keyboard, it lasts until the keyboard is handed back")
+    {
+        pContext->set_text_input_focus(false);
+        pContext->set_text_input_purpose(text::purpose::search);
+        pContext->set_text_input_focus(true);
+
+        REQUIRE(pContext->text_input_purpose() == text::purpose::search);
+    }
+}
+
 TEST_CASE("a mapped device presents the standard layout", "[null][input][mapping]")
 {
     auto pContext = null_context::make();

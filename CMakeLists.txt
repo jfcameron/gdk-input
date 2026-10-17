@@ -16,7 +16,12 @@ option(GDK_INPUT_EXT_LUA "Build the ext/ lua bindings codec, which depends on jf
 
 set(GDK_INPUT_JFC_LUA_PATH "" CACHE PATH "a jfc-lua checkout to use instead of the submodule")
 
-set(GDK_INPUT_IMPLEMENTATION_GLFW ON)
+if (ANDROID)
+    set(GDK_INPUT_IMPLEMENTATION_GLFW OFF)
+else()
+    set(GDK_INPUT_IMPLEMENTATION_GLFW ON)
+endif()
+
 set(GDK_INPUT_IMPLEMENTATION_NULL ON)
 
 add_subdirectory(extern)
@@ -25,6 +30,7 @@ if (GDK_INPUT_IMPLEMENTATION_GLFW)
     set(implementation_source_list "${implementation_source_list}"
         ${CMAKE_CURRENT_SOURCE_DIR}/impl/glfw/src/glfw_context.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/impl/glfw/src/glfw_gamepad.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/impl/glfw/src/glfw_joysticks.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/impl/glfw/src/glfw_keyboard.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/impl/glfw/src/glfw_mouse.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/impl/glfw/src/glfw_text_input.cpp
@@ -42,6 +48,16 @@ if (GDK_INPUT_IMPLEMENTATION_NULL)
 
     set(implementation_header_paths "${implementation_header_paths}"
         ${CMAKE_CURRENT_SOURCE_DIR}/impl/null/include)
+endif()
+
+# an Android activity's input, fed to the null implementation's context
+if (ANDROID)
+    set(implementation_source_list "${implementation_source_list}"
+        ${CMAKE_CURRENT_SOURCE_DIR}/impl/android/src/android_input.cpp
+    )
+
+    set(implementation_header_paths "${implementation_header_paths}"
+        ${CMAKE_CURRENT_SOURCE_DIR}/impl/android/include)
 endif()
 
 file(GLOB_RECURSE _gdk_input_own_sources
@@ -112,8 +128,13 @@ target_include_directories(gdkinput
 
 target_compile_features(gdkinput PUBLIC cxx_std_20)
 
-target_link_libraries(gdkinput PUBLIC
-    glfw)
+if (GDK_INPUT_IMPLEMENTATION_GLFW)
+    target_link_libraries(gdkinput PUBLIC glfw)
+endif()
+
+if (ANDROID)
+    target_link_libraries(gdkinput PUBLIC android)
+endif()
 
 target_link_libraries(gdkinput PRIVATE magic_enum)
 

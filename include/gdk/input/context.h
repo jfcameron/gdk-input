@@ -102,13 +102,15 @@ namespace gdk::input {
 
 		/// \brief give the keyboard to a text field or hand it back
 		///
-		/// **While a field has it, every key reads as up** to everything but \ref text_events 
-		///
 		/// Handing the keyboard back abandons any composition in progress.
 		virtual void set_text_input_focus(const bool aFocus) = 0;
 
 		/// \brief tell the input method where the field's caret is, so its windows open beside it
 		virtual void set_text_input_caret(const text::caret &aCaret) = 0;
+
+		/// \brief tell the input method what the field with the keyboard is for, so a screen's
+		/// keyboard offers the keys for it
+		virtual void set_text_input_purpose(const text::purpose aPurpose) { static_cast<void>(aPurpose); }
 
 		/// \brief get the content of the system clipboard
 		[[nodiscard]] virtual std::string clipboard() const { return {}; }

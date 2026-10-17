@@ -83,8 +83,12 @@ namespace gdk::input::keyboard {
         numlock, numslash, numasterisk, numminus, 
         num7, num8, num9, numplus, 
         num4, num5, num6, 
-        num1, num2, num3, numenter, 
-        num0, numperiod
+        num1, num2, num3, numenter,
+        num0, numperiod,
+
+        // a remote's media and television keys
+        playpause, play, pause, stop, rewind, fastforward, previoustrack, nexttrack,
+        channelup, channeldown, info, captions, menu, search
     };
 }
 std::ostream& operator<<(std::ostream&, const gdk::input::keyboard::key);

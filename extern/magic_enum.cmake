@@ -7,3 +7,6 @@ add_library(magic_enum INTERFACE)
 
 target_include_directories(magic_enum INTERFACE
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include/magic_enum>")
+
+target_compile_options(magic_enum INTERFACE "$<$<CXX_COMPILER_ID:Clang,AppleClang>:-fbracket-depth=512>")
+

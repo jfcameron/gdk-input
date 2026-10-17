@@ -231,6 +231,22 @@ static inline decltype(GLFW_KEY_ESCAPE) glfwKeyCodeFromKey(const keyboard::key a
         case keyboard::key::numenter:     return GLFW_KEY_KP_ENTER;
         case keyboard::key::num0:         return GLFW_KEY_KP_0;
         case keyboard::key::numperiod:    return GLFW_KEY_KP_DECIMAL;
+
+        // GLFW has no media or television keys: they read as up
+        case keyboard::key::playpause:
+        case keyboard::key::play:
+        case keyboard::key::pause:
+        case keyboard::key::stop:
+        case keyboard::key::rewind:
+        case keyboard::key::fastforward:
+        case keyboard::key::previoustrack:
+        case keyboard::key::nexttrack:
+        case keyboard::key::channelup:
+        case keyboard::key::channeldown:
+        case keyboard::key::info:
+        case keyboard::key::captions:
+        case keyboard::key::menu:
+        case keyboard::key::search:       return GLFW_KEY_UNKNOWN;
     }
 
     throw std::invalid_argument(std::string("Unable to convert keyboard key \"")

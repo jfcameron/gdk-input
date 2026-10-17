@@ -7,8 +7,10 @@
 #include <gdk/input/impl_glfw_text_input.h>
 
 #include <gdk/input/impl_gamepad_mappings.h>
+#include <gdk/input/impl_joysticks.h>
 #include <gdk/input/impl_slot_assignment.h>
 
+#include <algorithm>
 #include <array>
 #include <set>
 #include <iostream>
@@ -19,7 +21,6 @@ context_ptr_type glfw_context::make(std::shared_ptr<GLFWwindow> apGLFWWindow) {
 	return context_ptr_type(new glfw_context(std::move(apGLFWWindow)));
 }
 
-/// \brief everything the backend actually holds
 struct glfw_context::impl final {
 	using glfw_gamepad_ptr = std::shared_ptr<gamepad_glfw>;
 
@@ -153,7 +154,7 @@ void glfw_context::swap_players(const std::size_t aLeft, const std::size_t aRigh
 }
 
 std::size_t glfw_context::add_gamepad_mappings(const std::string &aMappings) {
-	glfwUpdateGamepadMappings(aMappings.c_str());
+	if (!update_gamepad_mappings(aMappings)) return 0;
 
 	return mapping_guids(aMappings).size();
 }
@@ -166,7 +167,7 @@ void glfw_context::impl::reconcile_devices() {
 
 		if (!joystick) continue;
 
-		if (glfwJoystickPresent(*joystick)) {
+		if (joystick_present(*joystick)) {
 			claimed.insert(*joystick);
 
 			continue;
@@ -175,12 +176,12 @@ void glfw_context::impl::reconcile_devices() {
 		gamepads[player]->detach();
 	}
 
-	for (int joystick = GLFW_JOYSTICK_1; joystick <= GLFW_JOYSTICK_LAST; ++joystick) {
-		if (!glfwJoystickPresent(joystick) || claimed.count(joystick)) continue;
+	const auto count = static_cast<int>(std::min(joystick_count(), gamepads.size()));
 
-		const auto *pGuid = glfwGetJoystickGUID(joystick);
+	for (int joystick = 0; joystick < count; ++joystick) {
+		if (!joystick_present(joystick) || claimed.count(joystick)) continue;
 
-		const std::string guid = pGuid ? pGuid : "";
+		const std::string guid = joystick_guid(joystick);
 
 		std::vector<slot_memory> slots;
 
@@ -217,6 +218,8 @@ void glfw_context::update() {
 	m_pImpl->text.update();
 	m_pImpl->keyboard.update(m_pImpl->text.focus(), m_pImpl->text.presses());
 	m_pImpl->mouse.update();
+
+	sample_joysticks();
 
 	m_pImpl->reconcile_devices();
 

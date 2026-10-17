@@ -28,9 +28,9 @@ TEST_CASE("every key is mapped", "[keyboard]") {
 TEST_CASE("the enum is worth sweeping", "[keyboard]") {
     REQUIRE(magic_enum::enum_values<keyboard::key>().size() > 90);
 
-    REQUIRE_FALSE(magic_enum::enum_name(keyboard::key::numperiod).empty());
+    REQUIRE_FALSE(magic_enum::enum_name(keyboard::key::search).empty());
 
-    REQUIRE(magic_enum::enum_values<keyboard::key>().back() == keyboard::key::numperiod);
+    REQUIRE(magic_enum::enum_values<keyboard::key>().back() == keyboard::key::search);
 }
 
 TEST_CASE("no key is down without input", "[keyboard]") {

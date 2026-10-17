@@ -4,6 +4,19 @@ if (TARGET glfw)
     return()
 endif()
 
+if (EMSCRIPTEN)
+    add_library(glfw INTERFACE)
+
+    target_include_directories(glfw INTERFACE "$<BUILD_INTERFACE:${EMSCRIPTEN_SYSROOT}/include>")
+
+
+    target_link_options(glfw INTERFACE "-sUSE_GLFW=3")
+
+    set(glfw_INCLUDE_DIR "${EMSCRIPTEN_SYSROOT}/include")
+
+    return()
+endif()
+
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "")
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "")
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "")
@@ -23,30 +36,9 @@ if(CMAKE_SYSTEM_NAME MATCHES "Darwin" OR CMAKE_SYSTEM_NAME MATCHES "Linux" OR CM
         FIND_LIBRARY(COCOA_LIBRARY Cocoa)
         FIND_LIBRARY(CORE_VIDEO CoreVideo)
         FIND_LIBRARY(IO_KIT IOKit)
-    elseif(CMAKE_SYSTEM_NAME MATCHES "Linux" OR CMAKE_SYSTEM_NAME MATCHES "Windows")
-        #[[find_package(OpenGL REQUIRED)
-
-        #project("GLEW") # Its weird to hide glew here but it works...
-
-        add_library(${PROJECT_NAME} STATIC
-            ${CMAKE_CURRENT_LIST_DIR}/glew-2.1.0/src/glew.c)
-
-        target_include_directories(${PROJECT_NAME} PRIVATE
-            ${CMAKE_CURRENT_LIST_DIR}/glew-2.1.0/include)
-
-        set_target_properties(${PROJECT_NAME} PROPERTIES
-            RULE_LAUNCH_COMPILE "${CMAKE_COMMAND} -E time")
-
-        add_custom_command(TARGET ${PROJECT_NAME}
-            POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${PROJECT_NAME}> "${PROJECT_BINARY_DIR}/$<TARGET_FILE_NAME:${PROJECT_NAME}>")
-
-        set(GLEW_LIBRARIES ${PROJECT_BINARY_DIR}/libGLEW.a)
-        set(GLEW_INCLUDE_DIR ${CMAKE_CURRENT_LIST_DIR}/glew-2.1.0/include)]]
-
-        if(CMAKE_SYSTEM_NAME MATCHES "Linux")
-            find_package(X11 REQUIRED) # Mir? Wayland?
-            find_package(Threads REQUIRED)
-        endif()
+    elseif(CMAKE_SYSTEM_NAME MATCHES "Linux")
+        find_package(X11 REQUIRED) # Mir? Wayland?
+        find_package(Threads REQUIRED)
     endif()
 else()
     message(FATAL_ERROR "${PROJECT_NAME}.cmake has not been configured to handle platform \"${CMAKE_SYSTEM_NAME}\".")
@@ -59,15 +51,10 @@ target_include_directories(glfw INTERFACE
     ${OPENGL_INCLUDE_DIR}
     ${Vulkan_INCLUDE_DIR}
 
-    # Linux or Windows
-    ${GLEW_INCLUDE_DIR}
-
     # Linux
     ${X11_INCLUDE_DIR})
 
 set_property(TARGET glfw APPEND PROPERTY INTERFACE_LINK_LIBRARIES
-    # Linux or Windows
-    ${GLEW_LIBRARIES}
     ${CMAKE_DL_LIBS}
 
     # Graphics interface
