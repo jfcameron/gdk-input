@@ -248,10 +248,34 @@ TEST_CASE("bindings may be added to what is already bound", "[ext][lua]")
 
     SECTION("**and an action bound by both has what each gave it**")
     {
-        constexpr auto ALSO = R"({["version"]=1,["actions"]={["walk"]={[1]={["kind"]="key",["key"]="up"}}}})";
+        constexpr auto ALSO = R"({["version"]=1,["actions"]={["walk"]={[1]={["kind"]="key",["key"]="uparrow"}}}})";
 
         REQUIRE(ext::from_string(*pControls, ALSO, ext::binding_order::add) == 0);
 
         REQUIRE(pControls->sources("walk").size() == 2);
     }
+}
+
+TEST_CASE("an action with nothing bound is read, written and read back as one there is", "[ext][lua]")
+{
+    fixture f;
+
+    auto pControls = f.make_controls();
+
+    constexpr auto DECLARED = R"({["version"]=1,["actions"]={["jump"]={[1]={["kind"]="key",["key"]="space"}},["spare"]={}}})";
+
+    REQUIRE(ext::from_string(*pControls, DECLARED) == 0);
+
+    REQUIRE(pControls->actions() == std::vector<std::string>{"jump", "spare"});
+    REQUIRE(pControls->sources("spare").empty());
+    REQUIRE_FALSE(pControls->down("spare"));
+
+    auto pLoaded = f.make_controls();
+
+    REQUIRE(ext::from_string(*pLoaded, ext::to_string(*pControls)) == 0);
+    REQUIRE(pLoaded->actions() == pControls->actions());
+
+    pLoaded->bind("spare", keyboard::key::f);
+
+    REQUIRE(pLoaded->sources("spare").size() == 1);
 }

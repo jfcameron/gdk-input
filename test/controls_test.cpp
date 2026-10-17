@@ -539,3 +539,21 @@ TEST_CASE("a pointer axis is a bindable source", "[controls][pointer_axis]")
         REQUIRE(f.pControls->source_count("look_x") == 0);
     }
 }
+
+TEST_CASE("an action declared is listed with nothing bound, and keeps what it has", "[controls]")
+{
+    auto pNull = null_context::make();
+
+    auto pControls = controls::make(pNull);
+
+    pControls->declare("spare");
+
+    REQUIRE(pControls->actions() == std::vector<std::string>{"spare"});
+    REQUIRE(pControls->sources("spare").empty());
+    REQUIRE_FALSE(pControls->down("spare"));
+
+    pControls->bind("jump", keyboard::key::space);
+    pControls->declare("jump");
+
+    REQUIRE(pControls->sources("jump").size() == 1);
+}

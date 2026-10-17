@@ -212,6 +212,8 @@ std::size_t gdk::input::ext::from_data_table(controls &aControls, const data_tab
 
         if (!pSources) { ++skipped; continue; }
 
+        aControls.declare(std::get<std::string>(key.value()));
+
         for (const auto &at : pSources->keys()) {
             const auto pEntry = pSources->get_data_table(at);
 

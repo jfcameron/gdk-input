@@ -58,6 +58,8 @@ void controls::bind_device_axis(const std::string &aAction, const std::string &a
     bind(aAction, binding::of_device_axis(aGuid, aIndex, aScale));
 }
 
+void controls::declare(const std::string &aAction) { mBindings.try_emplace(aAction); }
+
 void controls::unbind(const std::string &aAction) { mBindings.erase(aAction); }
 
 bool controls::unbind(const std::string &aAction, const binding &aBinding) {

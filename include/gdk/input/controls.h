@@ -54,13 +54,16 @@ namespace gdk::input {
         /// \brief bind a source described as a value
         void bind(const std::string &aAction, const binding &aBinding);
 
+        /// \brief declare an action with nothing bound to it
+        void declare(const std::string &aAction);
+
         //! forget every source bound to an action
         void unbind(const std::string &aAction);
 
         //! forget one source, if the action has it. \returns whether it did
         bool unbind(const std::string &aAction, const binding &aBinding);
 
-        //! every action that has at least one source bound, in a stable order
+        //! every action declared in a stable order
         [[nodiscard]] std::vector<std::string> actions() const;
 
         //! how many sources an action has
