@@ -13,8 +13,6 @@
 
 using namespace gdk::input;
 
-static constexpr char TAG[] = "keyboard_glfw";
-
 
 static const std::set<decltype(GLFW_KEY_A)> KEY_SET{
 	GLFW_KEY_ESCAPE,

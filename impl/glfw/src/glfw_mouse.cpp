@@ -15,8 +15,6 @@
 #include <set>
 #include <unordered_map>
 
-static constexpr char TAG[] = "mouse";
-
 using namespace gdk::input;
 
 static inline decltype(GLFW_MOUSE_BUTTON_1) glfwmouseButtonFromButton(const gdk::input::mouse::button a) {
