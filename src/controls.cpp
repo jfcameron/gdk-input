@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <string_view>
 
 using namespace gdk::input;
 
@@ -62,7 +63,7 @@ void controls::declare(const std::string &aAction) { mBindings.try_emplace(aActi
 
 void controls::unbind(const std::string &aAction) { mBindings.erase(aAction); }
 
-bool controls::unbind(const std::string &aAction, const binding &aBinding) {
+bool controls::unbind(std::string_view aAction, const binding &aBinding) {
     const auto found = mBindings.find(aAction);
 
     if (found == mBindings.end()) return false;
@@ -90,19 +91,19 @@ std::vector<std::string> controls::actions() const {
     return out;
 }
 
-std::size_t controls::source_count(const std::string &aAction) const {
+std::size_t controls::source_count(std::string_view aAction) const {
     const auto *pSources = sources_for(aAction);
 
     return pSources ? pSources->size() : 0;
 }
 
-std::vector<binding> controls::sources(const std::string &aAction) const {
+std::vector<binding> controls::sources(std::string_view aAction) const {
     const auto *pSources = sources_for(aAction);
 
     return pSources ? *pSources : std::vector<binding>{};
 }
 
-const std::vector<binding> *controls::sources_for(const std::string &aAction) const {
+const std::vector<binding> *controls::sources_for(std::string_view aAction) const {
     const auto found = mBindings.find(aAction);
 
     return found == mBindings.end() ? nullptr : &found->second;
@@ -118,7 +119,7 @@ namespace {
     }
 }
 
-controls::value_type controls::get(const std::string &aAction) const {
+controls::value_type controls::get(std::string_view aAction) const {
     const auto *pSources = sources_for(aAction);
 
     if (!pSources || !mpContext) return 0;
@@ -192,11 +193,11 @@ controls::value_type controls::get(const std::string &aAction) const {
     return strongest;
 }
 
-bool controls::down(const std::string &aAction) const {
+bool controls::down(std::string_view aAction) const {
     return get(aAction) >= mThreshold;
 }
 
-bool controls::just_pressed(const std::string &aAction) const {
+bool controls::just_pressed(std::string_view aAction) const {
     const auto *pSources = sources_for(aAction);
 
     if (!pSources || !mpContext) return false;
@@ -246,7 +247,7 @@ bool controls::just_pressed(const std::string &aAction) const {
     return false;
 }
 
-bool controls::just_released(const std::string &aAction) const {
+bool controls::just_released(std::string_view aAction) const {
     const auto *pSources = sources_for(aAction);
 
     if (!pSources || !mpContext) return false;

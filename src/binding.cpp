@@ -3,6 +3,7 @@
 #include <gdk/input/binding.h>
 
 #include <ostream>
+#include <string_view>
 
 using namespace gdk::input;
 
@@ -48,7 +49,7 @@ binding binding::of(const gamepad::axis aAxis, const value_type aScale) {
     return b;
 }
 
-binding binding::of_device_button(const std::string &aGuid, const gamepad::index_type aIndex) {
+binding binding::of_device_button(std::string_view aGuid, const gamepad::index_type aIndex) {
     binding b;
     b.which = kind::device_button;
     b.guid = aGuid;
@@ -57,7 +58,7 @@ binding binding::of_device_button(const std::string &aGuid, const gamepad::index
     return b;
 }
 
-binding binding::of_device_axis(const std::string &aGuid, const gamepad::index_type aIndex,
+binding binding::of_device_axis(std::string_view aGuid, const gamepad::index_type aIndex,
     const value_type aScale) {
     binding b;
     b.which = kind::device_axis;

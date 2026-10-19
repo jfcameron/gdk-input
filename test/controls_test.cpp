@@ -6,6 +6,7 @@
 #include <gdk/input/null_context.h>
 
 #include <string>
+#include <string_view>
 #include <vector>
 
 using namespace gdk::input;
@@ -16,7 +17,7 @@ namespace {
         context_ptr_type pContext{pNull};
         controls_ptr_type pControls{controls::make(pContext, 0)};
 
-        std::size_t attach(const std::string &aName = "pad", const std::string &aGuid = "guid-pad") {
+        std::size_t attach(std::string_view aName = "pad", std::string_view aGuid = "guid-pad") {
             const auto slot = pNull->attach_gamepad(aName, aGuid);
 
             return slot.value_or(0);

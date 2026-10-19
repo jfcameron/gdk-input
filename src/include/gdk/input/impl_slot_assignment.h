@@ -6,7 +6,9 @@
 #include <cstddef>
 #include <optional>
 #include <string>
+#include <string_view>
 #include <vector>
+#include <span>
 
 namespace gdk::input {
     /// \brief what a player slot remembers about the device that was last in it
@@ -22,7 +24,7 @@ namespace gdk::input {
 
     /// \brief choose which player a newly connected device belongs to
     [[nodiscard]] inline std::optional<std::size_t> assign_slot(
-        const std::vector<slot_memory> &aSlots, const std::string &aGuid,
+        std::span<const slot_memory> aSlots, std::string_view aGuid,
         const std::size_t aBackendIndex) {
         for (std::size_t i = 0; i < aSlots.size(); ++i)
             if (!aSlots[i].occupied && aSlots[i].guid == aGuid && !aGuid.empty()

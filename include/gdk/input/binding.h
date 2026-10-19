@@ -8,6 +8,7 @@
 
 #include <iosfwd>
 #include <string>
+#include <string_view>
 
 namespace gdk::input {
     /// \brief one physical control, named in the terms the hardware uses
@@ -46,10 +47,10 @@ namespace gdk::input {
         /// \brief bind cursor motion or the wheel
         [[nodiscard]] static binding of(const mouse::axis aAxis, const value_type aScale = 1);
 
-        [[nodiscard]] static binding of_device_button(const std::string &aGuid,
+        [[nodiscard]] static binding of_device_button(std::string_view aGuid,
             const gamepad::index_type aIndex);
 
-        [[nodiscard]] static binding of_device_axis(const std::string &aGuid,
+        [[nodiscard]] static binding of_device_axis(std::string_view aGuid,
             const gamepad::index_type aIndex, const value_type aScale = 1);
 
         //! whether this names a control on a gamepad, in either of the two forms

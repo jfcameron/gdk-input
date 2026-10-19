@@ -9,6 +9,7 @@
 
 #include <optional>
 #include <string>
+#include <string_view>
 
 namespace gdk::input {
     /// \brief gamepad implementation for GLFW3
@@ -43,7 +44,7 @@ namespace gdk::input {
         gamepad_glfw();
 
         //! a device appeared at this joystick id and belongs to this player
-        void attach(const int aJoystickIndex, const std::string &aGuid);
+        void attach(const int aJoystickIndex, std::string_view aGuid);
 
         //! the device went away; the guid stays so the player can be found again
         void detach();

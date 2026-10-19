@@ -12,12 +12,13 @@
 #include <iostream>
 #include <map>
 #include <vector>
+#include <string_view>
 
 using namespace gdk::input;
 
 gamepad_glfw::gamepad_glfw() = default;
 
-void gamepad_glfw::attach(const int aJoystickIndex, const std::string &aGuid) {
+void gamepad_glfw::attach(const int aJoystickIndex, std::string_view aGuid) {
     m_JoystickIndex = aJoystickIndex;
     m_LastJoystickIndex = aJoystickIndex;
     m_Guid = aGuid;

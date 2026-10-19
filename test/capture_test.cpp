@@ -8,6 +8,7 @@
 
 #include <sstream>
 #include <string>
+#include <string_view>
 
 using namespace gdk::input;
 
@@ -20,12 +21,12 @@ namespace {
             return capture::make(pContext, aPlayer);
         }
 
-        std::size_t attach(const std::string &aName = "pad", const std::string &aGuid = "guid-pad") {
+        std::size_t attach(std::string_view aName = "pad", std::string_view aGuid = "guid-pad") {
             return pNull->attach_gamepad(aName, aGuid).value_or(0);
         }
 
-        std::size_t attach_settled(capture &aCapture, const std::string &aName = "pad",
-            const std::string &aGuid = "guid-pad") {
+        std::size_t attach_settled(capture &aCapture, std::string_view aName = "pad",
+            std::string_view aGuid = "guid-pad") {
             const auto player = attach(aName, aGuid);
 
             idle(aCapture);

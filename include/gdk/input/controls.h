@@ -10,6 +10,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <vector>
 
 namespace gdk::input {
@@ -61,28 +62,28 @@ namespace gdk::input {
         void unbind(const std::string &aAction);
 
         //! forget one source, if the action has it. \returns whether it did
-        bool unbind(const std::string &aAction, const binding &aBinding);
+        bool unbind(std::string_view aAction, const binding &aBinding);
 
         //! every action declared in a stable order
         [[nodiscard]] std::vector<std::string> actions() const;
 
         //! how many sources an action has
-        [[nodiscard]] std::size_t source_count(const std::string &aAction) const;
+        [[nodiscard]] std::size_t source_count(std::string_view aAction) const;
 
         /// \brief every source bound to an action, in the order they were bound
-        [[nodiscard]] std::vector<binding> sources(const std::string &aAction) const;
+        [[nodiscard]] std::vector<binding> sources(std::string_view aAction) const;
 
         /// \brief the strongest contribution from any source bound to this action
-        [[nodiscard]] value_type get(const std::string &aAction) const;
+        [[nodiscard]] value_type get(std::string_view aAction) const;
 
         /// \brief whether the action is being driven, which is \ref get past \ref threshold
-        [[nodiscard]] bool down(const std::string &aAction) const;
+        [[nodiscard]] bool down(std::string_view aAction) const;
 
         /// \brief whether any bound source began this frame
-        [[nodiscard]] bool just_pressed(const std::string &aAction) const;
+        [[nodiscard]] bool just_pressed(std::string_view aAction) const;
 
         //! whether any bound source ended this frame. A pointer axis never reports this
-        [[nodiscard]] bool just_released(const std::string &aAction) const;
+        [[nodiscard]] bool just_released(std::string_view aAction) const;
 
         //! how far an axis must move before it counts as down
         [[nodiscard]] value_type threshold() const;
@@ -91,7 +92,7 @@ namespace gdk::input {
     private:
         controls(context_ptr_type aContext, const std::size_t aPlayer);
 
-        [[nodiscard]] const std::vector<binding> *sources_for(const std::string &aAction) const;
+        [[nodiscard]] const std::vector<binding> *sources_for(std::string_view aAction) const;
 
         [[nodiscard]] gamepad_ptr_type pad() const;
 
@@ -99,7 +100,7 @@ namespace gdk::input {
         std::size_t mPlayer;
         value_type mThreshold{0.1f};
 
-        std::map<std::string, std::vector<binding>> mBindings;
+        std::map<std::string, std::vector<binding>, std::less<>> mBindings;
     };
 
 }

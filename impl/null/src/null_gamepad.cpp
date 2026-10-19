@@ -5,6 +5,7 @@
 #include <gdk/input/impl_gamepad_mappings.h>
 
 #include <cmath>
+#include <string_view>
 
 using namespace gdk::input;
 
@@ -36,7 +37,7 @@ gamepad::hat_state_type null_gamepad::hat(const index_type index) const {
     return mHats[index];
 }
 
-void null_gamepad::attach_unmapped(const std::string &aName, const std::string &aGuid,
+void null_gamepad::attach_unmapped(std::string_view aName, std::string_view aGuid,
     const std::size_t aButtonCount, const std::size_t aAxisCount, const std::size_t aHatCount) {
     attach(aName, aGuid, aButtonCount, aAxisCount);
 
@@ -61,7 +62,7 @@ void null_gamepad::rest_triggers() {
         if (is_standard_trigger(i)) mPending[i] = -1.f;
 }
 
-void null_gamepad::attach(const std::string &aName, const std::string &aGuid,
+void null_gamepad::attach(std::string_view aName, std::string_view aGuid,
     const std::size_t aButtonCount, const std::size_t aAxisCount) {
     mConnected = true;
     mName = aName;

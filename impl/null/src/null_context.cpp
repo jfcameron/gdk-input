@@ -8,6 +8,7 @@
 #include <gdk/input/impl_text_input.h>
 
 #include <cmath>
+#include <string_view>
 
 using namespace gdk::input;
 
@@ -87,8 +88,8 @@ std::shared_ptr<null_gamepad> null_context::gamepad_at(const std::size_t index) 
     return index < mGamepads.size() ? mGamepads[index] : nullptr;
 }
 
-std::optional<std::size_t> null_context::attach_gamepad(const std::string &aName,
-    const std::string &aGuid) {
+std::optional<std::size_t> null_context::attach_gamepad(std::string_view aName,
+    std::string_view aGuid) {
     std::size_t port = 0;
 
     while (mPortsInUse.count(port)) ++port;
@@ -97,7 +98,7 @@ std::optional<std::size_t> null_context::attach_gamepad(const std::string &aName
 }
 
 std::optional<std::size_t> null_context::attach_gamepad_at_port(const std::size_t aPort,
-    const std::string &aName, const std::string &aGuid) {
+    std::string_view aName, std::string_view aGuid) {
     std::vector<slot_memory> slots;
 
     slots.reserve(mGamepads.size());

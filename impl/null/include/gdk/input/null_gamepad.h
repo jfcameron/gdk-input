@@ -6,6 +6,7 @@
 #include <gdk/input/gamepad.h>
 
 #include <string>
+#include <string_view>
 #include <vector>
 
 namespace gdk::input {
@@ -39,14 +40,14 @@ namespace gdk::input {
         [[nodiscard]] virtual std::optional<button_collection_type::size_type> any_button_down()
             const override;
 
-        void attach(const std::string &aName, const std::string &aGuid,
+        void attach(std::string_view aName, std::string_view aGuid,
             const std::size_t aButtonCount = 15, const std::size_t aAxisCount = 6);
 
         void set_port(const std::size_t aPort);
 
         [[nodiscard]] std::optional<std::size_t> last_port() const;
 
-        void attach_unmapped(const std::string &aName, const std::string &aGuid,
+        void attach_unmapped(std::string_view aName, std::string_view aGuid,
             const std::size_t aButtonCount, const std::size_t aAxisCount,
             const std::size_t aHatCount = 1);
 

@@ -11,6 +11,7 @@
 #include <memory>
 #include <set>
 #include <string>
+#include <string_view>
 #include <vector>
 
 namespace gdk::input {
@@ -55,11 +56,11 @@ namespace gdk::input {
 
         [[nodiscard]] std::shared_ptr<null_gamepad> gamepad_at(const std::size_t index);
 
-        [[nodiscard]] std::optional<std::size_t> attach_gamepad(const std::string &aName,
-            const std::string &aGuid);
+        [[nodiscard]] std::optional<std::size_t> attach_gamepad(std::string_view aName,
+            std::string_view aGuid);
 
         [[nodiscard]] std::optional<std::size_t> attach_gamepad_at_port(const std::size_t aPort,
-            const std::string &aName, const std::string &aGuid);
+            std::string_view aName, std::string_view aGuid);
 
         void detach_gamepad(const std::size_t aPlayer);
 
