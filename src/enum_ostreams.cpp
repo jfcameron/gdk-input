@@ -1,4 +1,4 @@
-// © Joseph Cameron - All Rights Reserved
+// Â© Joseph Cameron - MIT License
 
 #include <gdk/input/context.h>
 #include <gdk/input/gamepad.h>

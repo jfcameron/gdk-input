@@ -1,63 +1,26 @@
-# © Joseph Cameron - All Rights Reserved
+# © Joseph Cameron - MIT License
 
-cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
+
+if (TARGET gdkinput)
+    return()
+endif()
+
+project(gdk-input
+    VERSION 1.0
+    DESCRIPTION "the gdk input interface: keyboard, mouse, gamepads and text, controls over them, and a null implementation"
+    LANGUAGES CXX)
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/jfc-cmake/jfclib.cmake")
 
-project(gdkinput
-    VERSION 0.9
-    DESCRIPTION "game development kit human input device library")
+option(GDKINPUT_BUILD_TESTS "Build unit tests" ${PROJECT_IS_TOP_LEVEL})
+option(GDKINPUT_BUILD_DOCS "Build documentation" OFF)
+option(GDKINPUT_EXT_LUA "Build the ext/ lua bindings codec, which depends on jfc-lua" OFF)
 
-option(JFC_BUILD_DEMO "Build demos" ON)
-option(JFC_BUILD_DOCS  "Build documentation" ON)
-option(JFC_BUILD_TESTS "Build unit tests" OFF)
+if (GDKINPUT_BUILD_DOCS AND NOT GDKINPUT_BUILD_TESTS)
+    add_subdirectory(docs)
 
-option(GDK_INPUT_EXT_LUA "Build the ext/ lua bindings codec, which depends on jfc-lua" OFF)
-
-set(GDK_INPUT_JFC_LUA_PATH "" CACHE PATH "a jfc-lua checkout to use instead of the submodule")
-
-if (ANDROID)
-    set(GDK_INPUT_IMPLEMENTATION_GLFW OFF)
-else()
-    set(GDK_INPUT_IMPLEMENTATION_GLFW ON)
-endif()
-
-set(GDK_INPUT_IMPLEMENTATION_NULL ON)
-
-add_subdirectory(extern)
-
-if (GDK_INPUT_IMPLEMENTATION_GLFW) 
-    set(implementation_source_list "${implementation_source_list}"
-        ${CMAKE_CURRENT_SOURCE_DIR}/impl/glfw/src/glfw_context.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/impl/glfw/src/glfw_gamepad.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/impl/glfw/src/glfw_joysticks.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/impl/glfw/src/glfw_keyboard.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/impl/glfw/src/glfw_mouse.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/impl/glfw/src/glfw_text_input.cpp
-    )
-
-    set(implementation_header_paths "${implementation_header_paths}"
-        ${CMAKE_CURRENT_SOURCE_DIR}/impl/glfw/include)
-endif()
-
-if (GDK_INPUT_IMPLEMENTATION_NULL)
-    set(implementation_source_list "${implementation_source_list}"
-        ${CMAKE_CURRENT_SOURCE_DIR}/impl/null/src/null_context.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/impl/null/src/null_gamepad.cpp
-    )
-
-    set(implementation_header_paths "${implementation_header_paths}"
-        ${CMAKE_CURRENT_SOURCE_DIR}/impl/null/include)
-endif()
-
-# an Android activity's input, fed to the null implementation's context
-if (ANDROID)
-    set(implementation_source_list "${implementation_source_list}"
-        ${CMAKE_CURRENT_SOURCE_DIR}/impl/android/src/android_input.cpp
-    )
-
-    set(implementation_header_paths "${implementation_header_paths}"
-        ${CMAKE_CURRENT_SOURCE_DIR}/impl/android/include)
+    return()
 endif()
 
 file(GLOB_RECURSE _gdk_input_own_sources
@@ -74,6 +37,8 @@ foreach(_source ${_gdk_input_own_sources})
             "individual headers this file actually needs.")
     endif()
 endforeach()
+
+add_subdirectory(extern)
 
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -98,105 +63,100 @@ else()
     endforeach()
 endif()
 
+include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
+
 add_library(gdkinput STATIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/binding.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/capture.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/context.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/controls.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/enum_ostreams.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/exception.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/text_input.cpp
-    ${implementation_source_list})
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/binding.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/capture.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/context.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/controls.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/enum_ostreams.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/exception.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/text_input.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/impl/null/src/null_context.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/impl/null/src/null_gamepad.cpp")
 
 add_library(gdk::input ALIAS gdkinput)
 
-set_target_properties(gdkinput PROPERTIES EXPORT_NAME input)
-
-set_target_properties(gdkinput PROPERTIES PREFIX "lib")
-
-jfc_generate_build_info()
+set_target_properties(gdkinput PROPERTIES EXPORT_NAME input PREFIX "lib")
 
 target_include_directories(gdkinput
     PUBLIC
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
-        ${implementation_header_paths}
-        "$<INSTALL_INTERFACE:include>"
+        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/impl/null/include>"
+        "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
     PRIVATE
-        "${PROJECT_BINARY_DIR}/generated_include/"
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/include
-    )
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/include")
 
 target_compile_features(gdkinput PUBLIC cxx_std_20)
 
-if (GDK_INPUT_IMPLEMENTATION_GLFW)
-    target_link_libraries(gdkinput PUBLIC glfw)
-endif()
+target_link_libraries(gdkinput PRIVATE $<BUILD_INTERFACE:magic_enum>)
 
-if (ANDROID)
-    target_link_libraries(gdkinput PUBLIC android)
-endif()
+add_library(gdkinput_implementation INTERFACE)
 
-target_link_libraries(gdkinput PRIVATE magic_enum)
+target_include_directories(gdkinput_implementation INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/src/include")
 
-if (GDK_INPUT_EXT_LUA)
-    if (NOT TARGET jfclua)
-        set(_gdk_input_jfc_lua "${GDK_INPUT_JFC_LUA_PATH}")
+target_link_libraries(gdkinput_implementation INTERFACE gdkinput magic_enum)
 
-        if (NOT _gdk_input_jfc_lua)
-            set(_gdk_input_jfc_lua "${CMAKE_CURRENT_SOURCE_DIR}/extern/jfc-lua")
-        endif()
+add_library(gdkinput_conformance INTERFACE)
 
-        if (NOT EXISTS "${_gdk_input_jfc_lua}/CMakeLists.txt")
-            message(FATAL_ERROR
-                "GDK_INPUT_EXT_LUA needs jfc-lua, and ${_gdk_input_jfc_lua} has no CMakeLists.txt. "
-                "Run: git submodule update --init --recursive")
-        endif()
+target_sources(gdkinput_conformance INTERFACE
+    "${CMAKE_CURRENT_SOURCE_DIR}/test/conformance/controls_conformance.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/test/conformance/gamepad_conformance.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/test/conformance/keyboard_conformance.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/test/conformance/mouse_conformance.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/test/conformance/text_conformance.cpp")
 
-        set(_gdk_input_outer_tests "${JFC_BUILD_TESTS}")
-        set(_gdk_input_outer_docs "${JFC_BUILD_DOCS}")
-        set(_gdk_input_outer_demo "${JFC_BUILD_DEMO}")
-        set(_gdk_input_outer_bench "${JFC_BUILD_BENCH}")
+target_include_directories(gdkinput_conformance INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/test/conformance")
 
-        set(JFC_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-        set(JFC_BUILD_DOCS OFF CACHE BOOL "" FORCE)
-        set(JFC_BUILD_DEMO OFF CACHE BOOL "" FORCE)
-        set(JFC_BUILD_BENCH OFF CACHE BOOL "" FORCE)
+target_link_libraries(gdkinput_conformance INTERFACE gdkinput)
 
-        add_subdirectory("${_gdk_input_jfc_lua}" "${CMAKE_CURRENT_BINARY_DIR}/jfc-lua")
+if (GDKINPUT_EXT_LUA)
+    add_library(gdkinput_ext_lua STATIC "${CMAKE_CURRENT_SOURCE_DIR}/src/ext/lua_bindings.cpp")
 
-        set(JFC_BUILD_TESTS "${_gdk_input_outer_tests}" CACHE BOOL "" FORCE)
-        set(JFC_BUILD_DOCS "${_gdk_input_outer_docs}" CACHE BOOL "" FORCE)
-        set(JFC_BUILD_DEMO "${_gdk_input_outer_demo}" CACHE BOOL "" FORCE)
-        set(JFC_BUILD_BENCH "${_gdk_input_outer_bench}" CACHE BOOL "" FORCE)
-    endif()
-
-    add_library(gdkinput_ext_lua STATIC
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/ext/lua_bindings.cpp")
+    add_library(gdk::input_ext_lua ALIAS gdkinput_ext_lua)
 
     target_compile_features(gdkinput_ext_lua PUBLIC cxx_std_20)
-
-    target_include_directories(gdkinput_ext_lua
-        PUBLIC
-            "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
     target_link_libraries(gdkinput_ext_lua PRIVATE magic_enum)
 
     target_link_libraries(gdkinput_ext_lua PUBLIC gdkinput jfclua)
-
-    set(gdkinput_ext_lua_INCLUDE_DIRECTORIES
-        "${CMAKE_CURRENT_SOURCE_DIR}/include")
-    set(gdkinput_ext_lua_LIBRARIES gdkinput_ext_lua)
 endif()
 
-if (JFC_BUILD_TESTS)
+install(TARGETS gdkinput
+    EXPORT gdk-input-targets
+    ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}")
+
+install(DIRECTORY
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/"
+    "${CMAKE_CURRENT_SOURCE_DIR}/impl/null/include/"
+    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+    PATTERN "ext" EXCLUDE)
+
+install(EXPORT gdk-input-targets
+    FILE gdk-input-targets.cmake
+    NAMESPACE gdk::
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/gdk-input")
+
+write_basic_package_version_file(
+    "${PROJECT_BINARY_DIR}/gdk-input-config-version.cmake"
+    VERSION ${PROJECT_VERSION}
+    COMPATIBILITY SameMajorVersion)
+
+file(WRITE "${PROJECT_BINARY_DIR}/gdk-input-config.cmake"
+"include(\"\${CMAKE_CURRENT_LIST_DIR}/gdk-input-targets.cmake\")
+")
+
+install(FILES
+    "${PROJECT_BINARY_DIR}/gdk-input-config.cmake"
+    "${PROJECT_BINARY_DIR}/gdk-input-config-version.cmake"
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/gdk-input")
+
+if (GDKINPUT_BUILD_TESTS)
     add_subdirectory(test)
 endif()
 
-if (JFC_BUILD_DOCS)
+if (GDKINPUT_BUILD_DOCS)
     add_subdirectory(docs)
 endif()
-
-if (JFC_BUILD_DEMO)
-    add_subdirectory(demos)
-endif()
-

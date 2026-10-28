@@ -1,4 +1,4 @@
-// © Joseph Cameron - All Rights Reserved
+// © Joseph Cameron - MIT License
 
 #include <jfc/catch.hpp>
 
@@ -557,4 +557,63 @@ TEST_CASE("an action declared is listed with nothing bound, and keeps what it ha
     pControls->declare("jump");
 
     REQUIRE(pControls->sources("jump").size() == 1);
+}
+
+TEST_CASE("an action is down when any source drives it, whatever another pushes against it", "[controls]") {
+    fixture f;
+
+    const auto player = f.attach();
+
+    f.pControls->bind("throttle", gamepad::axis::right_trigger, 0.5f);
+    f.pControls->bind("throttle", gamepad::axis::left_x, 1.0f);
+
+    f.pNull->gamepad_at(player)->set_axis(static_cast<gamepad::index_type>(gamepad::axis::right_trigger), 1.f);
+    f.pNull->gamepad_at(player)->set_axis(static_cast<gamepad::index_type>(gamepad::axis::left_x), -0.9f);
+    f.pNull->update();
+
+    REQUIRE(f.pControls->get("throttle") == Approx(-0.9f));
+    REQUIRE(f.pControls->down("throttle"));
+}
+
+TEST_CASE("a key tapped within a frame begins and ends the action", "[controls]") {
+    fixture f;
+
+    f.pControls->bind("jump", keyboard::key::space);
+    f.pControls->bind("jump", keyboard::key::enter);
+
+    f.pNull->press_key(keyboard::key::space);
+    f.pNull->release_key(keyboard::key::space);
+
+    REQUIRE(f.pControls->just_pressed("jump"));
+    REQUIRE(f.pControls->just_released("jump"));
+    REQUIRE_FALSE(f.pControls->down("jump"));
+
+    SECTION("but not while another source holds it") {
+        f.pNull->update();
+        f.pNull->press_key(keyboard::key::enter);
+        f.pNull->update();
+        f.pNull->press_key(keyboard::key::space);
+        f.pNull->release_key(keyboard::key::space);
+
+        REQUIRE_FALSE(f.pControls->just_pressed("jump"));
+        REQUIRE_FALSE(f.pControls->just_released("jump"));
+        REQUIRE(f.pControls->down("jump"));
+    }
+}
+
+TEST_CASE("an unmapped pad reads nothing through the standard layout, before or now", "[controls][mapping]") {
+    fixture f;
+
+    const auto player = *f.pNull->attach_gamepad("stick", "guid-stick");
+
+    f.pNull->gamepad_at(player)->set_standard_mapping(false);
+    f.pNull->gamepad_at(player)->set_axis(0, 0.9f);
+    f.pNull->update();
+    f.pNull->gamepad_at(player)->set_axis(0, 0);
+    f.pNull->update();
+
+    const gamepad_ptr_type pPad = f.pNull->gamepad_at(player);
+
+    REQUIRE(pPad->previous_axis_value(gamepad::index_type{0}) == Approx(0.9f));
+    REQUIRE(pPad->previous_axis_value(gamepad::axis::left_x) == 0);
 }

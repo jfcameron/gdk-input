@@ -1,4 +1,4 @@
-// © Joseph Cameron - All Rights Reserved
+// © Joseph Cameron - MIT License
 
 #include <jfc/catch.hpp>
 
@@ -278,4 +278,20 @@ TEST_CASE("an action with nothing bound is read, written and read back as one th
     pLoaded->bind("spare", keyboard::key::f);
 
     REQUIRE(pLoaded->sources("spare").size() == 1);
+}
+
+TEST_CASE("a device index that cannot be one is skipped", "[ext][lua]")
+{
+    fixture f;
+
+    auto pControls = f.make_controls();
+
+    const std::string text = "{[\"version\"]=1,[\"actions\"]={[\"brake\"]={"
+        "[1]={[\"kind\"]=\"device_button\",[\"guid\"]=\"g\",[\"index\"]=-1},"
+        "[2]={[\"kind\"]=\"device_button\",[\"guid\"]=\"g\",[\"index\"]=70000},"
+        "[3]={[\"kind\"]=\"device_axis\",[\"guid\"]=\"g\",[\"index\"]=1.5},"
+        "[4]={[\"kind\"]=\"device_button\",[\"guid\"]=\"g\",[\"index\"]=7}}}}";
+
+    REQUIRE(ext::from_string(*pControls, text) == 3);
+    REQUIRE(pControls->sources("brake") == std::vector<binding>{binding::of_device_button("g", 7)});
 }

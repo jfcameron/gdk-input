@@ -1,4 +1,4 @@
-// © Joseph Cameron - All Rights Reserved
+// © Joseph Cameron - MIT License
 
 #ifndef GDK_INPUT_GAMEPAD_H
 #define GDK_INPUT_GAMEPAD_H
@@ -8,6 +8,8 @@
 #include <iosfwd>
 #include <optional>
 #include <string>
+#include <string_view>
+#include <utility>
 #include <vector>
 
 namespace gdk::input {
@@ -53,12 +55,13 @@ namespace gdk::input {
         /// \brief whether this device's buttons and axes are in the standard gamepad layout
         [[nodiscard]] virtual bool has_standard_mapping() const = 0;
 
-        /// \brief how many hats the device reports; always zero when \ref has_standard_mapping
+        //! how many buttons the device has
         [[nodiscard]] virtual std::size_t button_count() const = 0;
 
-        //! how many axes this device has. \see button_count
+        //! how many axes the device has
         [[nodiscard]] virtual std::size_t axis_count() const = 0;
 
+        //! how many hats the device reports; always zero when \ref has_standard_mapping
         [[nodiscard]] virtual std::size_t hat_count() const = 0;
 
         /// \brief where a hat is pointing; centred for an index the device does not have
@@ -119,7 +122,9 @@ namespace gdk::input {
 
         [[nodiscard]] axis_value_type previous_axis_value(const axis aAxis,
             const axis_value_type threshold = 0.1f) const {
-            return previous_axis_value(static_cast<index_type>(aAxis), threshold);
+            return has_standard_mapping()
+                ? previous_axis_value(static_cast<index_type>(aAxis), threshold)
+                : 0;
         }
 
         [[nodiscard]] axis_value_type axis_value(const axis aAxis,

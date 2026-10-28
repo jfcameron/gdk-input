@@ -1,4 +1,4 @@
-// © Joseph Cameron - All Rights Reserved
+// © Joseph Cameron - MIT License
 
 #ifndef GDK_INPUT_NULL_CONTEXT_H
 #define GDK_INPUT_NULL_CONTEXT_H
@@ -33,7 +33,7 @@ namespace gdk::input {
         [[nodiscard]] virtual mouse::cursor_2d_type mouse_cursor_position() const override;
         [[nodiscard]] virtual mouse::cursor_2d_type mouse_delta() const override;
         [[nodiscard]] virtual mouse::scroll_2d_type mouse_scroll_delta() const override;
-        [[nodiscard]] virtual std::optional<mouse::axis> any_mouse_axis_down(float threshold) const override;
+        [[nodiscard]] virtual std::optional<mouse::axis> any_mouse_axis_down(const value_type aThreshold) const override;
         [[nodiscard]] virtual mouse::cursor_mode mouse_cursor_mode() const override;
         virtual void set_mouse_cursor_mode(mouse::cursor_mode aMode) override;
 
@@ -49,7 +49,7 @@ namespace gdk::input {
         [[nodiscard]] virtual std::string clipboard() const override { return mClipboard; }
         virtual void set_clipboard(const std::string &aText) override { mClipboard = aText; }
 
-        [[nodiscard]] virtual gamepad_ptr get_gamepad(const size_t index) override;
+        [[nodiscard]] virtual gamepad_ptr get_gamepad(const std::size_t aIndex) override;
         [[nodiscard]] virtual gamepad_collection_type gamepads() override;
         virtual void swap_players(const std::size_t aLeft, const std::size_t aRight) override;
         virtual std::size_t add_gamepad_mappings(const std::string &aMappings) override;

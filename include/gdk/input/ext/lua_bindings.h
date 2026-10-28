@@ -1,4 +1,4 @@
-// © Joseph Cameron - All Rights Reserved
+// © Joseph Cameron - MIT License
 
 #ifndef GDK_INPUT_EXT_LUA_BINDINGS_H
 #define GDK_INPUT_EXT_LUA_BINDINGS_H
@@ -35,8 +35,8 @@ namespace gdk::input::ext {
 
     /// \brief what a table's bindings do to the ones already there
     enum class binding_order {
-        replace, //<! what was bound is unbound first
-        add      //<! what is in the table is bound beside what was already there
+        replace, ///< what was bound is unbound first
+        add      ///< what is in the table is bound beside what was already there
     };
 
     /// \brief put the bindings in a table onto a controls

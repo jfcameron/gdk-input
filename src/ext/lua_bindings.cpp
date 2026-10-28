@@ -1,4 +1,4 @@
-// © Joseph Cameron - All Rights Reserved
+// © Joseph Cameron - MIT License
 
 #include <gdk/input/ext/lua_bindings.h>
 
@@ -6,6 +6,8 @@
 
 #include <magic_enum/magic_enum.hpp>
 
+#include <cmath>
+#include <limits>
 #include <optional>
 #include <string>
 #include <variant>
@@ -38,6 +40,14 @@ namespace {
         if (!aName) return {};
 
         return magic_enum::enum_cast<T>(*aName);
+    }
+
+    [[nodiscard]] std::optional<gamepad::index_type> index_of(const std::optional<double> aIndex) {
+        if (!aIndex || !std::isfinite(*aIndex) || *aIndex < 0 || *aIndex != std::floor(*aIndex)
+            || *aIndex > std::numeric_limits<gamepad::index_type>::max())
+            return {};
+
+        return static_cast<gamepad::index_type>(*aIndex);
     }
 
     [[nodiscard]] data_table encode(const binding &aBinding) {
@@ -134,22 +144,20 @@ namespace {
 
             case binding::kind::device_button: {
                 const auto guid = aEntry.get_string(GUID_KEY);
-                const auto index = aEntry.get_number(INDEX_KEY);
+                const auto index = index_of(aEntry.get_number(INDEX_KEY));
 
                 if (!guid || !index) return {};
 
-                return binding::of_device_button(*guid,
-                    static_cast<gamepad::index_type>(*index));
+                return binding::of_device_button(*guid, *index);
             }
 
             case binding::kind::device_axis: {
                 const auto guid = aEntry.get_string(GUID_KEY);
-                const auto index = aEntry.get_number(INDEX_KEY);
+                const auto index = index_of(aEntry.get_number(INDEX_KEY));
 
                 if (!guid || !index) return {};
 
-                return binding::of_device_axis(*guid,
-                    static_cast<gamepad::index_type>(*index), scale);
+                return binding::of_device_axis(*guid, *index, scale);
             }
         }
 

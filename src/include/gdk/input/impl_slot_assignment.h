@@ -1,4 +1,4 @@
-// © Joseph Cameron - All Rights Reserved
+// © Joseph Cameron - MIT License
 
 #ifndef GDK_INPUT_IMPL_SLOT_ASSIGNMENT_H
 #define GDK_INPUT_IMPL_SLOT_ASSIGNMENT_H

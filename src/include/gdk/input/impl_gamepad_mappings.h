@@ -1,4 +1,4 @@
-// © Joseph Cameron - All Rights Reserved
+// © Joseph Cameron - MIT License
 
 #ifndef GDK_INPUT_IMPL_GAMEPAD_MAPPINGS_H
 #define GDK_INPUT_IMPL_GAMEPAD_MAPPINGS_H

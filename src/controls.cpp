@@ -1,4 +1,4 @@
-// © Joseph Cameron - All Rights Reserved
+// © Joseph Cameron - MIT License
 
 #include <gdk/input/context.h>
 #include <gdk/input/controls.h>
@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <cmath>
 #include <string_view>
+#include <vector>
 
 using namespace gdk::input;
 
@@ -114,27 +115,47 @@ controls::value_type controls::threshold() const { return mThreshold; }
 void controls::set_threshold(const value_type aThreshold) { mThreshold = aThreshold; }
 
 namespace {
+    struct reading final {
+        controls::value_type value{0};
+
+        bool now{false};
+        bool before{false};
+        bool started{false};
+        bool ended{false};
+    };
+
     [[nodiscard]] bool addresses(const context::gamepad_ptr &apGamepad, const binding &aBinding) {
         return apGamepad && apGamepad->guid() == aBinding.guid;
     }
-}
 
-controls::value_type controls::get(std::string_view aAction) const {
-    const auto *pSources = sources_for(aAction);
+    [[nodiscard]] reading button_reading(const bool aDown, const bool aJustPressed, const bool aJustReleased) {
+        reading out;
 
-    if (!pSources || !mpContext) return 0;
+        out.value = aDown ? 1.f : 0.f;
+        out.now = aDown;
+        out.started = aJustPressed;
+        out.ended = aJustReleased;
+        out.before = !aJustPressed && (aDown || aJustReleased);
 
-    const auto pGamepad = pad();
+        return out;
+    }
 
-    value_type strongest = 0;
+    [[nodiscard]] reading axis_reading(const controls::value_type aNow, const controls::value_type aBefore,
+        const controls::value_type aThreshold) {
+        reading out;
 
-    const auto consider = [&strongest](const value_type aValue) {
-        if (std::abs(aValue) > std::abs(strongest)) strongest = aValue;
-    };
+        out.value = aNow;
+        out.now = aNow >= aThreshold;
+        out.before = aBefore >= aThreshold;
+        out.started = out.now && !out.before;
+        out.ended = out.before && !out.now;
 
-    const auto pointer_value = [this](const binding &aBinding) {
-        const auto delta = mpContext->mouse_delta();
-        const auto scroll = mpContext->mouse_scroll_delta();
+        return out;
+    }
+
+    [[nodiscard]] controls::value_type pointer_value(const context &aContext, const binding &aBinding) {
+        const auto delta = aContext.mouse_delta();
+        const auto scroll = aContext.mouse_scroll_delta();
 
         const auto raw = [&]() -> double {
             switch (aBinding.pointerAxis) {
@@ -147,54 +168,102 @@ controls::value_type controls::get(std::string_view aAction) const {
             return 0;
         }();
 
-        const auto scaled = static_cast<value_type>(raw) * aBinding.scale;
+        const auto scaled = static_cast<controls::value_type>(raw) * aBinding.scale;
 
         const auto isWheel = aBinding.pointerAxis == mouse::axis::scroll_x
             || aBinding.pointerAxis == mouse::axis::scroll_y;
 
         if (isWheel) return scaled;
 
-        return std::max(value_type{-1}, std::min(value_type{1}, scaled));
-    };
+        return std::max(controls::value_type{-1}, std::min(controls::value_type{1}, scaled));
+    }
 
-    for (const auto &s : *pSources) {
-        switch (s.which) {
+    [[nodiscard]] reading read(const context &aContext, const context::gamepad_ptr &apGamepad,
+        const binding &aSource, const controls::value_type aThreshold) {
+        switch (aSource.which) {
             case binding::kind::key:
-                if (mpContext->key_down(s.key)) consider(1);
-            break;
+                return button_reading(aContext.key_down(aSource.key), aContext.key_just_pressed(aSource.key),
+                    aContext.key_just_released(aSource.key));
 
             case binding::kind::mouse_button:
-                if (mpContext->mouse_button_down(s.mouseButton)) consider(1);
-            break;
+                return button_reading(aContext.mouse_button_down(aSource.mouseButton),
+                    aContext.mouse_button_just_pressed(aSource.mouseButton),
+                    aContext.mouse_button_just_released(aSource.mouseButton));
 
-            case binding::kind::pointer_axis:
-                consider(pointer_value(s));
-            break;
+            case binding::kind::pointer_axis: {
+                reading out;
+
+                out.value = pointer_value(aContext, aSource);
+                out.now = out.value >= aThreshold;
+
+                return out;
+            }
 
             case binding::kind::gamepad_button:
-                if (pGamepad && pGamepad->button_down(s.gamepadButton)) consider(1);
-            break;
+                if (!apGamepad) return {};
+
+                return button_reading(apGamepad->button_down(aSource.gamepadButton),
+                    apGamepad->button_just_pressed(aSource.gamepadButton),
+                    apGamepad->button_just_released(aSource.gamepadButton));
 
             case binding::kind::gamepad_axis:
-                if (pGamepad) consider(pGamepad->axis_value(s.gamepadAxis, mThreshold) * s.scale);
-            break;
+                if (!apGamepad) return {};
+
+                return axis_reading(apGamepad->axis_value(aSource.gamepadAxis, aThreshold) * aSource.scale,
+                    apGamepad->previous_axis_value(aSource.gamepadAxis, aThreshold) * aSource.scale, aThreshold);
 
             case binding::kind::device_button:
-                if (addresses(pGamepad, s) && pGamepad->button_down(s.index)) consider(1);
-            break;
+                if (!addresses(apGamepad, aSource)) return {};
+
+                return button_reading(apGamepad->button_down(aSource.index),
+                    apGamepad->button_just_pressed(aSource.index), apGamepad->button_just_released(aSource.index));
 
             case binding::kind::device_axis:
-                if (addresses(pGamepad, s))
-                    consider(pGamepad->axis_value(s.index, mThreshold) * s.scale);
-            break;
+                if (!addresses(apGamepad, aSource)) return {};
+
+                return axis_reading(apGamepad->axis_value(aSource.index, aThreshold) * aSource.scale,
+                    apGamepad->previous_axis_value(aSource.index, aThreshold) * aSource.scale, aThreshold);
         }
+
+        return {};
     }
+
+    [[nodiscard]] std::vector<reading> read_all(const context &aContext, const context::gamepad_ptr &apGamepad,
+        const std::vector<binding> &aSources, const controls::value_type aThreshold) {
+        std::vector<reading> out;
+
+        out.reserve(aSources.size());
+
+        for (const auto &source : aSources) out.push_back(read(aContext, apGamepad, source, aThreshold));
+
+        return out;
+    }
+
+    template <typename predicate_type>
+    [[nodiscard]] bool any(const std::vector<reading> &aReadings, const predicate_type aPredicate) {
+        return std::any_of(aReadings.begin(), aReadings.end(), aPredicate);
+    }
+}
+
+controls::value_type controls::get(std::string_view aAction) const {
+    const auto *pSources = sources_for(aAction);
+
+    if (!pSources || !mpContext) return 0;
+
+    value_type strongest = 0;
+
+    for (const auto &r : read_all(*mpContext, pad(), *pSources, mThreshold))
+        if (std::abs(r.value) > std::abs(strongest)) strongest = r.value;
 
     return strongest;
 }
 
 bool controls::down(std::string_view aAction) const {
-    return get(aAction) >= mThreshold;
+    const auto *pSources = sources_for(aAction);
+
+    if (!pSources || !mpContext) return false;
+
+    return any(read_all(*mpContext, pad(), *pSources, mThreshold), [](const reading &r) { return r.now; });
 }
 
 bool controls::just_pressed(std::string_view aAction) const {
@@ -202,49 +271,9 @@ bool controls::just_pressed(std::string_view aAction) const {
 
     if (!pSources || !mpContext) return false;
 
-    const auto pGamepad = pad();
+    const auto all = read_all(*mpContext, pad(), *pSources, mThreshold);
 
-    const auto axis_began = [&](const value_type aNow, const value_type aScale) {
-        return aNow * aScale > 0;
-    };
-
-    for (const auto &s : *pSources) {
-        switch (s.which) {
-            case binding::kind::key:
-                if (mpContext->key_just_pressed(s.key)) return true;
-            break;
-
-            case binding::kind::mouse_button:
-                if (mpContext->mouse_button_just_pressed(s.mouseButton)) return true;
-            break;
-
-            case binding::kind::pointer_axis:
-            break;
-
-            case binding::kind::gamepad_button:
-                if (pGamepad && pGamepad->button_just_pressed(s.gamepadButton)) return true;
-            break;
-
-            case binding::kind::gamepad_axis:
-                if (pGamepad && pGamepad->axis_just_exceeded_threshold(s.gamepadAxis, mThreshold)
-                    && axis_began(pGamepad->axis_value(s.gamepadAxis, mThreshold), s.scale))
-                    return true;
-            break;
-
-            case binding::kind::device_button:
-                if (addresses(pGamepad, s) && pGamepad->button_just_pressed(s.index)) return true;
-            break;
-
-            case binding::kind::device_axis:
-                if (addresses(pGamepad, s)
-                    && pGamepad->axis_just_exceeded_threshold(s.index, mThreshold)
-                    && axis_began(pGamepad->axis_value(s.index, mThreshold), s.scale))
-                    return true;
-            break;
-        }
-    }
-
-    return false;
+    return any(all, [](const reading &r) { return r.started; }) && !any(all, [](const reading &r) { return r.before; });
 }
 
 bool controls::just_released(std::string_view aAction) const {
@@ -252,47 +281,7 @@ bool controls::just_released(std::string_view aAction) const {
 
     if (!pSources || !mpContext) return false;
 
-    const auto pGamepad = pad();
+    const auto all = read_all(*mpContext, pad(), *pSources, mThreshold);
 
-    const auto axis_ended = [&](const value_type aBefore, const value_type aScale) {
-        return aBefore * aScale > 0;
-    };
-
-    for (const auto &s : *pSources) {
-        switch (s.which) {
-            case binding::kind::key:
-                if (mpContext->key_just_released(s.key)) return true;
-            break;
-
-            case binding::kind::mouse_button:
-                if (mpContext->mouse_button_just_released(s.mouseButton)) return true;
-            break;
-
-            case binding::kind::pointer_axis:
-            break;
-
-            case binding::kind::gamepad_button:
-                if (pGamepad && pGamepad->button_just_released(s.gamepadButton)) return true;
-            break;
-
-            case binding::kind::gamepad_axis:
-                if (pGamepad && pGamepad->axis_just_dropped_below_threshold(s.gamepadAxis, mThreshold)
-                    && axis_ended(pGamepad->previous_axis_value(s.gamepadAxis, mThreshold), s.scale))
-                    return true;
-            break;
-
-            case binding::kind::device_button:
-                if (addresses(pGamepad, s) && pGamepad->button_just_released(s.index)) return true;
-            break;
-
-            case binding::kind::device_axis:
-                if (addresses(pGamepad, s)
-                    && pGamepad->axis_just_dropped_below_threshold(s.index, mThreshold)
-                    && axis_ended(pGamepad->previous_axis_value(s.index, mThreshold), s.scale))
-                    return true;
-            break;
-        }
-    }
-
-    return false;
+    return any(all, [](const reading &r) { return r.ended; }) && !any(all, [](const reading &r) { return r.now; });
 }

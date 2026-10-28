@@ -1,4 +1,4 @@
-// © Joseph Cameron - All Rights Reserved
+// © Joseph Cameron - MIT License
 
 #ifndef GDK_INPUT_CONTROLS_H
 #define GDK_INPUT_CONTROLS_H
@@ -76,13 +76,13 @@ namespace gdk::input {
         /// \brief the strongest contribution from any source bound to this action
         [[nodiscard]] value_type get(std::string_view aAction) const;
 
-        /// \brief whether the action is being driven, which is \ref get past \ref threshold
+        /// \brief whether any bound source drives the action past \ref threshold
         [[nodiscard]] bool down(std::string_view aAction) const;
 
-        /// \brief whether any bound source began this frame
+        /// \brief whether the action began this frame: a source began, and none was driving it before
         [[nodiscard]] bool just_pressed(std::string_view aAction) const;
 
-        //! whether any bound source ended this frame. A pointer axis never reports this
+        //! whether the action ended this frame: a source ended, and none drives it now. A pointer axis never begins or ends one
         [[nodiscard]] bool just_released(std::string_view aAction) const;
 
         //! how far an axis must move before it counts as down

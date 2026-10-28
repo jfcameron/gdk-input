@@ -1,4 +1,4 @@
-// © Joseph Cameron - All Rights Reserved
+// © Joseph Cameron - MIT License
 
 #include <gdk/input/null_context.h>
 
@@ -50,7 +50,7 @@ mouse::cursor_2d_type null_context::mouse_delta() const { return mMouseDelta; }
 
 mouse::scroll_2d_type null_context::mouse_scroll_delta() const { return mScrollDelta; }
 
-std::optional<mouse::axis> null_context::any_mouse_axis_down(float threshold) const {
+std::optional<mouse::axis> null_context::any_mouse_axis_down(const value_type threshold) const {
     if (std::abs(mMouseDelta.x) > threshold) return mouse::axis::x;
     if (std::abs(mMouseDelta.y) > threshold) return mouse::axis::y;
 
@@ -64,7 +64,7 @@ mouse::cursor_mode null_context::mouse_cursor_mode() const { return mCursorMode;
 
 void null_context::set_mouse_cursor_mode(mouse::cursor_mode aMode) { mCursorMode = aMode; }
 
-context::gamepad_ptr null_context::get_gamepad(const size_t index) {
+context::gamepad_ptr null_context::get_gamepad(const std::size_t index) {
     if (index >= mGamepads.size()) {
         static const auto pAbsent = std::make_shared<null_gamepad>();
 
@@ -245,6 +245,9 @@ void null_context::update() {
 
     mKeys.advance();
     mMouseButtons.advance();
+
+    mMouseDelta = {0, 0};
+    mScrollDelta = {0, 0};
 
     mTextEvents.clear();
 

@@ -1,4 +1,4 @@
-// © Joseph Cameron - All Rights Reserved
+// © Joseph Cameron - MIT License
 
 #include <gdk/input/null_gamepad.h>
 
@@ -221,7 +221,7 @@ bool null_gamepad::button_just_released(const index_type index) const {
 
 std::optional<null_gamepad::button_collection_type::size_type> null_gamepad::any_button_down() const {
     for (std::size_t i = 0; i < mButtons.size(); ++i)
-        if (mButtons[i] != button_state::up) return i;
+        if (button_down(static_cast<index_type>(i))) return i;
 
     return {};
 }

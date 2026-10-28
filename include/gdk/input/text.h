@@ -1,4 +1,4 @@
-// © Joseph Cameron - All Rights Reserved
+// © Joseph Cameron - MIT License
 
 #ifndef GDK_INPUT_TEXT_H
 #define GDK_INPUT_TEXT_H
@@ -49,7 +49,7 @@ namespace gdk::input::text {
     }
 
     struct edit final {
-        keyboard::key key = keyboard::key::backspace; //!< one of \ref EDITING_KEYS, or \ref SHORTCUT_KEYS with Control held
+        keyboard::key key = keyboard::key::backspace; //!< one of the editing keys, or a shortcut key with Control held
 
         modifiers held;
 
