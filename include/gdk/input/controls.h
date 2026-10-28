@@ -53,6 +53,10 @@ namespace gdk::input {
             const gamepad::index_type aIndex, const value_type aScale = 1);
 
         /// \brief bind a source described as a value
+        ///
+        /// A plain key gives way to a chord of it whose modifiers are held: with `z` and `control+z` bound, Control and
+        /// Z drive only the chord's action.
+        /// \throws exception for a modifier key alone, \see is_modifier
         void bind(const std::string &aAction, const binding &aBinding);
 
         /// \brief declare an action with nothing bound to it
@@ -85,6 +89,9 @@ namespace gdk::input {
         //! whether the action ended this frame: a source ended, and none drives it now. A pointer axis never begins or ends one
         [[nodiscard]] bool just_released(std::string_view aAction) const;
 
+        //! the modifier keys held now
+        [[nodiscard]] text::modifiers modifiers() const;
+
         //! how far an axis must move before it counts as down
         [[nodiscard]] value_type threshold() const;
         void set_threshold(const value_type aThreshold);
@@ -95,6 +102,10 @@ namespace gdk::input {
         [[nodiscard]] const std::vector<binding> *sources_for(std::string_view aAction) const;
 
         [[nodiscard]] gamepad_ptr_type pad() const;
+
+        [[nodiscard]] bool modifiers_allow(const binding &aBinding) const;
+
+        [[nodiscard]] std::vector<binding> allowed(const std::vector<binding> &aSources, bool aEnding) const;
 
         context_ptr_type mpContext;
         std::size_t mPlayer;

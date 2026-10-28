@@ -2,6 +2,7 @@
 
 #include <gdk/input/context.h>
 #include <gdk/input/controls.h>
+#include <gdk/input/exception.h>
 
 #include <algorithm>
 #include <cmath>
@@ -26,6 +27,9 @@ context::gamepad_ptr controls::pad() const {
 }
 
 void controls::bind(const std::string &aAction, const binding &aBinding) {
+    if (aBinding.which == binding::kind::key && is_modifier(aBinding.key))
+        throw exception("\"" + aAction + "\": a modifier key is held with another key, never bound alone");
+
     mBindings[aAction].push_back(aBinding);
 }
 
@@ -110,6 +114,8 @@ const std::vector<binding> *controls::sources_for(std::string_view aAction) cons
     return found == mBindings.end() ? nullptr : &found->second;
 }
 
+text::modifiers controls::modifiers() const { return mpContext ? mpContext->modifiers_held() : text::modifiers{}; }
+
 controls::value_type controls::threshold() const { return mThreshold; }
 
 void controls::set_threshold(const value_type aThreshold) { mThreshold = aThreshold; }
@@ -126,6 +132,12 @@ namespace {
 
     [[nodiscard]] bool addresses(const context::gamepad_ptr &apGamepad, const binding &aBinding) {
         return apGamepad && apGamepad->guid() == aBinding.guid;
+    }
+
+    [[nodiscard]] bool same_control(const binding &a, const binding &b) {
+        if (a.which != b.which) return false;
+
+        return a.which == binding::kind::key ? a.key == b.key : a.mouseButton == b.mouseButton;
     }
 
     [[nodiscard]] reading button_reading(const bool aDown, const bool aJustPressed, const bool aJustReleased) {
@@ -245,6 +257,31 @@ namespace {
     }
 }
 
+bool controls::modifiers_allow(const binding &aBinding) const {
+    if (aBinding.which != binding::kind::key && aBinding.which != binding::kind::mouse_button) return true;
+
+    const auto held = modifiers();
+
+    if (aBinding.is_chord()) return aBinding.with == held;
+
+    if (held == text::modifiers{}) return true;
+
+    for (const auto &[action, sources] : mBindings)
+        for (const auto &each : sources)
+            if (each.is_chord() && each.with == held && same_control(each, aBinding)) return false;
+
+    return true;
+}
+
+std::vector<binding> controls::allowed(const std::vector<binding> &aSources, const bool aEnding) const {
+    std::vector<binding> out;
+
+    for (const auto &each : aSources)
+        if ((aEnding && each.is_chord()) || modifiers_allow(each)) out.push_back(each);
+
+    return out;
+}
+
 controls::value_type controls::get(std::string_view aAction) const {
     const auto *pSources = sources_for(aAction);
 
@@ -252,7 +289,7 @@ controls::value_type controls::get(std::string_view aAction) const {
 
     value_type strongest = 0;
 
-    for (const auto &r : read_all(*mpContext, pad(), *pSources, mThreshold))
+    for (const auto &r : read_all(*mpContext, pad(), allowed(*pSources, false), mThreshold))
         if (std::abs(r.value) > std::abs(strongest)) strongest = r.value;
 
     return strongest;
@@ -263,7 +300,8 @@ bool controls::down(std::string_view aAction) const {
 
     if (!pSources || !mpContext) return false;
 
-    return any(read_all(*mpContext, pad(), *pSources, mThreshold), [](const reading &r) { return r.now; });
+    return any(read_all(*mpContext, pad(), allowed(*pSources, false), mThreshold),
+        [](const reading &r) { return r.now; });
 }
 
 bool controls::just_pressed(std::string_view aAction) const {
@@ -271,7 +309,7 @@ bool controls::just_pressed(std::string_view aAction) const {
 
     if (!pSources || !mpContext) return false;
 
-    const auto all = read_all(*mpContext, pad(), *pSources, mThreshold);
+    const auto all = read_all(*mpContext, pad(), allowed(*pSources, false), mThreshold);
 
     return any(all, [](const reading &r) { return r.started; }) && !any(all, [](const reading &r) { return r.before; });
 }
@@ -281,7 +319,7 @@ bool controls::just_released(std::string_view aAction) const {
 
     if (!pSources || !mpContext) return false;
 
-    const auto all = read_all(*mpContext, pad(), *pSources, mThreshold);
+    const auto all = read_all(*mpContext, pad(), allowed(*pSources, true), mThreshold);
 
     return any(all, [](const reading &r) { return r.ended; }) && !any(all, [](const reading &r) { return r.now; });
 }

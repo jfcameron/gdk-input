@@ -7,18 +7,27 @@
 
 using namespace gdk::input;
 
-binding binding::of(const keyboard::key aKey) {
+bool gdk::input::is_modifier(const keyboard::key aKey) {
+    using keyboard::key;
+
+    return aKey == key::leftshift || aKey == key::rightshift || aKey == key::leftcontrol || aKey == key::rightcontrol
+        || aKey == key::leftalt || aKey == key::rightalt;
+}
+
+binding binding::of(const keyboard::key aKey, const text::modifiers aWith) {
     binding b;
     b.which = kind::key;
     b.key = aKey;
+    b.with = aWith;
 
     return b;
 }
 
-binding binding::of(const mouse::button aButton) {
+binding binding::of(const mouse::button aButton, const text::modifiers aWith) {
     binding b;
     b.which = kind::mouse_button;
     b.mouseButton = aButton;
+    b.with = aWith;
 
     return b;
 }
@@ -78,12 +87,16 @@ bool binding::is_axis() const {
         || which == kind::pointer_axis;
 }
 
+bool binding::is_chord() const {
+    return (which == kind::key || which == kind::mouse_button) && with != text::modifiers{};
+}
+
 bool binding::operator==(const binding &aOther) const {
     if (which != aOther.which) return false;
 
     switch (which) {
-        case kind::key: return key == aOther.key;
-        case kind::mouse_button: return mouseButton == aOther.mouseButton;
+        case kind::key: return key == aOther.key && with == aOther.with;
+        case kind::mouse_button: return mouseButton == aOther.mouseButton && with == aOther.with;
         case kind::pointer_axis: return pointerAxis == aOther.pointerAxis && scale == aOther.scale;
         case kind::gamepad_button: return gamepadButton == aOther.gamepadButton;
         case kind::gamepad_axis: return gamepadAxis == aOther.gamepadAxis && scale == aOther.scale;
@@ -103,9 +116,16 @@ std::ostream &operator<<(std::ostream &aStream, const gdk::input::binding &aBind
         return aScale < 0 ? "-" : "+";
     };
 
+    const auto held = [&] {
+        if (aBinding.with.shift) aStream << "shift+";
+        if (aBinding.with.control) aStream << "control+";
+        if (aBinding.with.alt) aStream << "alt+";
+        if (aBinding.with.super) aStream << "super+";
+    };
+
     switch (aBinding.which) {
-        case kind::key: aStream << "key " << aBinding.key; break;
-        case kind::mouse_button: aStream << "mouse " << aBinding.mouseButton; break;
+        case kind::key: aStream << "key "; held(); aStream << aBinding.key; break;
+        case kind::mouse_button: aStream << "mouse "; held(); aStream << aBinding.mouseButton; break;
 
         case kind::pointer_axis:
             aStream << "pointer " << direction(aBinding.scale) << aBinding.pointerAxis;

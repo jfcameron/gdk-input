@@ -4,6 +4,7 @@
 #define GDK_INPUT_BINDING_H
 
 #include <gdk/input/gamepad.h>
+#include <gdk/input/text.h>
 #include <gdk/input/types.h>
 
 #include <iosfwd>
@@ -11,6 +12,9 @@
 #include <string_view>
 
 namespace gdk::input {
+    //! Shift, Control and Alt: held with a key or button, never bound alone
+    [[nodiscard]] bool is_modifier(keyboard::key aKey);
+
     /// \brief one physical control, named in the terms the hardware uses
     struct binding final {
         using value_type = gdk::input::value_type;
@@ -39,8 +43,11 @@ namespace gdk::input {
         /// \brief multiplies an axis; unused by the button kinds
         value_type scale{1};
 
-        [[nodiscard]] static binding of(const keyboard::key aKey);
-        [[nodiscard]] static binding of(const mouse::button aButton);
+        //! the modifiers held with a key or mouse button, exactly; unused by the other kinds
+        text::modifiers with{};
+
+        [[nodiscard]] static binding of(const keyboard::key aKey, const text::modifiers aWith = {});
+        [[nodiscard]] static binding of(const mouse::button aButton, const text::modifiers aWith = {});
         [[nodiscard]] static binding of(const gamepad::button aButton);
         [[nodiscard]] static binding of(const gamepad::axis aAxis, const value_type aScale = 1);
 
@@ -58,6 +65,9 @@ namespace gdk::input {
 
         //! whether this names an axis, in either form. The other kinds are all buttons.
         [[nodiscard]] bool is_axis() const;
+
+        //! whether a modifier must be held with it
+        [[nodiscard]] bool is_chord() const;
 
         [[nodiscard]] bool operator==(const binding &) const;
     };

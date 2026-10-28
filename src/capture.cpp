@@ -92,11 +92,15 @@ namespace {
 }
 
 std::optional<binding> capture::answer_from(const observation &aNow) const {
-    if (const auto key = arrived(aNow.keys, mPrevious.keys)) return binding::of(*key);
+    const auto held = mpContext ? mpContext->modifiers_held() : text::modifiers{};
+
+    for (const auto key : aNow.keys)
+        if (!is_modifier(key) && std::find(mPrevious.keys.begin(), mPrevious.keys.end(), key) == mPrevious.keys.end())
+            return binding::of(key, held);
 
     if (mAcceptsMouse)
         if (const auto button = arrived(aNow.mouseButtons, mPrevious.mouseButtons))
-            return binding::of(*button);
+            return binding::of(*button, held);
 
     const auto pGamepad = pad();
 

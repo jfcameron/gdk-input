@@ -7,6 +7,7 @@
 #include <gdk/input/null_context.h>
 
 #include <string>
+#include <vector>
 
 using namespace gdk::input;
 
@@ -280,8 +281,7 @@ TEST_CASE("an action with nothing bound is read, written and read back as one th
     REQUIRE(pLoaded->sources("spare").size() == 1);
 }
 
-TEST_CASE("a device index that cannot be one is skipped", "[ext][lua]")
-{
+TEST_CASE("a device index that cannot be one is skipped", "[ext][lua]") {
     fixture f;
 
     auto pControls = f.make_controls();
@@ -294,4 +294,40 @@ TEST_CASE("a device index that cannot be one is skipped", "[ext][lua]")
 
     REQUIRE(ext::from_string(*pControls, text) == 3);
     REQUIRE(pControls->sources("brake") == std::vector<binding>{binding::of_device_button("g", 7)});
+}
+
+TEST_CASE("a chord is written with its modifiers and read back as the same chord", "[ext][lua][modifiers]") {
+    fixture f;
+
+    auto pOriginal = f.make_controls();
+
+    pOriginal->bind("undo", binding::of(keyboard::key::z, {.control = true}));
+    pOriginal->bind("split", binding::of(mouse::button::left, {.shift = true, .alt = true}));
+    pOriginal->bind("turn", keyboard::key::r);
+
+    auto pLoaded = f.make_controls();
+
+    REQUIRE(ext::from_string(*pLoaded, ext::to_string(*pOriginal)) == 0);
+    REQUIRE(pLoaded->sources("undo") == pOriginal->sources("undo"));
+    REQUIRE(pLoaded->sources("split") == pOriginal->sources("split"));
+    REQUIRE(pLoaded->sources("turn") == std::vector<binding>{binding::of(keyboard::key::r)});
+}
+
+TEST_CASE("a modifier bound alone, or an unknown modifier, costs that binding and no others",
+    "[ext][lua][modifiers]") {
+    fixture f;
+
+    auto pControls = f.make_controls();
+
+    const auto skipped = ext::from_string(*pControls, R"({
+        version = 1,
+        actions = {
+            run = { { kind = "key", key = "leftshift" }, { kind = "key", key = "r" } },
+            undo = { { kind = "key", key = "z", with = { "hyper" } } },
+        },
+    })");
+
+    REQUIRE(skipped == 2);
+    REQUIRE(pControls->sources("run") == std::vector<binding>{binding::of(keyboard::key::r)});
+    REQUIRE(pControls->source_count("undo") == 0);
 }

@@ -344,3 +344,33 @@ TEST_CASE("a binding says what it is in words", "[capture][binding]") {
     REQUIRE(render(binding::of_device_button("guid-stick", 7)) == "button 7 on guid-stick");
 }
 
+TEST_CASE("a capture waits past a modifier for the key pressed with it, and answers with both",
+    "[capture][modifiers]") {
+    fixture f;
+
+    auto pCapture = f.begin();
+
+    f.pNull->press_key(keyboard::key::leftshift);
+
+    REQUIRE_FALSE(pCapture->poll());
+
+    f.pNull->update();
+    f.pNull->press_key(keyboard::key::one);
+
+    const auto pressed = pCapture->poll();
+
+    REQUIRE(pressed);
+    REQUIRE(*pressed == binding::of(keyboard::key::one, {.shift = true}));
+    REQUIRE(*pressed != binding::of(keyboard::key::one));
+    REQUIRE(render(*pressed) == "key shift+one");
+
+    SECTION("and a mouse button, where one is an answer") {
+        pCapture->reset();
+        pCapture->set_accepts_mouse(true);
+
+        f.pNull->press_key(keyboard::key::leftalt);
+        f.pNull->press_mouse_button(mouse::button::left);
+
+        REQUIRE(pCapture->poll() == binding::of(mouse::button::left, {.shift = true, .alt = true}));
+    }
+}

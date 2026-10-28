@@ -29,6 +29,7 @@ namespace {
     constexpr auto KEY_KEY = "key";
     constexpr auto BUTTON_KEY = "button";
     constexpr auto AXIS_KEY = "axis";
+    constexpr auto WITH_KEY = "with";
 
     template <typename T>
     [[nodiscard]] std::string name_of(const T aValue) {
@@ -50,10 +51,45 @@ namespace {
         return static_cast<gamepad::index_type>(*aIndex);
     }
 
+    [[nodiscard]] data_table encode_with(const text::modifiers &aWith) {
+        data_table out;
+
+        double at = 1;
+
+        if (aWith.shift) out.set(at++, std::string("shift"));
+        if (aWith.control) out.set(at++, std::string("control"));
+        if (aWith.alt) out.set(at++, std::string("alt"));
+        if (aWith.super) out.set(at++, std::string("super"));
+
+        return out;
+    }
+
+    [[nodiscard]] std::optional<text::modifiers> decode_with(const data_table &aEntry) {
+        text::modifiers out;
+
+        const auto pWith = aEntry.get_data_table(WITH_KEY);
+
+        if (!pWith) return out;
+
+        for (const auto &at : pWith->keys()) {
+            const auto name = pWith->get_string(at);
+
+            if (name == "shift") out.shift = true;
+            else if (name == "control") out.control = true;
+            else if (name == "alt") out.alt = true;
+            else if (name == "super") out.super = true;
+            else return {};
+        }
+
+        return out;
+    }
+
     [[nodiscard]] data_table encode(const binding &aBinding) {
         data_table out;
 
         out.set(KIND_KEY, name_of(aBinding.which));
+
+        if (aBinding.is_chord()) out.set(WITH_KEY, encode_with(aBinding.with));
 
         switch (aBinding.which) {
             case binding::kind::key:
@@ -101,13 +137,17 @@ namespace {
         const auto scale = static_cast<binding::value_type>(
             aEntry.get_number(SCALE_KEY).value_or(1));
 
+        const auto with = decode_with(aEntry);
+
+        if (!with) return {};
+
         switch (*which) {
             case binding::kind::key: {
                 const auto key = value_of<keyboard::key>(aEntry.get_string(KEY_KEY));
 
-                if (!key) return {};
+                if (!key || is_modifier(*key)) return {};
 
-                return binding::of(*key);
+                return binding::of(*key, *with);
             }
 
             case binding::kind::mouse_button: {
@@ -115,7 +155,7 @@ namespace {
 
                 if (!button) return {};
 
-                return binding::of(*button);
+                return binding::of(*button, *with);
             }
 
             case binding::kind::pointer_axis: {

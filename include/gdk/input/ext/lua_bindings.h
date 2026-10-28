@@ -27,7 +27,8 @@ namespace gdk::input::ext {
     ///     actions = {
     ///         jump = {[1] = {kind = "key", key = "space"},
     ///                 [2] = {kind = "gamepad_button", button = "a"}},
-    ///         move_left = {[1] = {kind = "gamepad_axis", axis = "left_x", scale = -1}}
+    ///         move_left = {[1] = {kind = "gamepad_axis", axis = "left_x", scale = -1}},
+    ///         undo = {[1] = {kind = "key", key = "z", with = {"control"}}}
     ///     }
     /// }
     /// ~~~

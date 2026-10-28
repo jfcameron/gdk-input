@@ -29,6 +29,8 @@ namespace gdk::input {
 
         /// \brief look at the current frame; call once per frame after the context has updated
         ///
+        /// A modifier key is no answer alone: the key or mouse button pressed while it is held is, as a chord.
+        ///
         /// \return nothing until the player presses something, then that something on every call
         /// until \ref reset. Latching rather than one-shot so a game can poll, draw the answer and
         /// wait for a confirmation without having to store it.
