@@ -17,10 +17,21 @@ option(GDKINPUT_BUILD_TESTS "Build unit tests" ${PROJECT_IS_TOP_LEVEL})
 option(GDKINPUT_BUILD_DOCS "Build documentation" OFF)
 option(GDKINPUT_EXT_LUA "Build the ext/ lua bindings codec, which depends on jfc-lua" OFF)
 
-if (GDKINPUT_BUILD_DOCS AND NOT GDKINPUT_BUILD_TESTS)
-    add_subdirectory(docs)
+if (GDKINPUT_BUILD_DOCS)
+    jfc_generate_documentation_doxygen(
+        PROJECT_LOGO     ${CMAKE_CURRENT_LIST_DIR}/docs/icon.png
 
-    return()
+        README_PATH      README.md
+        OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/docs
+
+        INCLUDE_DIRECTORIES
+            include/
+            impl/null/include/
+    )
+
+    if (NOT GDKINPUT_BUILD_TESTS)
+        return()
+    endif()
 endif()
 
 file(GLOB_RECURSE _gdk_input_own_sources
@@ -155,8 +166,4 @@ install(FILES
 
 if (GDKINPUT_BUILD_TESTS)
     add_subdirectory(test)
-endif()
-
-if (GDKINPUT_BUILD_DOCS)
-    add_subdirectory(docs)
 endif()
