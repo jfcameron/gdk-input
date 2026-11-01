@@ -134,10 +134,10 @@ namespace {
         return apGamepad && apGamepad->guid() == aBinding.guid;
     }
 
-    [[nodiscard]] bool same_control(const binding &a, const binding &b) {
-        if (a.which != b.which) return false;
+    [[nodiscard]] bool same_control(const binding &aLeft, const binding &aRight) {
+        if (aLeft.which != aRight.which) return false;
 
-        return a.which == binding::kind::key ? a.key == b.key : a.mouseButton == b.mouseButton;
+        return aLeft.which == binding::kind::key ? aLeft.key == aRight.key : aLeft.mouseButton == aRight.mouseButton;
     }
 
     [[nodiscard]] reading button_reading(const bool aDown, const bool aJustPressed, const bool aJustReleased) {
@@ -301,7 +301,7 @@ bool controls::down(std::string_view aAction) const {
     if (!pSources || !mpContext) return false;
 
     return any(read_all(*mpContext, pad(), allowed(*pSources, false), mThreshold),
-        [](const reading &r) { return r.now; });
+        [](const reading &aReading) { return aReading.now; });
 }
 
 bool controls::just_pressed(std::string_view aAction) const {
@@ -311,7 +311,7 @@ bool controls::just_pressed(std::string_view aAction) const {
 
     const auto all = read_all(*mpContext, pad(), allowed(*pSources, false), mThreshold);
 
-    return any(all, [](const reading &r) { return r.started; }) && !any(all, [](const reading &r) { return r.before; });
+    return any(all, [](const reading &aReading) { return aReading.started; }) && !any(all, [](const reading &aReading) { return aReading.before; });
 }
 
 bool controls::just_released(std::string_view aAction) const {
@@ -321,5 +321,5 @@ bool controls::just_released(std::string_view aAction) const {
 
     const auto all = read_all(*mpContext, pad(), allowed(*pSources, true), mThreshold);
 
-    return any(all, [](const reading &r) { return r.ended; }) && !any(all, [](const reading &r) { return r.now; });
+    return any(all, [](const reading &aReading) { return aReading.ended; }) && !any(all, [](const reading &aReading) { return aReading.now; });
 }

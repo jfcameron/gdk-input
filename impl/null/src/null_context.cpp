@@ -50,12 +50,12 @@ mouse::cursor_2d_type null_context::mouse_delta() const { return mMouseDelta; }
 
 mouse::scroll_2d_type null_context::mouse_scroll_delta() const { return mScrollDelta; }
 
-std::optional<mouse::axis> null_context::any_mouse_axis_down(const value_type threshold) const {
-    if (std::abs(mMouseDelta.x) > threshold) return mouse::axis::x;
-    if (std::abs(mMouseDelta.y) > threshold) return mouse::axis::y;
+std::optional<mouse::axis> null_context::any_mouse_axis_down(const value_type aThreshold) const {
+    if (std::abs(mMouseDelta.x) > aThreshold) return mouse::axis::x;
+    if (std::abs(mMouseDelta.y) > aThreshold) return mouse::axis::y;
 
-    if (std::abs(mScrollDelta.x) > threshold) return mouse::axis::scroll_x;
-    if (std::abs(mScrollDelta.y) > threshold) return mouse::axis::scroll_y;
+    if (std::abs(mScrollDelta.x) > aThreshold) return mouse::axis::scroll_x;
+    if (std::abs(mScrollDelta.y) > aThreshold) return mouse::axis::scroll_y;
 
     return {};
 }
@@ -64,14 +64,14 @@ mouse::cursor_mode null_context::mouse_cursor_mode() const { return mCursorMode;
 
 void null_context::set_mouse_cursor_mode(mouse::cursor_mode aMode) { mCursorMode = aMode; }
 
-context::gamepad_ptr null_context::get_gamepad(const std::size_t index) {
-    if (index >= mGamepads.size()) {
+context::gamepad_ptr null_context::get_gamepad(const std::size_t aIndex) {
+    if (aIndex >= mGamepads.size()) {
         static const auto pAbsent = std::make_shared<null_gamepad>();
 
         return pAbsent;
     }
 
-    return mGamepads[index];
+    return mGamepads[aIndex];
 }
 
 context::gamepad_collection_type null_context::gamepads() {
@@ -84,8 +84,8 @@ context::gamepad_collection_type null_context::gamepads() {
     return out;
 }
 
-std::shared_ptr<null_gamepad> null_context::gamepad_at(const std::size_t index) {
-    return index < mGamepads.size() ? mGamepads[index] : nullptr;
+std::shared_ptr<null_gamepad> null_context::gamepad_at(const std::size_t aIndex) {
+    return aIndex < mGamepads.size() ? mGamepads[aIndex] : nullptr;
 }
 
 std::optional<std::size_t> null_context::attach_gamepad(std::string_view aName,

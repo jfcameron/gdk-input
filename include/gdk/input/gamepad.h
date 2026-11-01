@@ -65,7 +65,7 @@ namespace gdk::input {
         [[nodiscard]] virtual std::size_t hat_count() const = 0;
 
         /// \brief where a hat is pointing; centred for an index the device does not have
-        [[nodiscard]] virtual hat_state_type hat(const index_type index) const = 0;
+        [[nodiscard]] virtual hat_state_type hat(const index_type aIndex) const = 0;
 
         /// \brief human readable device name
         [[nodiscard]] virtual std::string_view name() const = 0;
@@ -80,29 +80,29 @@ namespace gdk::input {
         [[nodiscard]] virtual bool just_disconnected() const = 0;
 
 		/// \brief normalized magnitude of axis. 0 = no input, 1 = full input
-		[[nodiscard]] virtual axis_value_type axis_value(const index_type index, const axis_value_type threshold = 0.1f) const = 0;
+		[[nodiscard]] virtual axis_value_type axis_value(const index_type aIndex, const axis_value_type aThreshold = 0.1f) const = 0;
 
 		/// \brief the axis left its dead zone during the last update
-		[[nodiscard]] virtual bool axis_just_exceeded_threshold(const index_type index, const axis_value_type threshold = 0.1f) const = 0;
+		[[nodiscard]] virtual bool axis_just_exceeded_threshold(const index_type aIndex, const axis_value_type aThreshold = 0.1f) const = 0;
 
 		/// \brief the axis returned to its dead zone during the last update
-		[[nodiscard]] virtual bool axis_just_dropped_below_threshold(const index_type index, const axis_value_type threshold = 0.1f) const = 0;
+		[[nodiscard]] virtual bool axis_just_dropped_below_threshold(const index_type aIndex, const axis_value_type aThreshold = 0.1f) const = 0;
 
 		/// \brief what \ref axis_value read before the last update
-		[[nodiscard]] virtual axis_value_type previous_axis_value(const index_type index, const axis_value_type threshold = 0.1f) const = 0;
+		[[nodiscard]] virtual axis_value_type previous_axis_value(const index_type aIndex, const axis_value_type aThreshold = 0.1f) const = 0;
 
 		/// \brief returns an axis if one is down, otherwise the optional will be null
 		/// \warning If multiple axes are down, the first found is returned. Order should be considered arbitrary
-		[[nodiscard]] virtual std::optional<std::pair<index_type, axis_value_type>> any_axis_down(axis_value_type threshold = 0.1f) const = 0;
+		[[nodiscard]] virtual std::optional<std::pair<index_type, axis_value_type>> any_axis_down(axis_value_type aThreshold = 0.1f) const = 0;
 
         /// \brief whether or not the button is being held down by the user
-        [[nodiscard]] virtual bool button_down(const index_type index) const = 0;
+        [[nodiscard]] virtual bool button_down(const index_type aIndex) const = 0;
 
 		/// \brief whether or not the button was just pressed this frame
-		[[nodiscard]] virtual bool button_just_pressed(const index_type index) const = 0;
+		[[nodiscard]] virtual bool button_just_pressed(const index_type aIndex) const = 0;
 
 		/// \brief whether or not the button was just released this frame
-		[[nodiscard]] virtual bool button_just_released(const index_type index) const = 0;
+		[[nodiscard]] virtual bool button_just_released(const index_type aIndex) const = 0;
 
 		/// \brief returns a button if any button is down, otherwise the optional will be null
 		/// \warning If multiple buttons are down, the first found is returned. Order should be considered arbitrary
@@ -121,29 +121,29 @@ namespace gdk::input {
         }
 
         [[nodiscard]] axis_value_type previous_axis_value(const axis aAxis,
-            const axis_value_type threshold = 0.1f) const {
+            const axis_value_type aThreshold = 0.1f) const {
             return has_standard_mapping()
-                ? previous_axis_value(static_cast<index_type>(aAxis), threshold)
+                ? previous_axis_value(static_cast<index_type>(aAxis), aThreshold)
                 : 0;
         }
 
         [[nodiscard]] axis_value_type axis_value(const axis aAxis,
-            const axis_value_type threshold = 0.1f) const {
+            const axis_value_type aThreshold = 0.1f) const {
             return has_standard_mapping()
-                ? axis_value(static_cast<index_type>(aAxis), threshold)
+                ? axis_value(static_cast<index_type>(aAxis), aThreshold)
                 : 0;
         }
 
         [[nodiscard]] bool axis_just_exceeded_threshold(const axis aAxis,
-            const axis_value_type threshold = 0.1f) const {
+            const axis_value_type aThreshold = 0.1f) const {
             return has_standard_mapping()
-                && axis_just_exceeded_threshold(static_cast<index_type>(aAxis), threshold);
+                && axis_just_exceeded_threshold(static_cast<index_type>(aAxis), aThreshold);
         }
 
         [[nodiscard]] bool axis_just_dropped_below_threshold(const axis aAxis,
-            const axis_value_type threshold = 0.1f) const {
+            const axis_value_type aThreshold = 0.1f) const {
             return has_standard_mapping()
-                && axis_just_dropped_below_threshold(static_cast<index_type>(aAxis), threshold);
+                && axis_just_dropped_below_threshold(static_cast<index_type>(aAxis), aThreshold);
         }
 
         virtual ~gamepad() = default;

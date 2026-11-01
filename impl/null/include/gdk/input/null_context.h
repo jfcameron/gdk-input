@@ -54,7 +54,7 @@ namespace gdk::input {
         virtual void swap_players(const std::size_t aLeft, const std::size_t aRight) override;
         virtual std::size_t add_gamepad_mappings(const std::string &aMappings) override;
 
-        [[nodiscard]] std::shared_ptr<null_gamepad> gamepad_at(const std::size_t index);
+        [[nodiscard]] std::shared_ptr<null_gamepad> gamepad_at(const std::size_t aIndex);
 
         [[nodiscard]] std::optional<std::size_t> attach_gamepad(std::string_view aName,
             std::string_view aGuid);

@@ -31,10 +31,10 @@ std::size_t null_gamepad::axis_count() const { return mAxes.size(); }
 
 std::size_t null_gamepad::hat_count() const { return mHats.size(); }
 
-gamepad::hat_state_type null_gamepad::hat(const index_type index) const {
-    if (index >= mHats.size()) return {};
+gamepad::hat_state_type null_gamepad::hat(const index_type aIndex) const {
+    if (aIndex >= mHats.size()) return {};
 
-    return mHats[index];
+    return mHats[aIndex];
 }
 
 void null_gamepad::attach_unmapped(std::string_view aName, std::string_view aGuid,
@@ -45,8 +45,8 @@ void null_gamepad::attach_unmapped(std::string_view aName, std::string_view aGui
     mHats.assign(aHatCount, hat_state_type{});
 }
 
-void null_gamepad::set_hat(const index_type index, const hat_state_type aState) {
-    if (index < mHats.size()) mHats[index] = aState;
+void null_gamepad::set_hat(const index_type aIndex, const hat_state_type aState) {
+    if (aIndex < mHats.size()) mHats[aIndex] = aState;
 }
 
 void null_gamepad::set_standard_mapping(const bool aMapped) {
@@ -98,16 +98,16 @@ void null_gamepad::detach() {
     mHasStandardMapping = false;
 }
 
-void null_gamepad::press(const index_type index) {
-    if (index < mHeld.size()) mHeld[index] = true;
+void null_gamepad::press(const index_type aIndex) {
+    if (aIndex < mHeld.size()) mHeld[aIndex] = true;
 }
 
-void null_gamepad::release(const index_type index) {
-    if (index < mHeld.size()) mHeld[index] = false;
+void null_gamepad::release(const index_type aIndex) {
+    if (aIndex < mHeld.size()) mHeld[aIndex] = false;
 }
 
-void null_gamepad::set_axis(const index_type index, const axis_value_type value) {
-    if (index < mPending.size()) mPending[index] = value;
+void null_gamepad::set_axis(const index_type aIndex, const axis_value_type aValue) {
+    if (aIndex < mPending.size()) mPending[aIndex] = aValue;
 }
 
 void null_gamepad::update() {
@@ -151,72 +151,72 @@ void null_gamepad::update() {
     }
 }
 
-null_gamepad::axis_value_type null_gamepad::axis_value(const index_type index,
-    const axis_value_type threshold) const {
-    if (index >= mAxes.size()) return 0;
+null_gamepad::axis_value_type null_gamepad::axis_value(const index_type aIndex,
+    const axis_value_type aThreshold) const {
+    if (aIndex >= mAxes.size()) return 0;
 
-    const auto value = mAxes[index];
+    const auto value = mAxes[aIndex];
 
-    if (std::abs(value) < threshold) return 0;
-
-    return value;
-}
-
-null_gamepad::axis_value_type null_gamepad::previous_axis_value(const index_type index,
-    const axis_value_type threshold) const {
-    if (index >= mLastAxes.size()) return 0;
-
-    const auto value = mLastAxes[index];
-
-    if (std::abs(value) < threshold) return 0;
+    if (std::abs(value) < aThreshold) return 0;
 
     return value;
 }
 
-bool null_gamepad::axis_just_exceeded_threshold(const index_type index,
-    const axis_value_type threshold) const {
-    if (index >= mAxes.size()) return false;
+null_gamepad::axis_value_type null_gamepad::previous_axis_value(const index_type aIndex,
+    const axis_value_type aThreshold) const {
+    if (aIndex >= mLastAxes.size()) return 0;
 
-    const auto last = index < mLastAxes.size() ? mLastAxes[index] : 0;
+    const auto value = mLastAxes[aIndex];
 
-    return std::abs(mAxes[index]) >= threshold && std::abs(last) < threshold;
+    if (std::abs(value) < aThreshold) return 0;
+
+    return value;
 }
 
-bool null_gamepad::axis_just_dropped_below_threshold(const index_type index,
-    const axis_value_type threshold) const {
-    if (index >= mAxes.size()) return false;
+bool null_gamepad::axis_just_exceeded_threshold(const index_type aIndex,
+    const axis_value_type aThreshold) const {
+    if (aIndex >= mAxes.size()) return false;
 
-    const auto last = index < mLastAxes.size() ? mLastAxes[index] : 0;
+    const auto last = aIndex < mLastAxes.size() ? mLastAxes[aIndex] : 0;
 
-    return std::abs(mAxes[index]) < threshold && std::abs(last) >= threshold;
+    return std::abs(mAxes[aIndex]) >= aThreshold && std::abs(last) < aThreshold;
+}
+
+bool null_gamepad::axis_just_dropped_below_threshold(const index_type aIndex,
+    const axis_value_type aThreshold) const {
+    if (aIndex >= mAxes.size()) return false;
+
+    const auto last = aIndex < mLastAxes.size() ? mLastAxes[aIndex] : 0;
+
+    return std::abs(mAxes[aIndex]) < aThreshold && std::abs(last) >= aThreshold;
 }
 
 std::optional<std::pair<null_gamepad::index_type, null_gamepad::axis_value_type>>
-null_gamepad::any_axis_down(axis_value_type threshold) const {
+null_gamepad::any_axis_down(axis_value_type aThreshold) const {
     for (std::size_t i = 0; i < mAxes.size(); ++i)
-        if (const auto value = axis_value(static_cast<index_type>(i), threshold))
+        if (const auto value = axis_value(static_cast<index_type>(i), aThreshold))
             return {{static_cast<index_type>(i), value}};
 
     return {};
 }
 
-bool null_gamepad::button_down(const index_type index) const {
-    if (index >= mButtons.size()) return false;
+bool null_gamepad::button_down(const index_type aIndex) const {
+    if (aIndex >= mButtons.size()) return false;
 
-    return mButtons[index] == button_state::held_down
-        || mButtons[index] == button_state::just_pressed;
+    return mButtons[aIndex] == button_state::held_down
+        || mButtons[aIndex] == button_state::just_pressed;
 }
 
-bool null_gamepad::button_just_pressed(const index_type index) const {
-    if (index >= mButtons.size()) return false;
+bool null_gamepad::button_just_pressed(const index_type aIndex) const {
+    if (aIndex >= mButtons.size()) return false;
 
-    return mButtons[index] == button_state::just_pressed;
+    return mButtons[aIndex] == button_state::just_pressed;
 }
 
-bool null_gamepad::button_just_released(const index_type index) const {
-    if (index >= mButtons.size()) return false;
+bool null_gamepad::button_just_released(const index_type aIndex) const {
+    if (aIndex >= mButtons.size()) return false;
 
-    return mButtons[index] == button_state::just_released;
+    return mButtons[aIndex] == button_state::just_released;
 }
 
 std::optional<null_gamepad::button_collection_type::size_type> null_gamepad::any_button_down() const {

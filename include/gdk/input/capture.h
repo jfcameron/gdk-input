@@ -19,7 +19,6 @@ namespace gdk::input {
         using value_type = binding::value_type;
 
         /// \brief how far an axis must move to count as an answer
-        /// TODO: this should be moved to a policy object. 
         static constexpr value_type DEFAULT_THRESHOLD{0.6f};
 
         /// \param aContext where the physical input comes from

@@ -21,22 +21,22 @@ namespace gdk::input {
         [[nodiscard]] virtual std::size_t button_count() const override;
         [[nodiscard]] virtual std::size_t axis_count() const override;
         [[nodiscard]] virtual std::size_t hat_count() const override;
-        [[nodiscard]] virtual hat_state_type hat(const index_type index) const override;
+        [[nodiscard]] virtual hat_state_type hat(const index_type aIndex) const override;
 
-        [[nodiscard]] virtual axis_value_type axis_value(const index_type index,
-            const axis_value_type threshold) const override;
-        [[nodiscard]] virtual bool axis_just_exceeded_threshold(const index_type index,
-            const axis_value_type threshold) const override;
-        [[nodiscard]] virtual bool axis_just_dropped_below_threshold(const index_type index,
-            const axis_value_type threshold) const override;
-        [[nodiscard]] virtual axis_value_type previous_axis_value(const index_type index,
-            const axis_value_type threshold) const override;
+        [[nodiscard]] virtual axis_value_type axis_value(const index_type aIndex,
+            const axis_value_type aThreshold) const override;
+        [[nodiscard]] virtual bool axis_just_exceeded_threshold(const index_type aIndex,
+            const axis_value_type aThreshold) const override;
+        [[nodiscard]] virtual bool axis_just_dropped_below_threshold(const index_type aIndex,
+            const axis_value_type aThreshold) const override;
+        [[nodiscard]] virtual axis_value_type previous_axis_value(const index_type aIndex,
+            const axis_value_type aThreshold) const override;
         [[nodiscard]] virtual std::optional<std::pair<index_type, axis_value_type>> any_axis_down(
-            axis_value_type threshold) const override;
+            axis_value_type aThreshold) const override;
 
-        [[nodiscard]] virtual bool button_down(const index_type index) const override;
-        [[nodiscard]] virtual bool button_just_pressed(const index_type index) const override;
-        [[nodiscard]] virtual bool button_just_released(const index_type index) const override;
+        [[nodiscard]] virtual bool button_down(const index_type aIndex) const override;
+        [[nodiscard]] virtual bool button_just_pressed(const index_type aIndex) const override;
+        [[nodiscard]] virtual bool button_just_released(const index_type aIndex) const override;
         [[nodiscard]] virtual std::optional<button_collection_type::size_type> any_button_down()
             const override;
 
@@ -51,17 +51,17 @@ namespace gdk::input {
             const std::size_t aButtonCount, const std::size_t aAxisCount,
             const std::size_t aHatCount = 1);
 
-        void set_hat(const index_type index, const hat_state_type aState);
+        void set_hat(const index_type aIndex, const hat_state_type aState);
 
         void set_standard_mapping(const bool aMapped);
 
         void detach();
 
-        void press(const index_type index);
+        void press(const index_type aIndex);
 
-        void release(const index_type index);
+        void release(const index_type aIndex);
 
-        void set_axis(const index_type index, const axis_value_type value);
+        void set_axis(const index_type aIndex, const axis_value_type aValue);
 
         void update();
 

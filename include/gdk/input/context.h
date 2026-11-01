@@ -69,11 +69,10 @@ namespace gdk::input {
         /// Cursor motion is reported ahead of the wheel, and x ahead of y within each.
         [[nodiscard]] virtual std::optional<mouse::axis> any_mouse_axis_down(const value_type aThreshold) const = 0;
 
-        /// \brief gets the cursor mode
         [[nodiscard]] virtual mouse::cursor_mode mouse_cursor_mode() const = 0;
 
         /// \brief affects cursor behaviour
-        virtual void set_mouse_cursor_mode(mouse::cursor_mode mode) = 0;
+        virtual void set_mouse_cursor_mode(mouse::cursor_mode aMode) = 0;
     ///@}
 
     /// \name text input

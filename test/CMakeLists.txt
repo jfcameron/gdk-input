@@ -15,6 +15,7 @@ jfc_add_tests(
         "${CMAKE_CURRENT_LIST_DIR}/capture_test.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/controls_test.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/enum_test.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/exception_test.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/null_backend_test.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/null_conformance.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/text_test.cpp"
