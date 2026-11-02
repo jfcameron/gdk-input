@@ -56,7 +56,7 @@ namespace gdk::input {
         ///
         /// A plain key gives way to a chord of it whose modifiers are held: with `z` and `control+z` bound, Control and
         /// Z drive only the chord's action.
-        /// \throws exception for a modifier key alone, \see is_modifier
+        /// \throws exception for a modifier key that is itself a chord, \see is_modifier
         void bind(const std::string &aAction, const binding &aBinding);
 
         /// \brief declare an action with nothing bound to it

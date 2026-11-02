@@ -27,8 +27,9 @@ context::gamepad_ptr controls::pad() const {
 }
 
 void controls::bind(const std::string &aAction, const binding &aBinding) {
-    if (aBinding.which == binding::kind::key && is_modifier(aBinding.key))
-        throw exception("\"" + aAction + "\": a modifier key is held with another key, never bound alone");
+    if (aBinding.which == binding::kind::key && is_modifier(aBinding.key) && aBinding.is_chord())
+        throw exception("\"" + aAction + "\": a modifier key is bound alone or held with another key, never a chord "
+            "itself");
 
     mBindings[aAction].push_back(aBinding);
 }

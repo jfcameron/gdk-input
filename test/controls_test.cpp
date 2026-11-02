@@ -696,16 +696,61 @@ TEST_CASE("a mouse button may be a chord too", "[controls][modifiers]") {
     REQUIRE_FALSE(f.pControls->just_pressed("pick"));
 }
 
-TEST_CASE("a modifier key alone is refused, and is read as a modifier", "[controls][modifiers]") {
+TEST_CASE("a modifier key may be bound alone, and is read as a modifier too", "[controls][modifiers]") {
     fixture f;
 
-    REQUIRE_THROWS_AS(f.pControls->bind("run", keyboard::key::leftshift), exception);
-    REQUIRE_THROWS_AS(f.pControls->bind("fine", keyboard::key::rightalt), exception);
-    REQUIRE(f.pControls->source_count("run") == 0);
+    f.pControls->bind("run", keyboard::key::leftshift);
+    f.pControls->bind("crouch", keyboard::key::leftcontrol);
+    f.pControls->bind("forward", keyboard::key::w);
 
     REQUIRE(f.pControls->modifiers() == text::modifiers{});
+    REQUIRE_FALSE(f.pControls->down("run"));
 
     f.pNull->press_key(keyboard::key::leftshift);
+    f.pNull->press_key(keyboard::key::w);
 
     REQUIRE(f.pControls->modifiers() == text::modifiers{.shift = true});
+    REQUIRE(f.pControls->down("run"));
+    REQUIRE(f.pControls->just_pressed("run"));
+    REQUIRE(f.pControls->down("forward"));
+    REQUIRE_FALSE(f.pControls->down("crouch"));
+
+    SECTION("another modifier held as well leaves it down") {
+        f.pNull->press_key(keyboard::key::leftcontrol);
+
+        REQUIRE(f.pControls->down("run"));
+        REQUIRE(f.pControls->down("crouch"));
+    }
+
+    SECTION("let go, it is released") {
+        f.pNull->update();
+        f.pNull->release_key(keyboard::key::leftshift);
+
+        REQUIRE(f.pControls->just_released("run"));
+        REQUIRE_FALSE(f.pControls->down("run"));
+    }
+}
+
+TEST_CASE("a modifier bound alone and a chord with it both drive their actions", "[controls][modifiers]") {
+    fixture f;
+
+    f.pControls->bind("run", keyboard::key::leftshift);
+    f.pControls->bind("zap", binding::of(keyboard::key::z, {.shift = true}));
+    f.pControls->bind("zoom", keyboard::key::z);
+
+    f.pNull->press_key(keyboard::key::leftshift);
+    f.pNull->press_key(keyboard::key::z);
+
+    REQUIRE(f.pControls->down("run"));
+    REQUIRE(f.pControls->down("zap"));
+    REQUIRE_FALSE(f.pControls->down("zoom"));
+}
+
+TEST_CASE("a modifier key is never a chord itself", "[controls][modifiers]") {
+    fixture f;
+
+    REQUIRE_THROWS_WITH(f.pControls->bind("odd", binding::of(keyboard::key::leftshift, {.control = true})),
+        Catch::Matchers::Contains("never a chord itself"));
+    REQUIRE_THROWS_AS(f.pControls->bind("odd", binding::of(keyboard::key::rightalt, {.alt = true})), exception);
+    REQUIRE(f.pControls->source_count("odd") == 0);
 }

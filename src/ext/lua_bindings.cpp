@@ -145,9 +145,13 @@ namespace {
             case binding::kind::key: {
                 const auto key = value_of<keyboard::key>(aEntry.get_string(KEY_KEY));
 
-                if (!key || is_modifier(*key)) return {};
+                if (!key) return {};
 
-                return binding::of(*key, *with);
+                const auto bound = binding::of(*key, *with);
+
+                if (is_modifier(*key) && bound.is_chord()) return {};
+
+                return bound;
             }
 
             case binding::kind::mouse_button: {

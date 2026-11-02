@@ -12,7 +12,7 @@
 #include <string_view>
 
 namespace gdk::input {
-    //! Shift, Control and Alt: held with a key or button, never bound alone
+    //! Shift, Control and Alt: bound alone, or held with a key or button as a chord, never a chord themselves
     [[nodiscard]] bool is_modifier(keyboard::key aKey);
 
     /// \brief one physical control, named in the terms the hardware uses

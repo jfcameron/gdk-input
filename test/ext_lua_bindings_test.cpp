@@ -313,7 +313,7 @@ TEST_CASE("a chord is written with its modifiers and read back as the same chord
     REQUIRE(pLoaded->sources("turn") == std::vector<binding>{binding::of(keyboard::key::r)});
 }
 
-TEST_CASE("a modifier bound alone, or an unknown modifier, costs that binding and no others",
+TEST_CASE("a modifier that is a chord itself, or an unknown modifier, costs that binding and no others",
     "[ext][lua][modifiers]") {
     fixture f;
 
@@ -322,7 +322,7 @@ TEST_CASE("a modifier bound alone, or an unknown modifier, costs that binding an
     const auto skipped = ext::from_string(*pControls, R"({
         version = 1,
         actions = {
-            run = { { kind = "key", key = "leftshift" }, { kind = "key", key = "r" } },
+            run = { { kind = "key", key = "leftshift", with = { "control" } }, { kind = "key", key = "r" } },
             undo = { { kind = "key", key = "z", with = { "hyper" } } },
         },
     })");
@@ -330,4 +330,27 @@ TEST_CASE("a modifier bound alone, or an unknown modifier, costs that binding an
     REQUIRE(skipped == 2);
     REQUIRE(pControls->sources("run") == std::vector<binding>{binding::of(keyboard::key::r)});
     REQUIRE(pControls->source_count("undo") == 0);
+}
+
+TEST_CASE("a modifier bound alone is read, and written back the same", "[ext][lua][modifiers]") {
+    fixture f;
+
+    auto pOriginal = f.make_controls();
+
+    REQUIRE(ext::from_string(*pOriginal, R"({
+        version = 1,
+        actions = {
+            run = { { kind = "key", key = "leftshift" }, { kind = "key", key = "r" } },
+            auto_run = { { kind = "key", key = "leftcontrol" } },
+        },
+    })") == 0);
+
+    REQUIRE(pOriginal->sources("run")
+        == std::vector<binding>{binding::of(keyboard::key::leftshift), binding::of(keyboard::key::r)});
+
+    auto pLoaded = f.make_controls();
+
+    REQUIRE(ext::from_string(*pLoaded, ext::to_string(*pOriginal)) == 0);
+    REQUIRE(pLoaded->sources("run") == pOriginal->sources("run"));
+    REQUIRE(pLoaded->sources("auto_run") == std::vector<binding>{binding::of(keyboard::key::leftcontrol)});
 }
