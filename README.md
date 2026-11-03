@@ -52,6 +52,8 @@ void play(const gdk::input::context_ptr_type &pInput) {
 
 An action's edges are the action's: holding one key bound to it and pressing another doesn't press it again. The cursor's position is normalised across the window, 0,0 the bottom left; its delta is in pixels, y up, and the wheel's in notches, both for the last update only.
 
+A rebinding window waits on a `capture` for the next press: a key, a pad's button or axis, and when asked a mouse button or a turn of the wheel. A modifier held with a key answers as a chord, and one let go with nothing beside it answers alone. `controls::rebind` binds the answer as such a window does: it comes off every other action, and replaces what the action had from the same side, the pad or the keyboard and mouse.
+
 Whatever composes the program picks the implementation, for example `gdk::input::glfw_context::make(pGLFWWindow)`.
 
 ## Conformance

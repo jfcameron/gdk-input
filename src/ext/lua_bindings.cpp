@@ -209,6 +209,10 @@ namespace {
     }
 }
 
+data_table gdk::input::ext::to_data_table(const binding &aBinding) { return encode(aBinding); }
+
+std::optional<binding> gdk::input::ext::binding_from_data_table(const data_table &aEntry) { return decode(aEntry); }
+
 data_table gdk::input::ext::to_data_table(const controls &aControls) {
     data_table out;
 

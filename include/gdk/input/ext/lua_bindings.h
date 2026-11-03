@@ -8,6 +8,7 @@
 #include <jfc/lua/data_table.h>
 
 #include <cstddef>
+#include <optional>
 #include <string>
 
 /// \file
@@ -33,6 +34,12 @@ namespace gdk::input::ext {
     /// }
     /// ~~~
     [[nodiscard]] jfc::lua::data_table to_data_table(const controls &aControls);
+
+    /// \brief one binding as a table, as an action's list holds it, for a script that shows or chooses one
+    [[nodiscard]] jfc::lua::data_table to_data_table(const binding &aBinding);
+
+    /// \brief one binding read from a table as an action's list holds it; nothing for one that names nothing known
+    [[nodiscard]] std::optional<binding> binding_from_data_table(const jfc::lua::data_table &aEntry);
 
     /// \brief what a table's bindings do to the ones already there
     enum class binding_order {

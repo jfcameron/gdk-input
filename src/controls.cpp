@@ -26,12 +26,31 @@ context::gamepad_ptr controls::pad() const {
     return mpContext ? mpContext->get_gamepad(mPlayer) : nullptr;
 }
 
+namespace {
+    void refuse_modifier_chord(const std::string &aAction, const binding &aBinding) {
+        if (aBinding.which == binding::kind::key && is_modifier(aBinding.key) && aBinding.is_chord())
+            throw exception("\"" + aAction + "\": a modifier key is bound alone or held with another key, never a "
+                "chord itself");
+    }
+}
+
 void controls::bind(const std::string &aAction, const binding &aBinding) {
-    if (aBinding.which == binding::kind::key && is_modifier(aBinding.key) && aBinding.is_chord())
-        throw exception("\"" + aAction + "\": a modifier key is bound alone or held with another key, never a chord "
-            "itself");
+    refuse_modifier_chord(aAction, aBinding);
 
     mBindings[aAction].push_back(aBinding);
+}
+
+void controls::rebind(const std::string &aAction, const binding &aBinding) {
+    refuse_modifier_chord(aAction, aBinding);
+
+    for (const auto &action : actions())
+        if (action != aAction)
+            while (unbind(action, aBinding)) {}
+
+    for (const auto &each : sources(aAction))
+        if (each.is_gamepad() == aBinding.is_gamepad()) unbind(aAction, each);
+
+    bind(aAction, aBinding);
 }
 
 void controls::bind(const std::string &aAction, const keyboard::key aKey) {

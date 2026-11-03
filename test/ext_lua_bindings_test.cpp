@@ -354,3 +354,22 @@ TEST_CASE("a modifier bound alone is read, and written back the same", "[ext][lu
     REQUIRE(pLoaded->sources("run") == pOriginal->sources("run"));
     REQUIRE(pLoaded->sources("auto_run") == std::vector<binding>{binding::of(keyboard::key::leftcontrol)});
 }
+
+TEST_CASE("one binding is written as a table and read back, and one naming nothing known is nothing", "[ext][lua]")
+{
+    for (const auto &each : {binding::of(keyboard::key::space), binding::of(keyboard::key::z, {.control = true}),
+        binding::of(mouse::button::right), binding::of(mouse::axis::scroll_y, -1),
+        binding::of(gamepad::axis::left_y, -1), binding::of(gamepad::button::a),
+        binding::of_device_button("guid-stick", 7)}) {
+        const auto table = ext::to_data_table(each);
+        REQUIRE(ext::binding_from_data_table(table) == each);
+    }
+
+    REQUIRE(ext::to_data_table(binding::of(keyboard::key::space)).get_string("key") == std::string("space"));
+
+    jfc::lua::data_table unknown;
+    unknown.set("kind", std::string("key"));
+    unknown.set("key", std::string("not a key"));
+    REQUIRE_FALSE(ext::binding_from_data_table(unknown));
+    REQUIRE_FALSE(ext::binding_from_data_table(jfc::lua::data_table{}));
+}

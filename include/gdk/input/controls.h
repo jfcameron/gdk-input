@@ -68,6 +68,11 @@ namespace gdk::input {
         //! forget one source, if the action has it. \returns whether it did
         bool unbind(std::string_view aAction, const binding &aBinding);
 
+        /// \brief bind a source as a rebinding window does: it comes off every other action, and aAction keeps none of
+        /// its other sources from the same side, a gamepad's or the keyboard and mouse
+        /// \throws exception as bind does, changing nothing
+        void rebind(const std::string &aAction, const binding &aBinding);
+
         //! every action declared in a stable order
         [[nodiscard]] std::vector<std::string> actions() const;
 

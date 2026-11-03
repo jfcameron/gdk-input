@@ -374,3 +374,102 @@ TEST_CASE("a capture waits past a modifier for the key pressed with it, and answ
         REQUIRE(pCapture->poll() == binding::of(mouse::button::left, {.shift = true, .alt = true}));
     }
 }
+
+TEST_CASE("a modifier let go with nothing pressed beside it answers alone", "[capture][modifiers]") {
+    fixture f;
+
+    auto pCapture = f.begin();
+
+    f.pNull->press_key(keyboard::key::leftshift);
+    REQUIRE_FALSE(pCapture->poll());
+
+    f.pNull->update();
+    REQUIRE_FALSE(pCapture->poll());
+
+    f.pNull->update();
+    f.pNull->release_key(keyboard::key::leftshift);
+
+    const auto alone = pCapture->poll();
+    REQUIRE(alone);
+    REQUIRE(*alone == binding::of(keyboard::key::leftshift));
+    REQUIRE_FALSE(alone->is_chord());
+}
+
+TEST_CASE("a modifier is no answer alone when something was pressed beside it, or it was held before", "[capture][modifiers]") {
+    fixture f;
+
+    auto pCapture = f.begin();
+
+    SECTION("another modifier") {
+        f.pNull->press_key(keyboard::key::leftshift);
+        REQUIRE_FALSE(pCapture->poll());
+        f.pNull->update();
+        f.pNull->press_key(keyboard::key::leftcontrol);
+        REQUIRE_FALSE(pCapture->poll());
+        f.pNull->update();
+        f.pNull->release_key(keyboard::key::leftshift);
+        REQUIRE_FALSE(pCapture->poll());
+        f.pNull->update();
+        f.pNull->release_key(keyboard::key::leftcontrol);
+        REQUIRE_FALSE(pCapture->poll());
+    }
+
+    SECTION("a mouse button, though not an answer itself") {
+        f.pNull->press_key(keyboard::key::leftalt);
+        REQUIRE_FALSE(pCapture->poll());
+        f.pNull->update();
+        f.pNull->press_mouse_button(mouse::button::left);
+        REQUIRE_FALSE(pCapture->poll());
+        f.pNull->update();
+        f.pNull->release_key(keyboard::key::leftalt);
+        f.pNull->release_mouse_button(mouse::button::left);
+        REQUIRE_FALSE(pCapture->poll());
+
+        SECTION("until all are let go, when one may answer again") {
+            f.pNull->update();
+            f.pNull->press_key(keyboard::key::leftalt);
+            REQUIRE_FALSE(pCapture->poll());
+            f.pNull->update();
+            f.pNull->release_key(keyboard::key::leftalt);
+            REQUIRE(pCapture->poll() == binding::of(keyboard::key::leftalt));
+        }
+    }
+
+    SECTION("held from before the capture began") {
+        f.pNull->press_key(keyboard::key::rightcontrol);
+        pCapture->reset();
+        f.pNull->update();
+        REQUIRE_FALSE(pCapture->poll());
+        f.pNull->release_key(keyboard::key::rightcontrol);
+        REQUIRE_FALSE(pCapture->poll());
+    }
+}
+
+TEST_CASE("a turn of the wheel answers only when asked for, the way it turned", "[capture][wheel]") {
+    fixture f;
+
+    auto pCapture = f.begin();
+
+    f.pNull->set_scroll_delta({0, -1});
+    REQUIRE_FALSE(pCapture->poll());
+    REQUIRE_FALSE(pCapture->accepts_wheel());
+
+    pCapture->set_accepts_wheel(true);
+    REQUIRE(pCapture->accepts_wheel());
+
+    f.pNull->update();
+    REQUIRE_FALSE(pCapture->poll());
+
+    f.pNull->set_scroll_delta({0, -2});
+    REQUIRE(pCapture->poll() == binding::of(mouse::axis::scroll_y, -1));
+
+    pCapture->reset();
+    f.pNull->update();
+    f.pNull->set_scroll_delta({0.5, 0});
+    REQUIRE(pCapture->poll() == binding::of(mouse::axis::scroll_x, 1));
+
+    pCapture->reset();
+    f.pNull->update();
+    f.pNull->set_scroll_delta({0, 3});
+    REQUIRE(pCapture->poll() == binding::of(mouse::axis::scroll_y, 1));
+}

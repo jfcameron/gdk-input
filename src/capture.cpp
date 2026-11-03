@@ -30,12 +30,18 @@ bool capture::accepts_mouse() const { return mAcceptsMouse; }
 
 void capture::set_accepts_mouse(const bool aAccepts) { mAcceptsMouse = aAccepts; }
 
+bool capture::accepts_wheel() const { return mAcceptsWheel; }
+
+void capture::set_accepts_wheel(const bool aAccepts) { mAcceptsWheel = aAccepts; }
+
 bool capture::captured() const { return mResult.has_value(); }
 
 std::optional<binding> capture::result() const { return mResult; }
 
 void capture::reset() {
     mResult.reset();
+    mLoneModifier.reset();
+    mModifierSpoiled = false;
     mPrevious = observe();
 }
 
@@ -46,6 +52,7 @@ capture::observation capture::observe() const {
 
     out.keys = mpContext->keys_down();
     out.mouseButtons = mpContext->mouse_buttons_down();
+    out.scroll = mpContext->mouse_scroll_delta();
 
     if (const auto pGamepad = pad(); pGamepad && pGamepad->connected()) {
         out.guid = pGamepad->guid();
@@ -102,6 +109,11 @@ std::optional<binding> capture::answer_from(const observation &aNow) const {
         if (const auto button = arrived(aNow.mouseButtons, mPrevious.mouseButtons))
             return binding::of(*button, held);
 
+    if (mAcceptsWheel) {
+        if (aNow.scroll.y != 0) return binding::of(mouse::axis::scroll_y, aNow.scroll.y < 0 ? -1.f : 1.f);
+        if (aNow.scroll.x != 0) return binding::of(mouse::axis::scroll_x, aNow.scroll.x < 0 ? -1.f : 1.f);
+    }
+
     const auto pGamepad = pad();
 
     if (!pGamepad) return {};
@@ -129,12 +141,51 @@ std::optional<binding> capture::answer_from(const observation &aNow) const {
     return {};
 }
 
+std::optional<binding> capture::alone(const observation &aNow) {
+    const auto down = [&](const keyboard::key aKey) {
+        return std::find(aNow.keys.begin(), aNow.keys.end(), aKey) != aNow.keys.end();
+    };
+
+    if (mLoneModifier && !down(*mLoneModifier)) {
+        const auto key = *mLoneModifier;
+        mLoneModifier.reset();
+
+        return binding::of(key);
+    }
+
+    const auto modifiersHeld = std::any_of(aNow.keys.begin(), aNow.keys.end(), is_modifier);
+
+    if (!modifiersHeld) {
+        mModifierSpoiled = false;
+        return {};
+    }
+
+    for (const auto key : aNow.keys) {
+        if (!is_modifier(key) || std::find(mPrevious.keys.begin(), mPrevious.keys.end(), key) != mPrevious.keys.end())
+            continue;
+
+        if (mLoneModifier || mModifierSpoiled) {
+            mLoneModifier.reset();
+            mModifierSpoiled = true;
+        }
+        else mLoneModifier = key;
+    }
+
+    if (arrived(aNow.mouseButtons, mPrevious.mouseButtons) || (aNow.scroll.x != 0 || aNow.scroll.y != 0)) {
+        mLoneModifier.reset();
+        mModifierSpoiled = true;
+    }
+
+    return {};
+}
+
 std::optional<binding> capture::poll() {
     if (mResult) return mResult;
 
     const auto now = observe();
 
     mResult = answer_from(now);
+    if (!mResult) mResult = alone(now);
 
     mPrevious = now;
 

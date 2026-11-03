@@ -28,7 +28,8 @@ namespace gdk::input {
 
         /// \brief look at the current frame; call once per frame after the context has updated
         ///
-        /// A modifier key is no answer alone: the key or mouse button pressed while it is held is, as a chord.
+        /// A key or mouse button pressed while a modifier is held answers as a chord. A modifier answers alone when it is
+        /// let go with nothing pressed while it was held, and no other modifier held with it.
         ///
         /// \return nothing until the player presses something, then that something on every call
         /// until \ref reset. Latching rather than one-shot so a game can poll, draw the answer and
@@ -50,6 +51,11 @@ namespace gdk::input {
         [[nodiscard]] bool accepts_mouse() const;
         void set_accepts_mouse(const bool aAccepts);
 
+        /// \brief whether a turn of the wheel may be the answer, as a pointer axis whose scale is the way it turned. Off
+        /// by default
+        [[nodiscard]] bool accepts_wheel() const;
+        void set_accepts_wheel(const bool aAccepts);
+
     private:
         capture(context_ptr_type aContext, const std::size_t aPlayer);
 
@@ -61,6 +67,8 @@ namespace gdk::input {
 
             std::vector<std::pair<gamepad::index_type, value_type>> gamepadAxes;
 
+            mouse::scroll_2d_type scroll{0, 0};
+
             std::string guid; 
         };
 
@@ -68,12 +76,21 @@ namespace gdk::input {
 
         [[nodiscard]] std::optional<binding> answer_from(const observation &aNow) const;
 
+        //! a modifier let go alone, keeping track of the one held meanwhile
+        [[nodiscard]] std::optional<binding> alone(const observation &aNow);
+
         [[nodiscard]] gamepad_ptr_type pad() const;
 
         context_ptr_type mpContext;
         std::size_t mPlayer;
         value_type mThreshold{DEFAULT_THRESHOLD};
         bool mAcceptsMouse{false};
+        bool mAcceptsWheel{false};
+
+        //! the modifier pressed with nothing else since, which answers if it is let go so
+        std::optional<keyboard::key> mLoneModifier;
+        //! something was pressed beside a modifier still held, so none answers alone until all are let go
+        bool mModifierSpoiled{false};
 
         observation mPrevious;
         std::optional<binding> mResult;

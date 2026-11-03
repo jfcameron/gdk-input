@@ -754,3 +754,36 @@ TEST_CASE("a modifier key is never a chord itself", "[controls][modifiers]") {
     REQUIRE_THROWS_AS(f.pControls->bind("odd", binding::of(keyboard::key::rightalt, {.alt = true})), exception);
     REQUIRE(f.pControls->source_count("odd") == 0);
 }
+
+TEST_CASE("a rebinding takes the source off every other action, and replaces the action's own from the same side",
+    "[controls][rebind]") {
+    fixture f;
+
+    f.pControls->bind("jump", keyboard::key::space);
+    f.pControls->bind("jump", gamepad::button::a);
+    f.pControls->bind("crouch", keyboard::key::c);
+    f.pControls->bind("fire", mouse::button::left);
+    f.pControls->bind("fire", gamepad::axis::right_trigger);
+    f.pControls->bind("look", gamepad::axis::right_y, -1);
+
+    f.pControls->rebind("jump", binding::of(keyboard::key::c));
+    REQUIRE(f.pControls->sources("jump") == std::vector{binding::of(gamepad::button::a), binding::of(keyboard::key::c)});
+    REQUIRE(f.pControls->sources("crouch").empty());
+
+    f.pControls->rebind("fire", binding::of(keyboard::key::f));
+    REQUIRE(f.pControls->sources("fire")
+        == std::vector{binding::of(gamepad::axis::right_trigger), binding::of(keyboard::key::f)});
+
+    f.pControls->rebind("jump", binding::of(gamepad::button::b));
+    REQUIRE(f.pControls->sources("jump") == std::vector{binding::of(keyboard::key::c), binding::of(gamepad::button::b)});
+
+    f.pControls->rebind("crouch", binding::of(gamepad::axis::right_y, 1));
+    REQUIRE(f.pControls->sources("look") == std::vector{binding::of(gamepad::axis::right_y, -1)});
+    REQUIRE(f.pControls->sources("crouch") == std::vector{binding::of(gamepad::axis::right_y, 1)});
+
+    f.pControls->rebind("crouch", binding::of(keyboard::key::c, {.shift = true}));
+    REQUIRE(f.pControls->sources("jump") == std::vector{binding::of(keyboard::key::c), binding::of(gamepad::button::b)});
+
+    REQUIRE_THROWS_AS(f.pControls->rebind("jump", binding::of(keyboard::key::leftshift, {.control = true})), exception);
+    REQUIRE(f.pControls->sources("jump") == std::vector{binding::of(keyboard::key::c), binding::of(gamepad::button::b)});
+}
